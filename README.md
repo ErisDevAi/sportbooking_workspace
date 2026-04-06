@@ -1,37 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Để chạy thử
 
-## Getting Started
+# 1. Cài dependencies cho backend và frontend
+cd node-backend-with-cms-integration && npm install
+cd ../frontend-nextjs-antd-tailwind && npm install
 
-First, run the development server:
+# 2. Start MongoDB (nếu chưa chạy - yêu cầu mở terminal mới)
+# mongod
 
-```bash
+# 3. Seed data cho backend (để có dữ liệu mẫu)
+cd ../node-backend-with-cms-integration && npm run seed
+
+# 4. Start backend (mặc định port 8000)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result 123.
-
-You can start editing the page by modifying `app/page_ignore.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources: 
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
+# 5. Start frontend (mặc định port 3000) - Mở terminal khác
+# cd ../frontend-nextjs-antd-tailwind && npm run dev
