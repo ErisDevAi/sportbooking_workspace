@@ -1,3 +1,12 @@
+Dự án “Decision Maker”
+Mô tả ngăn
+Website “Decision Maker” (giúp ra quyết định)
+💡 Ý tưởng:
+Nhập nhiều lựa chọn dựa trên danh mục ( quần áo, đồ ăn, thức uống, địa điểm )
+Hệ thống random / spin chọn 
+Checkin bằng hình ảnh, dựa trên lựa trọn => giữ streak ask & do ( hỏi và làm )
+👉 Ví dụ:
+“Ăn gì hôm nay?”  -> quay random ( bún bò ) -> mua bún bò ăn -> chụp báo cáo -> streak
 # Để chạy thử
 
 # 1. Cài dependencies cho backend và frontend
