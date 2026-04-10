@@ -42,7 +42,7 @@ Decision Maker - Product Specification Document
 
 # Để chạy thử
 
-okok
+okok2
 
 # 1. Cài dependencies cho backend và frontend
 
