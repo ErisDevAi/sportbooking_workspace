@@ -1,4 +1,4 @@
-Dự án “Decision Maker”
+Dự án “Decision Maker” - Ngô Đại
 Mô tả ngăn
 Website “Decision Maker” (giúp ra quyết định)
 💡 Ý tưởng:
