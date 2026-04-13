@@ -12,8 +12,8 @@ Mã sinh viên: 2221050350
 <br/>
 Lớp: DCCTCT67A
 <br/>
-Họ và tên: Vũ Ngọc Hải Anh
+Họ Và Tên: Vũ Ngọc Hải Anh
 <br/>
-Mã sinh viên: 2221050488
+Mã Sinh Viên: 2221050488
 <br/>
 Lớp: DCCTCT67A
