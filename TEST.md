@@ -1,6 +1,6 @@
 LASTSYNCDATE = 13/07/2026
 <br/>
-Họ và tên: Lê Văn Dũng
+Họ Và Tên: Lê Văn Dũng
 <br/>
 Mã sinh viên: 2221050817
 <br/>
