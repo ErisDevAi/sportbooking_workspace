@@ -1,15 +1,19 @@
 LASTSYNCDATE = 13/07/2026
-Lê văn dũng
-27042004
-DCCTCT67A
-<<<<<<< HEAD
-2221050817
-=======
-
-Ngô Văn Đại
-2221050350
-DCCTCT67-05A
-Vũ Ngọc Hải Anh - 2221050488
-Good Morning!
-Lê văn dũng 27042004
-DCCTCT67-05A
+<br/>
+Họ và tên: Lê Văn Dũng
+<br/>
+Mã sinh viên: 2221050817
+<br/>
+Lớp: DCCTCT67A
+<br/>
+Họ và tên: Ngô Văn Đại
+<br/>
+Mã sinh viên: 2221050350
+<br/>
+Lớp: DCCTCT67A
+<br/>
+Họ và tên: Vũ Ngọc Hải Anh
+<br/>
+Mã sinh viên: 2221050488
+<br/>
+Lớp: DCCTCT67A
