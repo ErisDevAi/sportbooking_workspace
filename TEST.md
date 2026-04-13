@@ -10,7 +10,7 @@ Họ và tên: Ngô Văn Đại
 <br/>
 Mã sinh viên: 2221050350
 <br/>
-Lớp: DCCTCT67A-05a
+Lớp: DCCTCT67A-05A
 <br/>
 Họ và tên: Vũ Ngọc Hải Anh
 <br/>
