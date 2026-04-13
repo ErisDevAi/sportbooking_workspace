@@ -6,9 +6,9 @@ Mã sinh viên: 2221050817
 <br/>
 Lớp: DCCTCT67A
 <br/>
-Họ và tên: Ngô Văn Đại
+Họ Và Tên: Ngô Văn Đại
 <br/>
-Mã sinh viên: 2221050350
+Mã Sinh Viên: 2221050350
 <br/>
 Lớp: DCCTCT67A
 <br/>
@@ -19,3 +19,5 @@ Mã Sinh Viên: 2221050488
 Lớp: DCCTCT67A
 
 Cổ Nhuế - Hà Nội 
+<br/>
+Trường đại học mỏ địa chất
