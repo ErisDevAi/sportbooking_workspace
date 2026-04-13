@@ -64,3 +64,10 @@ npm run dev
 # 5. Start frontend (mặc định port 3000) - Mở terminal khác
 
 # cd ../frontend-nextjs-antd-tailwind && npm run dev
+
+### 2.2 User Flow chính
+
+```
+Đặt câu hỏi → Chọn/Thêm lựa chọn → Quay Spin Wheel → Nhận kết quả
+→ Thực hiện → Chụp ảnh Check-in → Giữ Streak → Lên level
+```
