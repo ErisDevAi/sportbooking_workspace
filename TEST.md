@@ -17,5 +17,7 @@ Họ Và Tên: Vũ Ngọc Hải Anh
 Mã Sinh Viên: 2221050488
 <br/>
 Lớp: DCCTCT67A
+
+Cổ Nhuế - Hà Nội 
 <br/>
 Trường đại học mỏ địa chất
