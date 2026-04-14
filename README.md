@@ -113,3 +113,11 @@ npm install
 
 cd ../frontend-nextjs-antd-tailwind
 npm install
+# cd ../frontend-nextjs-antd-tailwind && npm run dev
+
+### 2.2 User Flow chính
+
+```
+Đặt câu hỏi → Chọn/Thêm lựa chọn → Quay Spin Wheel → Nhận kết quả
+→ Thực hiện → Chụp ảnh Check-in → Giữ Streak → Lên level
+```

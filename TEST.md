@@ -1,14 +1,14 @@
 LASTSYNCDATE = 13/07/2026
 <br/>
-Họ và tên: Lê Văn Dũng
+Họ Và Tên: Lê Văn Dũng
 <br/>
 Mã sinh viên: 2221050817
 <br/>
 Lớp: DCCTCT67A
 <br/>
-Họ và tên: Ngô Văn Đại
+Họ Và Tên: Ngô Văn Đại
 <br/>
-Mã sinh viên: 2221050350
+Mã Sinh Viên: 2221050350
 <br/>
 Lớp: DCCTCT67A
 <br/>
@@ -17,3 +17,7 @@ Họ Và Tên: Vũ Ngọc Hải Anh
 Mã Sinh Viên: 2221050488
 <br/>
 Lớp: DCCTCT67A
+
+Cổ Nhuế - Hà Nội 
+<br/>
+Trường đại học mỏ địa chất
