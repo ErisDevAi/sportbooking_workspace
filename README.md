@@ -1,37 +1,119 @@
-Dự án “Decision Maker”
-Mô tả ngăn
-Website “Decision Maker” (giúp ra quyết định)
-💡 Ý tưởng:
-Nhập nhiều lựa chọn dựa trên danh mục ( quần áo, đồ ăn, thức uống, địa điểm )
-Hệ thống random / spin chọn
-Checkin bằng hình ảnh, dựa trên lựa trọn => giữ streak ask & do ( hỏi và làm )
-👉 Ví dụ:
-“Ăn gì hôm nay?” -> quay random ( bún bò ) -> mua bún bò ăn -> chụp báo cáo -> streak
-Decision Maker - Product Specification Document
+# Decision Maker
 
-## 1. Tổng quan sản phẩm
-
-**Decision Maker** là một web application giúp người dùng ra quyết định hàng ngày thông qua cơ chế random/spin wheel. Ứng dụng kết hợp gamification (streak tracking) và social proof (check-in bằng hình ảnh) để tạo động lực thực hiện quyết định.
-
-### 1.1 Tagline
-
-> "Hỏi và Làm" - Ask & Do
-
-### 1.2 Core Value
-
-- Giải quyết "analysis paralysis" - tình trạng không thể ra quyết định vì quá nhiều lựa chọn
-- Gamify quá trình ra quyết định để tạo thói quen tích cực
-- Xây dựng cộng đồng chia sẻ trải nghiệm
+"Ask & Do" – Hỏi và Làm
 
 ---
 
-## 2. Personas & Use Cases
+## 1. Giới thiệu
 
-### 2.1 Persona chính
+Decision Maker là một web application giúp người dùng ra quyết định hàng ngày thông qua cơ chế random / spin wheel.
 
-- **Người dùng cá nhân**: Khó quyết định ăn gì, mặc gì, đi đâu hàng ngày
-- **Nhóm bạn**: Cùng quay và thực hiện thử thách
-- **Couples**: Quyết định hẹn hò đi đâu, ăn gì
+Ứng dụng tập trung vào việc:
+- Giảm thời gian suy nghĩ
+- Tăng hành động thực tế
+- Tạo thói quen thông qua streak và check-in
+
+---
+
+## 2. Core Value
+
+### 2.1 Anti Overthinking
+Giải quyết tình trạng "analysis paralysis" khi có quá nhiều lựa chọn.
+
+### 2.2 Gamification
+- Streak (chuỗi ngày)
+- Level
+- Thành tích
+
+Giúp người dùng duy trì thói quen ra quyết định và hành động.
+
+### 2.3 Social Proof
+- Check-in bằng hình ảnh
+- Chia sẻ trải nghiệm
+
+Tạo động lực thực hiện quyết định.
+
+---
+
+## 3. Personas
+
+### 3.1 Cá nhân
+- Không biết ăn gì
+- Không biết mặc gì
+- Không biết làm gì
+
+### 3.2 Nhóm bạn
+- Chọn địa điểm đi chơi
+- Chọn quán ăn
+
+### 3.3 Couples
+- Quyết định hẹn hò
+- Tránh tranh luận
+
+---
+
+## 4. User Flow
+
+Đặt câu hỏi  
+→ Thêm lựa chọn  
+→ Spin Wheel  
+→ Nhận kết quả  
+→ Thực hiện  
+→ Check-in ảnh  
+→ Streak + Level  
+
+---
+
+## 5. Ví dụ
+
+"Ăn gì hôm nay?"  
+→ Spin → "Bún bò"  
+→ Đi ăn  
+→ Chụp ảnh check-in  
+→ Tăng streak  
+
+---
+
+## 6. Tính năng chính
+
+- Random / Spin Wheel
+- Quản lý danh sách lựa chọn
+- Check-in bằng hình ảnh
+- Streak tracking
+- Level system
+
+Planned:
+- Social feed
+- Group decision
+- AI suggestion
+
+---
+
+## 7. Tech Stack
+
+### Frontend
+- Next.js (App Router)
+- Ant Design
+- TailwindCSS
+
+### Backend
+- Node.js
+- Express
+- MongoDB
+
+---
+
+## 8. Setup & Run
+
+### 8.1 Cài dependencies
+
+```bash
+cd node-backend-with-cms-integration
+npm install
+
+cd ../frontend-nextjs-antd-tailwind
+npm install
+# cd ../frontend-nextjs-antd-tailwind && npm run dev
 
 ### 2.2 User Flow chính
 
@@ -39,28 +121,3 @@ Decision Maker - Product Specification Document
 Đặt câu hỏi → Chọn/Thêm lựa chọn → Quay Spin Wheel → Nhận kết quả
 → Thực hiện → Chụp ảnh Check-in → Giữ Streak → Lên level
 ```
-
-# Để chạy thử
-
-okok2
-
-# 1. Cài dependencies cho backend và frontend
-
-cd node-backend-with-cms-integration && npm install
-cd ../frontend-nextjs-antd-tailwind && npm install
-
-# 2. Start MongoDB (nếu chưa chạy - yêu cầu mở terminal mới)
-
-# mongod
-
-# 3. Seed data cho backend (để có dữ liệu mẫu)
-
-cd ../node-backend-with-cms-integration && npm run seed
-
-# 4. Start backend (mặc định port 8000)
-
-npm run dev
-
-# 5. Start frontend (mặc định port 3000) - Mở terminal khác
-
-# cd ../frontend-nextjs-antd-tailwind && npm run dev
