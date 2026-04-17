@@ -485,7 +485,7 @@
 </div>
 
 <div class="card">
-  <h2>🎰 Thử ngay</h2>
+  <h2> Thử ngay</h2>
 
 <button onclick="randomDecision()">Quyết định giúp tôi</button>
 
