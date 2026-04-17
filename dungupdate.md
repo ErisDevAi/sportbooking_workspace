@@ -11,7 +11,7 @@ Chức năng cho phép người dùng tạo tài khoản mới để truy cập 
    Thành công: tài khoản được lưu vào hệ thống
    Thất bại: không có dữ liệu nào được lưu
 5. Luồng chính (Main Flow)
-  - Người dùng chọn chức năng Đăng ký
+  -Người dùng chọn chức năng Đăng ký
   -  Hệ thống hiển thị form đăng ký
   - Người dùng nhập:
    Username
@@ -70,20 +70,20 @@ Cho phép người dùng truy cập hệ thống bằng tài khoản đã đăng
    Thành công: user đăng nhập và nhận token/session
    Thất bại: không tạo session
 5. Luồng chính (Main Flow)
-   Người dùng chọn Đăng nhập
-   Hệ thống hiển thị form login
-   Người dùng nhập:
-   Username/Email
-   Password
-   Người dùng nhấn Login
-   Hệ thống kiểm tra:
-   Không để trống
-   Hệ thống tìm user trong database
-   So sánh password (hash)
-   Nếu đúng:
-   Tạo token (JWT) hoặc session
-   Trả về client
-   Hiển thị Đăng nhập thành công
+   - Người dùng chọn Đăng nhập
+   - Hệ thống hiển thị form login
+   - Người dùng nhập:
+     Username/Email
+     Password
+   - Người dùng nhấn Login
+   - Hệ thống kiểm tra:
+     Không để trống
+   - Hệ thống tìm user trong database
+   - So sánh password (hash)
+   - Nếu đúng:
+     Tạo token (JWT) hoặc session
+     Trả về client
+     Hiển thị Đăng nhập thành công
 6. Luồng thay thế (Alternative Flow)
    ❌ A1: Thiếu dữ liệu
    Hiển thị: "Vui lòng nhập đầy đủ thông tin"
