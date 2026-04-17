@@ -1,174 +1,215 @@
 <h1>Phân tích chức năng: Đăng ký, đăng nhập, quản lý các thư mục quyết định, quản lý các quyết định, đưa ra quyết định </h1>
-I. CHỨC NĂNG: ĐĂNG KÝ (REGISTER)
-🔐 I. CHỨC NĂNG: ĐĂNG KÝ (REGISTER)
-1. Mô tả
+<h2>I. Đăng ký (Register)</h2>
 
-Chức năng cho phép người dùng tạo tài khoản mới để truy cập hệ thống.
+<div class="section">
+  <h3>1. Mô tả</h3>
+  <p>Chức năng cho phép người dùng tạo tài khoản mới để truy cập hệ thống.</p>
+</div>
 
-2. Actor
-   Người dùng (User)
-3. Tiền điều kiện (Pre-condition)
-   Người dùng chưa đăng nhập
-   Người dùng truy cập trang đăng ký
-4. Hậu điều kiện (Post-condition)
-   Thành công: tài khoản được lưu vào hệ thống
-   Thất bại: không có dữ liệu nào được lưu
-5. Luồng chính (Main Flow)
-   Người dùng chọn chức năng Đăng ký
-   Hệ thống hiển thị form đăng ký
-   Người dùng nhập:
-   Username
-   Email
-   Password
-   Confirm Password
-   Người dùng nhấn Submit
-   Hệ thống kiểm tra:
-   Dữ liệu không rỗng
-   Email đúng định dạng
-   Password ≥ 6 ký tự
-   Password = Confirm Password
-   Hệ thống kiểm tra:
-   Username chưa tồn tại
-   Email chưa tồn tại
-   Hệ thống mã hóa password (hash)
-   Lưu user vào database
-   Trả thông báo Đăng ký thành công
-6. Luồng thay thế (Alternative Flow)
-   ❌ A1: Thiếu dữ liệu
-   Nếu input trống → hiển thị lỗi: "Không được để trống"
-   ❌ A2: Email sai định dạng
-   Hiển thị: "Email không hợp lệ"
-   ❌ A3: Password không khớp
-   Hiển thị: "Mật khẩu không khớp"
-   ❌ A4: Tài khoản đã tồn tại
-   Hiển thị: "Username hoặc Email đã tồn tại"
-7. Yêu cầu chức năng (Functional Requirements)
-   FR-R1: Hệ thống cung cấp form đăng ký
-   FR-R2: Hệ thống kiểm tra dữ liệu đầu vào
-   FR-R3: Hệ thống kiểm tra trùng tài khoản
-   FR-R4: Hệ thống mã hóa mật khẩu
-   FR-R5: Hệ thống lưu thông tin vào DB
-   FR-R6: Hệ thống trả thông báo kết quả
-8. Yêu cầu phi chức năng (Non-functional Requirements)
-   🔒 Bảo mật
-   NFR-R1: Password phải được hash (bcrypt)
-   NFR-R2: Không lưu password dạng plain text
-   NFR-R3: Dữ liệu truyền qua HTTPS
-   ⚡ Hiệu năng
-   NFR-R4: Thời gian xử lý < 2 giây
-   📈 Khả năng mở rộng
-   NFR-R5: Hỗ trợ nhiều user đăng ký cùng lúc
-   🎨 Usability
-   NFR-R6: Giao diện dễ hiểu, thông báo rõ ràng
-   🔑 II. CHỨC NĂNG: ĐĂNG NHẬP (LOGIN)
-9. Mô tả
+<div class="section">
+  <h3>2. Actor</h3>
+  <p><span class="label">Người dùng (User)</span></p>
+</div>
 
-Cho phép người dùng truy cập hệ thống bằng tài khoản đã đăng ký.
+<div class="section">
+  <h3>3. Tiền điều kiện (Pre-condition)</h3>
+  <ul>
+    <li>Người dùng chưa đăng nhập</li>
+    <li>Người dùng truy cập trang đăng ký</li>
+  </ul>
+</div>
 
-2. Actor
-   Người dùng (User)
-3. Tiền điều kiện
-   Người dùng đã có tài khoản
-4. Hậu điều kiện
-   Thành công: user đăng nhập và nhận token/session
-   Thất bại: không tạo session
-5. Luồng chính (Main Flow)
-   Người dùng chọn Đăng nhập
-   Hệ thống hiển thị form login
-   Người dùng nhập:
-   Username/Email
-   Password
-   Người dùng nhấn Login
-   Hệ thống kiểm tra:
-   Không để trống
-   Hệ thống tìm user trong database
-   So sánh password (hash)
-   Nếu đúng:
-   Tạo token (JWT) hoặc session
-   Trả về client
-   Hiển thị Đăng nhập thành công
-6. Luồng thay thế (Alternative Flow)
-   ❌ A1: Thiếu dữ liệu
-   Hiển thị: "Vui lòng nhập đầy đủ thông tin"
-   ❌ A2: Không tìm thấy user
-   Hiển thị: "Tài khoản không tồn tại"
-   ❌ A3: Sai mật khẩu
-   Hiển thị: "Sai mật khẩu"
-   ❌ A4: Bị khóa tài khoản
-   Hiển thị: "Tài khoản bị khóa"
-7. Yêu cầu chức năng (Functional Requirements)
-   FR-L1: Hệ thống hiển thị form đăng nhập
-   FR-L2: Hệ thống kiểm tra dữ liệu đầu vào
-   FR-L3: Hệ thống xác thực tài khoản
-   FR-L4: Hệ thống tạo token/session
-   FR-L5: Hệ thống trả kết quả đăng nhập
-8. Yêu cầu phi chức năng (Non-functional Requirements)
-   🔒 Bảo mật
-   NFR-L1: Password phải được mã hóa khi so sánh
-   NFR-L2: Token phải có thời hạn (expiration)
-   NFR-L3: Giới hạn số lần login sai (anti brute-force)
-   ⚡ Hiệu năng
-   NFR-L4: Thời gian phản hồi < 1–2 giây
-   📈 Độ tin cậy
-   NFR-L5: Hệ thống hoạt động ổn định khi nhiều user login
-   🧠 Khả dụng
-   NFR-L6: Thông báo lỗi rõ ràng, dễ hiểu
+<div class="section">
+  <h3>4. Hậu điều kiện (Post-condition)</h3>
+  <ul>
+    <li><span class="success">Thành công:</span> Tài khoản được lưu vào hệ thống</li>
+    <li><span class="error">Thất bại:</span> Không có dữ liệu nào được lưu</li>
+  </ul>
+</div>
 
-9. Actor
-   Người dùng (User)
-10. Tiền điều kiện
-    Người dùng đã có tài khoản
-11. Hậu điều kiện
-    Thành công: user đăng nhập và nhận token/session
-    Thất bại: không tạo session
-12. Luồng chính (Main Flow)
-    - Người dùng chọn Đăng nhập
-    - Hệ thống hiển thị form login
-    - Người dùng nhập:
-      Username/Email
-      Password
-    - Người dùng nhấn Login
-    - Hệ thống kiểm tra:
-      Không để trống
-    - Hệ thống tìm user trong database
-    - So sánh password (hash)
-    - Nếu đúng:
-      Tạo token (JWT) hoặc session
-      Trả về client
-      Hiển thị Đăng nhập thành công
-13. Luồng thay thế (Alternative Flow)
-    ❌ A1: Thiếu dữ liệu
-    Hiển thị: "Vui lòng nhập đầy đủ thông tin"
-    ❌ A2: Không tìm thấy user
-    Hiển thị: "Tài khoản không tồn tại"
-    ❌ A3: Sai mật khẩu
-    Hiển thị: "Sai mật khẩu"
-    ❌ A4: Bị khóa tài khoản
-    Hiển thị: "Tài khoản bị khóa"
-14. Yêu cầu chức năng (Functional Requirements)
-    FR-L1: Hệ thống hiển thị form đăng nhập
-    FR-L2: Hệ thống kiểm tra dữ liệu đầu vào
-    FR-L3: Hệ thống xác thực tài khoản
-    FR-L4: Hệ thống tạo token/session
-    FR-L5: Hệ thống trả kết quả đăng nhập
-15. Yêu cầu phi chức năng (Non-functional Requirements)
-    🔒 Bảo mật
-    NFR-L1: Password phải được mã hóa khi so sánh
-    NFR-L2: Token phải có thời hạn (expiration)
-    NFR-L3: Giới hạn số lần login sai (anti brute-force)
-    ⚡ Hiệu năng
-    NFR-L4: Thời gian phản hồi < 1–2 giây
-    📈 Độ tin cậy
-    NFR-L5: Hệ thống hoạt động ổn định khi nhiều user login
-    🧠 Khả dụng
-    NFR-L6: Thông báo lỗi rõ ràng, dễ hiểu
-    🧩 III. RÀNG BUỘC HỆ THỐNG (System Constraints)
-    Sử dụng database (MySQL/PostgreSQL)
-    Backend: Node.js (Express)
-    Authentication: JWT
-    Password hashing: bcrypt
-    🎯 IV. TÓM TẮT NGẮN (để bạn chép nhanh)
-    Đăng ký: nhập → validate → check trùng → hash → lưu DB
-    Đăng nhập: nhập → check → so sánh → tạo token
-    Functional: xử lý đúng logic user
-    Non-functional: bảo mật, nhanh, ổn định
+<div class="section">
+  <h3>5. Luồng chính (Main Flow)</h3>
+  <ol>
+    <li>Người dùng chọn chức năng <b>Đăng ký</b></li>
+    <li>Hệ thống hiển thị form đăng ký</li>
+    <li>Người dùng nhập:
+      <ul>
+        <li>Username</li>
+        <li>Email</li>
+        <li>Password</li>
+        <li>Confirm Password</li>
+      </ul>
+    </li>
+    <li>Người dùng nhấn <b>Submit</b></li>
+    <li>Hệ thống kiểm tra dữ liệu hợp lệ</li>
+    <li>Hệ thống kiểm tra trùng tài khoản</li>
+    <li>Mã hóa mật khẩu (hash)</li>
+    <li>Lưu vào database</li>
+    <li>Hiển thị thông báo <span class="success">Đăng ký thành công</span></li>
+  </ol>
+</div>
+
+<div class="section">
+  <h3>6. Luồng thay thế (Alternative Flow)</h3>
+  <ul>
+    <li class="error">A1: Thiếu dữ liệu → "Không được để trống"</li>
+    <li class="error">A2: Email không hợp lệ → "Email không hợp lệ"</li>
+    <li class="error">A3: Mật khẩu không khớp → "Mật khẩu không khớp"</li>
+    <li class="error">A4: Tài khoản đã tồn tại → "Username hoặc Email đã tồn tại"</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>7. Yêu cầu chức năng (Functional Requirements)</h3>
+  <ul>
+    <li>FR-R1: Cung cấp form đăng ký</li>
+    <li>FR-R2: Kiểm tra dữ liệu đầu vào</li>
+    <li>FR-R3: Kiểm tra trùng tài khoản</li>
+    <li>FR-R4: Mã hóa mật khẩu</li>
+    <li>FR-R5: Lưu dữ liệu vào database</li>
+    <li>FR-R6: Trả thông báo kết quả</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>8. Yêu cầu phi chức năng (Non-functional Requirements)</h3>
+
+  <h4> Bảo mật</h4>
+  <ul>
+    <li>Password phải được hash (bcrypt)</li>
+    <li>Không lưu password dạng plain text</li>
+    <li>Dữ liệu truyền qua HTTPS</li>
+  </ul>
+
+  <h4> Hiệu năng</h4>
+  <ul>
+    <li>Thời gian xử lý &lt; 2 giây</li>
+  </ul>
+
+  <h4> Khả năng mở rộng</h4>
+  <ul>
+    <li>Hỗ trợ nhiều user đăng ký cùng lúc</li>
+  </ul>
+
+  <h4> Khả dụng (Usability)</h4>
+  <ul>
+    <li>Giao diện dễ hiểu, thông báo rõ ràng</li>
+  </ul>
+</div>
+Chức năng đăng nhập <br>
+<div class="card">
+  <h2>1. Mô tả</h2>
+  <p>Cho phép người dùng truy cập hệ thống bằng tài khoản đã đăng ký.</p>
+</div>
+
+<div class="card">
+  <h2>2. Actor</h2>
+  <span class="tag">Người dùng (User)</span>
+</div>
+
+<div class="card">
+  <h2>3. Tiền điều kiện</h2>
+  <ul>
+    <li>Người dùng đã có tài khoản</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>4. Hậu điều kiện</h2>
+  <ul>
+    <li><span class="success">Thành công:</span> Nhận token/session</li>
+    <li><span class="error">Thất bại:</span> Không tạo session</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>5. Luồng chính (Main Flow)</h2>
+  <ol>
+    <li>Chọn <b>Đăng nhập</b></li>
+    <li>Hiển thị form login</li>
+    <li>Nhập:
+      <ul>
+        <li>Username/Email</li>
+        <li>Password</li>
+      </ul>
+    </li>
+    <li>Nhấn <b>Login</b></li>
+    <li>Kiểm tra dữ liệu không rỗng</li>
+    <li>Tìm user trong database</li>
+    <li>So sánh password (hash)</li>
+    <li>Nếu đúng:
+      <ul>
+        <li>Tạo token (JWT) / session</li>
+        <li>Trả về client</li>
+        <li><span class="success">Đăng nhập thành công</span></li>
+      </ul>
+    </li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>6. Luồng thay thế (Alternative Flow)</h2>
+  <ul>
+    <li class="error">A1: Thiếu dữ liệu → "Vui lòng nhập đầy đủ thông tin"</li>
+    <li class="error">A2: Không tìm thấy user → "Tài khoản không tồn tại"</li>
+    <li class="error">A3: Sai mật khẩu → "Sai mật khẩu"</li>
+    <li class="error">A4: Bị khóa → "Tài khoản bị khóa"</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>7. Functional Requirements</h2>
+  <ul>
+    <li>FR-L1: Hiển thị form đăng nhập</li>
+    <li>FR-L2: Kiểm tra dữ liệu</li>
+    <li>FR-L3: Xác thực tài khoản</li>
+    <li>FR-L4: Tạo token/session</li>
+    <li>FR-L5: Trả kết quả</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>8. Non-functional Requirements</h2>
+
+  <p><b> Bảo mật</b></p>
+  <ul>
+    <li>Password được mã hóa</li>
+    <li>Token có thời hạn</li>
+    <li>Giới hạn login sai</li>
+  </ul>
+
+  <p><b> Hiệu năng</b></p>
+  <ul>
+    <li>&lt; 2 giây</li>
+  </ul>
+
+  <p><b> Độ tin cậy</b></p>
+  <ul>
+    <li>Ổn định khi nhiều user</li>
+  </ul>
+
+  <p><b> Khả dụng</b></p>
+  <ul>
+    <li>Thông báo rõ ràng</li>
+  </ul>
+
+</div>
+
+<div class="card">
+  <h2>9. Ràng buộc hệ thống</h2>
+  <ul>
+    <li>Database: MySQL / PostgreSQL</li>
+    <li>Backend: Node.js (Express)</li>
+    <li>JWT Authentication</li>
+    <li>Bcrypt hashing</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>10. Tóm tắt</h2>
+  <ul>
+    <li>Đăng nhập: nhập → kiểm tra → xác thực → tạo token</li>
+    <li>Functional: xử lý logic</li>
+    <li>Non-functional: bảo mật, nhanh, ổn định</li>
+  </ul>
+</div>
