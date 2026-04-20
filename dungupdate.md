@@ -484,8 +484,7 @@
   </ul>
 </div>
 <!--  -->
-Ma trận actor x Các chức năng (CRUD MATRIX)
-### 3.3 Ma trận Actor × Chức năng (CRUD Matrix)
+<h1>Ma trận actor x Các chức năng (CRUD MATRIX)</h1>
 
 <table>
   <thead>
