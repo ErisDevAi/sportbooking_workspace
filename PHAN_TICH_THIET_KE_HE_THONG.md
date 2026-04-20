@@ -139,7 +139,7 @@ Người dùng (User)
     <li>Hệ thống kiểm tra dữ liệu hợp lệ</li>
     <li>Hệ thống kiểm tra trùng tài khoản</li>
     <li>Mã hóa mật khẩu (hash)</li>
-    <li>Lưu vào database</li>
+    <li>Lưu vào MongoDB</li>
     <li>Hiển thị thông báo <span class="success">Đăng ký thành công</span></li>
   </ol>
 
@@ -215,7 +215,7 @@ Người dùng (User)
    - Password
 4. Người dùng nhấn **Login**
 5. Hệ thống kiểm tra dữ liệu không rỗng
-6. Hệ thống tìm user trong database
+6. Hệ thống tìm user trong MongoDB
 7. Hệ thống so sánh password (hash)
 8. Nếu đúng:
    - Tạo token (JWT) / session
@@ -281,7 +281,7 @@ Người dùng (User)
 3. Người dùng nhập tên thư mục
 4. Người dùng nhấn **Lưu**
 5. Hệ thống kiểm tra dữ liệu hợp lệ
-6. Lưu vào database
+6. Lưu vào MongoDB
 7. Hiển thị danh sách thư mục cập nhật
 
 **5.2. Sửa thư mục**
@@ -289,13 +289,13 @@ Người dùng (User)
 1. Người dùng chọn **Sửa** trên thư mục cần chỉnh sửa
 2. Nhập tên mới
 3. Hệ thống kiểm tra hợp lệ
-4. Cập nhật database
+4. Cập nhật MongoDB
 
 **5.3. Xóa thư mục**
 
 1. Người dùng chọn **Xóa** trên thư mục cần xóa
 2. Hệ thống hiển thị xác nhận
-3. Người dùng xác nhận → Xóa khỏi database
+3. Người dùng xác nhận → Xóa khỏi MongoDB
 
 ##### 6. Luồng thay thế (Alternative Flow)
 
@@ -356,7 +356,7 @@ Người dùng (User)
 3. Nhập nội dung quyết định
 4. Nhấn **Lưu**
 5. Hệ thống kiểm tra dữ liệu hợp lệ
-6. Lưu vào database
+6. Lưu vào MongoDB
 7. Hiển thị danh sách quyết định cập nhật
 
 **5.2. Sửa quyết định**
@@ -364,13 +364,13 @@ Người dùng (User)
 1. Người dùng chọn **Sửa** trên quyết định cần chỉnh sửa
 2. Nhập nội dung mới
 3. Hệ thống kiểm tra hợp lệ
-4. Cập nhật database
+4. Cập nhật MongoDB
 
 **5.3. Xóa quyết định**
 
 1. Người dùng chọn **Xóa** trên quyết định cần xóa
 2. Hệ thống hiển thị xác nhận
-3. Người dùng xác nhận → Xóa khỏi database
+3. Người dùng xác nhận → Xóa khỏi MongoDB
 
 ##### 6. Luồng thay thế (Alternative Flow)
 
