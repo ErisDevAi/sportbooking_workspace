@@ -21,7 +21,7 @@ Decision Maker là một web application giúp người dùng ra quyết định
 
 ### Các nhóm người dùng chính (Personas chính)
 
-- Người dùng cá nhân: Khó quyết định ăn gì, mặc gì, đi đâu hàng ngày 
+- Người dùng cá nhân: Khó quyết định ăn gì, mặc gì, đi đâu hàng ngày
 - Nhóm bạn: Cùng quay và thực hiện thử thách
 - Couples: Quyết định hẹn hò đi đâu, ăn gì
 - Nhà quản lý: sử dụng kết quả để ra quyết định
@@ -100,15 +100,365 @@ User vào “Yêu thích” để xem lại
 
 #### Đăng ký (Register)
 
+##### 1. Mô tả
+
+Chức năng cho phép người dùng tạo tài khoản mới để truy cập hệ thống.
+
+##### 2. Actor
+
+Người dùng (User)
+
+##### 3. Tiền điều kiện (Pre-condition)
+
+<ul>
+    <li>Người dùng chưa đăng nhập</li>
+    <li>Người dùng truy cập trang đăng ký</li>
+</ul>
+
+##### 4. Hậu điều kiện (Post-condition)
+
+<ul>
+    <li><span class="success">Thành công:</span> Tài khoản được lưu vào hệ thống</li>
+    <li><span class="error">Thất bại:</span> Không có dữ liệu nào được lưu</li>
+</ul>
+
+##### 5. Luồng chính (Main Flow)
+
+<ol>
+    <li>Người dùng chọn chức năng <b>Đăng ký</b></li>
+    <li>Hệ thống hiển thị form đăng ký</li>
+    <li>Người dùng nhập:
+      <ul>
+        <li>Username</li>
+        <li>Email</li>
+        <li>Password</li>
+        <li>Confirm Password</li>
+      </ul>
+    </li>
+    <li>Người dùng nhấn <b>Submit</b></li>
+    <li>Hệ thống kiểm tra dữ liệu hợp lệ</li>
+    <li>Hệ thống kiểm tra trùng tài khoản</li>
+    <li>Mã hóa mật khẩu (hash)</li>
+    <li>Lưu vào database</li>
+    <li>Hiển thị thông báo <span class="success">Đăng ký thành công</span></li>
+  </ol>
+
+##### 6. Luồng thay thế (Alternative Flow)
+
+<ul>
+    <li class="error">A1: Thiếu dữ liệu → "Không được để trống"</li>
+    <li class="error">A2: Email không hợp lệ → "Email không hợp lệ"</li>
+    <li class="error">A3: Mật khẩu không khớp → "Mật khẩu không khớp"</li>
+    <li class="error">A4: Tài khoản đã tồn tại → "Username hoặc Email đã tồn tại"</li>
+</ul>
+
+##### 7. Yêu cầu chức năng (Functional Requirements)
+
+<ul>
+    <li>FR-R1: Cung cấp form đăng ký</li>
+    <li>FR-R2: Kiểm tra dữ liệu đầu vào (validate valuations)</li>
+    <li>FR-R3: Kiểm tra trùng tài khoản</li>
+    <li>FR-R4: Mã hóa mật khẩu</li>
+    <li>FR-R5: Lưu dữ liệu vào MongoDB</li>
+    <li>FR-R6: Trả thông báo kết quả</li>
+</ul>
+
+##### 8. Yêu cầu phi chức năng (Non-functional Requirements)
+
+###### Bảo mật
+  <ul>
+    <li>Password phải được hash (bcrypt) bằng JWT</li>
+    <li>Không lưu password dạng plain text</li>
+    <li>Dữ liệu truyền qua HTTPS</li>
+  </ul>
+
+###### Hiệu năng
+  <ul>
+    <li>Thời gian xử lý &lt; 2 giây</li>
+  </ul>
+
+###### Khả năng mở rộng
+  <ul>
+    <li>Hỗ trợ nhiều user đăng ký cùng lúc</li>
+  </ul>
+
+###### Khả dụng (Usability)
+  <ul>
+    <li>Giao diện dễ hiểu, thông báo rõ ràng</li>
+  </ul>
+
 #### Đăng nhập (Login)
+
+##### 1. Mô tả
+
+Cho phép người dùng truy cập hệ thống bằng tài khoản đã đăng ký.
+
+##### 2. Tác nhân (Actor)
+
+Người dùng (User)
+
+##### 3. Tiền điều kiện
+
+- Người dùng đã có tài khoản trong hệ thống
+
+##### 4. Hậu điều kiện
+
+- **Thành công:** Người dùng nhận được token (JWT) / session và truy cập được hệ thống
+- **Thất bại:** Không tạo session, người dùng không thể truy cập
+
+##### 5. Luồng chính (Main Flow)
+
+1. Người dùng chọn chức năng **Đăng nhập**
+2. Hệ thống hiển thị form đăng nhập
+3. Người dùng nhập:
+   - Username hoặc Email
+   - Password
+4. Người dùng nhấn **Login**
+5. Hệ thống kiểm tra dữ liệu không rỗng
+6. Hệ thống tìm user trong database
+7. Hệ thống so sánh password (hash)
+8. Nếu đúng:
+   - Tạo token (JWT) / session
+   - Trả về client
+   - Hiển thị thông báo **Đăng nhập thành công**
+
+##### 6. Luồng thay thế (Alternative Flow)
+
+- A1: Thiếu dữ liệu → "Vui lòng nhập đầy đủ thông tin"
+- A2: Không tìm thấy user → "Tài khoản không tồn tại"
+- A3: Sai mật khẩu → "Sai mật khẩu"
+- A4: Tài khoản bị khóa → "Tài khoản bị khóa"
+
+##### 7. Yêu cầu chức năng (Functional Requirements)
+
+- FR-L1: Hiển thị form đăng nhập
+- FR-L2: Kiểm tra dữ liệu đầu vào
+- FR-L3: Xác thực tài khoản (so sánh username/email và password)
+- FR-L4: Tạo token (JWT) / session
+- FR-L5: Trả kết quả cho client
+
+##### 8. Yêu cầu phi chức năng (Non-functional Requirements)
+
+###### Bảo mật
+- Password được mã hóa bằng bcrypt
+- Token JWT có thời hạn
+- Giới hạn số lần đăng nhập sai
+
+###### Hiệu năng
+- Thời gian xử lý < 2 giây
+
+###### Độ tin cậy
+- Hệ thống ổn định khi nhiều user đăng nhập đồng thời
+
+###### Khả dụng (Usability)
+- Thông báo lỗi rõ ràng, dễ hiểu
 
 #### Quản lý các thư mục quyết định (Categories)
 
-#### Quản lý các quyết định (choices)
+##### 1. Mô tả
+
+Cho phép người dùng tạo và quản lý các thư mục để phân loại các quyết định theo từng chủ đề như ăn uống, giải trí, học tập...
+
+##### 2. Tác nhân (Actor)
+
+Người dùng (User)
+
+##### 3. Tiền điều kiện
+
+- Người dùng đã đăng nhập hệ thống
+
+##### 4. Hậu điều kiện
+
+- **Thành công:** Thư mục được tạo mới / cập nhật / xóa thành công
+- **Thất bại:** Không có thay đổi dữ liệu trong hệ thống
+
+##### 5. Luồng chính (Main Flow)
+
+**5.1. Tạo thư mục**
+
+1. Người dùng chọn **Tạo thư mục**
+2. Hệ thống hiển thị form nhập
+3. Người dùng nhập tên thư mục
+4. Người dùng nhấn **Lưu**
+5. Hệ thống kiểm tra dữ liệu hợp lệ
+6. Lưu vào database
+7. Hiển thị danh sách thư mục cập nhật
+
+**5.2. Sửa thư mục**
+
+1. Người dùng chọn **Sửa** trên thư mục cần chỉnh sửa
+2. Nhập tên mới
+3. Hệ thống kiểm tra hợp lệ
+4. Cập nhật database
+
+**5.3. Xóa thư mục**
+
+1. Người dùng chọn **Xóa** trên thư mục cần xóa
+2. Hệ thống hiển thị xác nhận
+3. Người dùng xác nhận → Xóa khỏi database
+
+##### 6. Luồng thay thế (Alternative Flow)
+
+- A1: Tên rỗng → "Không được để trống"
+- A2: Trùng tên thư mục → "Thư mục đã tồn tại"
+- A3: Lỗi hệ thống → "Vui lòng thử lại"
+- A4: Xóa thư mục có chứa quyết định → "Bạn có chắc chắn muốn xóa?"
+
+##### 7. Yêu cầu chức năng (Functional Requirements)
+
+- FR-F1: Tạo thư mục mới
+- FR-F2: Hiển thị danh sách thư mục
+- FR-F3: Chỉnh sửa thư mục
+- FR-F4: Xóa thư mục
+- FR-F5: Validate dữ liệu đầu vào
+
+##### 8. Yêu cầu phi chức năng (Non-functional Requirements)
+
+###### Bảo mật
+- Chỉ user đã đăng nhập mới được thao tác
+- User chỉ quản lý thư mục của chính mình
+
+###### Hiệu năng
+- Thời gian xử lý < 1 giây
+
+###### Khả năng mở rộng
+- Hỗ trợ nhiều user thao tác đồng thời
+
+###### Khả dụng (Usability)
+- Giao diện đơn giản, dễ sử dụng
+
+#### Quản lý các quyết định (Choices)
+
+##### 1. Mô tả
+
+Cho phép người dùng thêm, chỉnh sửa và quản lý các lựa chọn (quyết định) trong từng thư mục.
+
+##### 2. Tác nhân (Actor)
+
+Người dùng (User)
+
+##### 3. Tiền điều kiện
+
+- Người dùng đã đăng nhập
+- Đã có ít nhất một thư mục quyết định
+
+##### 4. Hậu điều kiện
+
+- **Thành công:** Quyết định được thêm mới / cập nhật / xóa thành công
+- **Thất bại:** Không có thay đổi dữ liệu trong hệ thống
+
+##### 5. Luồng chính (Main Flow)
+
+**5.1. Thêm quyết định**
+
+1. Người dùng chọn một thư mục
+2. Nhấn **Thêm quyết định**
+3. Nhập nội dung quyết định
+4. Nhấn **Lưu**
+5. Hệ thống kiểm tra dữ liệu hợp lệ
+6. Lưu vào database
+7. Hiển thị danh sách quyết định cập nhật
+
+**5.2. Sửa quyết định**
+
+1. Người dùng chọn **Sửa** trên quyết định cần chỉnh sửa
+2. Nhập nội dung mới
+3. Hệ thống kiểm tra hợp lệ
+4. Cập nhật database
+
+**5.3. Xóa quyết định**
+
+1. Người dùng chọn **Xóa** trên quyết định cần xóa
+2. Hệ thống hiển thị xác nhận
+3. Người dùng xác nhận → Xóa khỏi database
+
+##### 6. Luồng thay thế (Alternative Flow)
+
+- A1: Nội dung rỗng → "Không được để trống"
+- A2: Trùng nội dung trong cùng thư mục → "Quyết định đã tồn tại"
+- A3: Lỗi hệ thống → "Vui lòng thử lại"
+
+##### 7. Yêu cầu chức năng (Functional Requirements)
+
+- FR-D1: Thêm quyết định vào thư mục
+- FR-D2: Hiển thị danh sách quyết định theo thư mục
+- FR-D3: Chỉnh sửa nội dung quyết định
+- FR-D4: Xóa quyết định
+- FR-D5: Validate dữ liệu đầu vào
+
+##### 8. Yêu cầu phi chức năng (Non-functional Requirements)
+
+###### Bảo mật
+- Chỉ user đã đăng nhập mới được thao tác
+- User chỉ quản lý quyết định của chính mình
+
+###### Hiệu năng
+- Thời gian xử lý < 1 giây
+
+###### Khả năng mở rộng
+- Hỗ trợ nhiều user thao tác đồng thời
+
+###### Khả dụng (Usability)
+- Giao diện dễ hiểu, thao tác trực quan
 
 #### Đưa ra quyết định (Make Decision)
 
+##### 1. Mô tả
+
+Hệ thống hỗ trợ người dùng lựa chọn nhanh bằng cách chọn ngẫu nhiên một quyết định từ danh sách các lựa chọn trong thư mục.
+
+##### 2. Tác nhân (Actor)
+
+Người dùng (User)
+
+##### 3. Tiền điều kiện
+
+- Người dùng đã đăng nhập
+- Đã có ít nhất một thư mục chứa các quyết định
+
+##### 4. Hậu điều kiện
+
+- **Thành công:** Hệ thống hiển thị kết quả quyết định được chọn ngẫu nhiên
+- **Thất bại:** Không có kết quả (thư mục rỗng hoặc lỗi hệ thống)
+
+##### 5. Luồng chính (Main Flow)
+
+1. Người dùng chọn một thư mục quyết định
+2. Nhấn **Quay** (Spin)
+3. Hệ thống thực hiện hiệu ứng quay (spin wheel)
+4. Hệ thống chọn ngẫu nhiên một quyết định từ danh sách
+5. Hiển thị kết quả quyết định được chọn
+6. Người dùng có thể:
+   - **Chấp nhận** quyết định
+   - **Bỏ qua** và quay lại
+
+##### 6. Luồng thay thế (Alternative Flow)
+
+- A1: Thư mục rỗng (không có quyết định) → "Vui lòng thêm quyết định trước"
+- A2: Lỗi hệ thống → "Vui lòng thử lại"
+
+##### 7. Yêu cầu chức năng (Functional Requirements)
+
+- FR-M1: Chọn ngẫu nhiên quyết định từ danh sách
+- FR-M2: Hiển thị hiệu ứng quay (spin wheel) tạo trải nghiệm thú vị
+- FR-M3: Hiển thị kết quả quyết định
+- FR-M4: Cho phép chấp nhận hoặc bỏ qua kết quả
+- FR-M5: Lưu lịch sử quyết định
+
+##### 8. Yêu cầu phi chức năng (Non-functional Requirements)
+
+###### Bảo mật
+- Chỉ user đã đăng nhập mới được sử dụng chức năng
+
+###### Hiệu năng
+- Hiệu ứng quay mượt mà, thời gian xử lý < 1 giây
+
+###### Khả dụng (Usability)
+- Hiệu ứng quay trực quan, tạo cảm giác thú vị cho người dùng
+- Kết quả hiển thị rõ ràng, dễ đọc
+
 ### Phân tích phi chức năng
+
 <table>
   <tr>
     <th>Mã</th>
