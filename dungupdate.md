@@ -486,63 +486,21 @@
 <!--  -->
 Ma trận actor x Các chức năng (CRUD MATRIX)
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>CRUD Matrix Table</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-        h2 { font-size: 24px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; border: 1px solid #ddd; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f9f9f9; font-weight: bold; }
-        
-        /* Căn giữa các cột quyền hạn */
-        th:not(:first-child), td:not(:first-child) {
-            text-align: left;
-            padding-left: 20px;
-        }
+# 3.3 Ma trận Actor × Chức năng (CRUD Matrix)
 
-        /* Hiệu ứng hover dòng */
-        tr:hover { background-color: #f5f5f5; }
-
-        .header-row { background-color: #ffffff; }
-        .text-center { text-align: center !important; }
-    </style>
-
-</head>
-<body>
-
-    <h2>3.3 Ma trận Actor × Chức năng (CRUD Matrix)</h2>
-
-    <table>
-        <thead>
-            <tr class="header-row">
-                <th style="width: 25%;">Chức năng</th>
-                <th>Guest</th>
-                <th>User (viewer)</th>
-                <th>Admin</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>Đăng ký</td><td>C</td><td>-</td><td>-</td></tr>
-            <tr><td>Đăng nhập</td><td>R</td><td>-</td><td>-</td></tr>
-            <tr><td>Đăng xuất</td><td>-</td><td>✓</td><td>✓</td></tr>
-            <tr><td>Xem profile</td><td>-</td><td>R</td><td>R</td></tr>
-            <tr><td>Danh mục</td><td>-</td><td>C R U D (own)</td><td>C R U D (all)</td></tr>
-            <tr><td>Lựa chọn</td><td>-</td><td>C R U D (own)</td><td>C R U D (all)</td></tr>
-            <tr><td>Quay Spin</td><td>-</td><td>C</td><td>C</td></tr>
-            <tr><td>Chấp nhận/Bỏ qua</td><td>-</td><td>U (own)</td><td>U (own)</td></tr>
-            <tr><td>Check-in</td><td>-</td><td>C (own)</td><td>C (own)</td></tr>
-            <tr><td>Xem lịch sử</td><td>-</td><td>R (own)</td><td>R (own)</td></tr>
-            <tr><td>Xem streak</td><td>-</td><td>R (own)</td><td>R (own)</td></tr>
-            <tr><td>Xem leaderboard</td><td>-</td><td>R</td><td>R</td></tr>
-            <tr><td>Quản lý users</td><td>-</td><td>-</td><td>C R U D</td></tr>
-            <tr><td>Quản lý roles</td><td>-</td><td>-</td><td>C R U D</td></tr>
-            <tr><td>Dashboard stats</td><td>-</td><td>-</td><td>R</td></tr>
-        </tbody>
-    </table>
-
-</body>
-</html>
+| Chức năng            | Guest | User (viewer) | Admin         |
+| :------------------- | :---: | :------------ | :------------ |
+| **Đăng ký**          |   C   | -             | -             |
+| **Đăng nhập**        |   R   | -             | -             |
+| **Đăng xuất**        |   -   | ✓             | ✓             |
+| **Xem profile**      |   -   | R             | R             |
+| **Danh mục**         |   -   | C R U D (own) | C R U D (all) |
+| **Lựa chọn**         |   -   | C R U D (own) | C R U D (all) |
+| **Quay Spin**        |   -   | C             | C             |
+| **Chấp nhận/Bỏ qua** |   -   | U (own)       | U (own)       |
+| **Check-in**         |   -   | C (own)       | C (own)       |
+| **Xem lịch sử**      |   -   | R (own)       | R (own)       |
+| **Xem streak**       |   -   | R (own)       | R (own)       |
+| **Xem leaderboard**  |   -   | R             | R             |
+| **Quản lý users**    |   -   | -             | C R U D       |
+| **Quản lý roles**    |   -   | -             | C R U D       |
