@@ -468,7 +468,7 @@
 
 </div>
 <hr>
-<h1>🎯 CHỨC NĂNG: QUYẾT ĐỊNH GIÚP TÔI</h1>
+<h1> CHỨC NĂNG: QUYẾT ĐỊNH GIÚP TÔI</h1>
 
 <div class="card">
   <h2>1. Mô tả</h2>
@@ -483,43 +483,3 @@
     <li>Có hiệu ứng “quay” tạo trải nghiệm thú vị</li>
   </ul>
 </div>
-
-<div class="card">
-  <h2> Thử ngay</h2>
-
-<button onclick="randomDecision()">Quyết định giúp tôi</button>
-
-  <div id="result" class="result"></div>
-</div>
-
-</div>
-
-<script>
-  const decisions = [
-    "🍜 Ăn phở",
-    "🍔 Ăn fast food",
-    "🍱 Ăn cơm",
-    "🎮 Chơi game",
-    "📚 Học bài",
-    "🎬 Xem phim",
-    "🏃 Đi tập thể dục"
-  ];
-
-  function randomDecision() {
-    const resultDiv = document.getElementById("result");
-
-    resultDiv.innerHTML = "<span class='loading'>Đang suy nghĩ...</span>";
-
-    let count = 0;
-
-    const interval = setInterval(() => {
-      const random = decisions[Math.floor(Math.random() * decisions.length)];
-      resultDiv.innerHTML = random;
-      count++;
-
-      if (count > 10) {
-        clearInterval(interval);
-      }
-    }, 100);
-  }
-</script>
