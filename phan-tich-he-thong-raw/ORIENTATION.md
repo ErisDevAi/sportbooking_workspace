@@ -23,10 +23,14 @@ https://www.figma.com/design/wJTwsqdTezDOmlqQ8tm830/%F0%9F%8D%80-Decision-Maker?
 ### 3. Tài khoản quản lý
 
 #### 3.1 Figma
+
 - Email: deveris.vu@gmail.com
+- Email: dunglv270404@gmail.com
 
 #### 3.2 MongoDB
+
 - Email: deveris.vu@gmail.com
+- Email: dunglv270404@gmail.com
 
 ---
 
@@ -34,6 +38,9 @@ https://www.figma.com/design/wJTwsqdTezDOmlqQ8tm830/%F0%9F%8D%80-Decision-Maker?
 
 - Vũ Ngọc Hải Anh  
   Email: deveris.vu@gmail.com
+
+- Lê Văn Dũng
+- Email: dunglv270404@gmail.com
 
 ---
 - Đinh Trọng Phúc
