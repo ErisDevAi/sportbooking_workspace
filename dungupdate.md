@@ -513,4 +513,4 @@
     <tr><td><b>Dashboard stats</b></td><td>-</td><td>-</td><td>R</td></tr>
   </tbody>
 </table>
-<H1> USECASE Check in - Streak
+<h1> USECASE Check in - Streak </h1>
