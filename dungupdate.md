@@ -485,22 +485,32 @@
 </div>
 <!--  -->
 Ma trận actor x Các chức năng (CRUD MATRIX)
+### 3.3 Ma trận Actor × Chức năng (CRUD Matrix)
 
-# 3.3 Ma trận Actor × Chức năng (CRUD Matrix)
-
-| Chức năng            | Guest | User (viewer) | Admin         |
-| :------------------- | :---: | :------------ | :------------ |
-| **Đăng ký**          |   C   | -             | -             |
-| **Đăng nhập**        |   R   | -             | -             |
-| **Đăng xuất**        |   -   | ✓             | ✓             |
-| **Xem profile**      |   -   | R             | R             |
-| **Danh mục**         |   -   | C R U D (own) | C R U D (all) |
-| **Lựa chọn**         |   -   | C R U D (own) | C R U D (all) |
-| **Quay Spin**        |   -   | C             | C             |
-| **Chấp nhận/Bỏ qua** |   -   | U (own)       | U (own)       |
-| **Check-in**         |   -   | C (own)       | C (own)       |
-| **Xem lịch sử**      |   -   | R (own)       | R (own)       |
-| **Xem streak**       |   -   | R (own)       | R (own)       |
-| **Xem leaderboard**  |   -   | R             | R             |
-| **Quản lý users**    |   -   | -             | C R U D       |
-| **Quản lý roles**    |   -   | -             | C R U D       |
+<table>
+  <thead>
+    <tr>
+      <th align="left">Chức năng</th>
+      <th align="center">Guest</th>
+      <th align="left">User (viewer)</th>
+      <th align="left">Admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><b>Đăng ký</b></td><td>C</td><td>-</td><td>-</td></tr>
+    <tr><td><b>Đăng nhập</b></td><td>R</td><td>-</td><td>-</td></tr>
+    <tr><td><b>Đăng xuất</b></td><td>-</td><td>✓</td><td>✓</td></tr>
+    <tr><td><b>Xem profile</b></td><td>-</td><td>R</td><td>R</td></tr>
+    <tr><td><b>Danh mục</b></td><td>-</td><td>C R U D (own)</td><td>C R U D (all)</td></tr>
+    <tr><td><b>Lựa chọn</b></td><td>-</td><td>C R U D (own)</td><td>C R U D (all)</td></tr>
+    <tr><td><b>Quay Spin</b></td><td>-</td><td>C</td><td>C</td></tr>
+    <tr><td><b>Chấp nhận/Bỏ qua</b></td><td>-</td><td>U (own)</td><td>U (own)</td></tr>
+    <tr><td><b>Check-in</b></td><td>-</td><td>C (own)</td><td>C (own)</td></tr>
+    <tr><td><b>Xem lịch sử</b></td><td>-</td><td>R (own)</td><td>R (own)</td></tr>
+    <tr><td><b>Xem streak</b></td><td>-</td><td>R (own)</td><td>R (own)</td></tr>
+    <tr><td><b>Xem leaderboard</b></td><td>-</td><td>R</td><td>R</td></tr>
+    <tr><td><b>Quản lý users</b></td><td>-</td><td>-</td><td>C R U D</td></tr>
+    <tr><td><b>Quản lý roles</b></td><td>-</td><td>-</td><td>C R U D</td></tr>
+    <tr><td><b>Dashboard stats</b></td><td>-</td><td>-</td><td>R</td></tr>
+  </tbody>
+</table>
