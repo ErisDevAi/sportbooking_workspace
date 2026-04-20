@@ -514,4 +514,3 @@
   </tbody>
 </table>
 <H1> USECASE Check in - Streak
-![alt text](image-1.png)
