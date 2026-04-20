@@ -513,3 +513,5 @@
     <tr><td><b>Dashboard stats</b></td><td>-</td><td>-</td><td>R</td></tr>
   </tbody>
 </table>
+<H1> USECASE Check in - Streak
+![alt text](image-1.png)
