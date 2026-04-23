@@ -1,0 +1,79 @@
+@startuml DFD_Level1
+!theme plain
+skinparam rectangle {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **SƠ ĐỒ LUỒNG DỮ LIỆU MỨC 1 (DFD Level 1)\nHỆ THỐNG DECISION MAKER**
+
+' External entities
+rectangle "Khách\n(Guest)" as Guest #E3F2FD
+rectangle "Người dùng\n(User)" as User #C8E6C9
+rectangle "Quản trị viên\n(Admin)" as Admin #FFCDD2
+
+' Processes
+usecase "1.0\nXác thực\n& Phân quyền" as P1 #E8F5E9
+usecase "2.0\nQuản lý\nDanh mục" as P2 #E3F2FD
+usecase "3.0\nQuản lý\nLựa chọn" as P3 #FFF3E0
+usecase "4.0\nQuay Spin\n& Quyết định" as P4 #FCE4EC
+usecase "5.0\nCheck-in\n& Upload" as P5 #F3E5F5
+usecase "6.0\nStreak &\nGamification" as P6 #FFF9C4
+usecase "7.0\nQuản trị\nhệ thống" as P7 #FFEBEE
+
+' Data stores
+database "D1: Users" as D1
+database "D2: Categories" as D2
+database "D3: Choices" as D3
+database "D4: Decisions" as D4
+database "D5: UserStreaks" as D5
+database "D6: Roles" as D6
+storage "D7: Files" as D7
+
+' === P1: Xác thực ===
+Guest --> P1 : Đăng ký (tên, email, password)\nĐăng nhập (email, password)
+P1 --> Guest : JWT token + user info\nLỗi xác thực
+P1 --> D1 : Tạo/Đọc user
+P1 --> D6 : Đọc role + permissions
+User --> P1 : Token (mỗi request)
+P1 --> User : Xác nhận danh tính
+
+' === P2: Quản lý Danh mục ===
+User --> P2 : Tạo/Sửa/Xóa danh mục\n(name, icon, color)
+P2 --> User : Danh sách danh mục\n(own + public)
+P2 --> D2 : CRUD categories
+
+' === P3: Quản lý Lựa chọn ===
+User --> P3 : Tạo/Sửa/Xóa lựa chọn\n(name, desc, weight, tags)
+P3 --> User : Danh sách lựa chọn\ntrong danh mục
+P3 --> D3 : CRUD choices
+P3 --> D2 : Cập nhật choiceCount
+
+' === P4: Quay Spin ===
+User --> P4 : Chọn danh mục + câu hỏi\nChấp nhận / Bỏ qua
+P4 --> User : Kết quả spin (choice)\nLịch sử quyết định
+P4 --> D3 : Đọc choices + cập nhật\ntimesSelected
+P4 --> D4 : Tạo/Cập nhật decision
+P4 --> D5 : Tăng totalDecisions
+
+' === P5: Check-in ===
+User --> P5 : Ảnh + rating + caption
+P5 --> User : Xác nhận check-in thành công
+P5 --> D4 : Cập nhật decision\n(status=completed, checkin data)
+P5 --> D3 : Tăng timesCompleted
+P5 --> D7 : Lưu ảnh check-in
+P5 --> P6 : Trigger cập nhật streak
+
+' === P6: Streak & Gamification ===
+P6 --> User : Streak hiện tại, level,\nbadges, bảng xếp hạng
+P6 --> D5 : Đọc/Ghi streak data
+P6 --> D4 : Đọc decisions\n(cho badge foodie, explorer)
+
+' === P7: Quản trị ===
+Admin --> P7 : CRUD users, roles, permissions
+P7 --> Admin : Dashboard stats\nDanh sách users
+P7 --> D1 : CRUD users
+P7 --> D6 : CRUD roles/permissions
+P7 --> D4 : Đọc thống kê decisions
+
+@enduml

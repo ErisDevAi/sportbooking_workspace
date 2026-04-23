@@ -1,0 +1,164 @@
+@startuml Sequence_Checkin
+!theme plain
+skinparam sequenceArrowThickness 2
+
+title **BIỂU ĐỒ TUẦN TỰ - CHECK-IN & CẬP NHẬT STREAK**
+
+actor "Người dùng" as User #LightGreen
+participant "Dashboard\n(/dashboard)" as Dashboard #E3F2FD
+participant "Check-in Page\n(/checkin)" as CheckinPage #FFF3E0
+participant "API Client\n(Axios)" as API #FCE4EC
+participant "DecisionController" as Controller #E8F5E9
+participant "DecisionService" as DecService #C8E6C9
+participant "StreakService" as StreakService #FFF9C4
+database "MongoDB" as DB #F3E5F5
+
+== Bước 1: Xem nhiệm vụ hôm nay ==
+
+User -> Dashboard : Truy cập /dashboard
+activate Dashboard
+
+Dashboard -> API : GET /api/decisions/today
+activate API
+API -> DB : Decision.find({\n  userId,\n  status: "pending",\n  expiresAt: {$gt: now}\n}).populate('choiceId')
+activate DB
+DB --> API : pendingDecisions[]
+deactivate DB
+API --> Dashboard : pendingDecisions[]
+deactivate API
+
+Dashboard --> User : Hiển thị card "Nhiệm vụ hôm nay"\n🍜 Bún bò Huế\n⏰ Còn 18h để check-in\n[📸 Check-in ngay]
+deactivate Dashboard
+
+== Bước 2: Mở trang Check-in ==
+
+User -> Dashboard : Nhấn "Check-in ngay"
+activate Dashboard
+Dashboard -> CheckinPage : navigate('/checkin?id=...')
+deactivate Dashboard
+activate CheckinPage
+
+CheckinPage --> User : Form check-in:\n- Nhiệm vụ: Bún bò Huế\n- ⏰ Còn 18h\n- [📷 Upload ảnh]\n- Đánh giá: ☆☆☆☆☆\n- Caption (tùy chọn)
+
+== Bước 3: Điền form check-in ==
+
+User -> CheckinPage : 1. Chọn/chụp ảnh
+CheckinPage -> CheckinPage : Preview ảnh\nValidate: JPEG/PNG, < 5MB
+
+User -> CheckinPage : 2. Đánh giá ⭐⭐⭐⭐☆ (4 sao)
+User -> CheckinPage : 3. Viết caption:\n"Tô bún bò ngon lắm!"
+
+== Bước 4: Gửi check-in ==
+
+User -> CheckinPage : Nhấn "Hoàn thành Check-in"
+activate CheckinPage
+
+CheckinPage -> CheckinPage : Validate:\n- Ảnh đã chọn? ✅\n- Rating đã chọn? ✅
+
+CheckinPage -> API : POST /api/decisions/:id/checkin\nContent-Type: multipart/form-data\n{image: File, rating: 4,\ncaption: "Tô bún bò ngon lắm!"}
+activate API
+
+API -> Controller : checkin(req, res)
+activate Controller
+
+Controller -> DecService : checkin(decisionId,\nimage, caption, rating)
+activate DecService
+
+== Bước 5: Xử lý server ==
+
+DecService -> DB : Decision.findById(decisionId)
+activate DB
+DB --> DecService : decision
+deactivate DB
+
+DecService -> DecService : Kiểm tra:\n- decision.status == "pending"? ✅\n- decision.expiresAt > now? ✅\n- decision.userId == req.user? ✅
+
+DecService -> DecService : Lưu file ảnh\n(local storage /uploads)
+
+DecService -> DB : Decision.findByIdAndUpdate(id, {\n  status: "completed",\n  checkin: {\n    imageUrl: "/uploads/xxx.jpg",\n    caption: "Tô bún bò ngon lắm!",\n    rating: 4,\n    completedAt: new Date()\n  }\n})
+activate DB
+DB --> DecService : updated decision
+deactivate DB
+
+DecService -> DB : Choice.findByIdAndUpdate(\n  choiceId,\n  {$inc: {timesCompleted: 1}}\n)
+activate DB
+DB --> DecService : updated choice
+deactivate DB
+
+== Bước 6: Cập nhật Streak ==
+
+DecService -> StreakService : incrementStreak(userId)
+activate StreakService
+
+StreakService -> DB : UserStreak.findOne({userId})
+activate DB
+DB --> StreakService : streak (hoặc null)
+deactivate DB
+
+alt Chưa có streak record
+  StreakService -> DB : UserStreak.create({\n  userId,\n  currentStreak: 1,\n  longestStreak: 1,\n  totalCheckins: 1,\n  lastCheckinDate: today,\n  streakStartDate: today,\n  level: 1\n})
+  activate DB
+  DB --> StreakService : new streak
+  deactivate DB
+else Đã check-in hôm nay
+  StreakService -> StreakService : totalCheckins++\nKhông thay đổi streak
+else Ngày liên tiếp (yesterday)
+  StreakService -> StreakService : currentStreak++\ntotalCheckins++\nlastCheckinDate = today
+  StreakService -> StreakService : if currentStreak > longestStreak:\n  longestStreak = currentStreak
+else Bị gián đoạn (> 1 ngày)
+  StreakService -> StreakService : currentStreak = 1\ntotalCheckins++\nstreakStartDate = today\nlastCheckinDate = today
+end
+
+== Bước 7: Tính Level ==
+
+StreakService -> StreakService : calculateLevel(currentStreak):\n  0-2   → Level 1 (Newcomer 🌱)\n  3-6   → Level 2 (Starter ⭐)\n  7-13  → Level 3 (Decisive 🔥)\n  14-29 → Level 4 (Committed 💪)\n  30-59 → Level 5 (Master 👑)\n  60-99 → Level 6 (Legend 💎)\n  100+  → Level 7 (Unstoppable 🏆)
+
+== Bước 8: Kiểm tra Badge ==
+
+StreakService -> StreakService : checkBadges():
+
+group Kiểm tra từng badge
+  StreakService -> StreakService : first_spin?\n  totalDecisions >= 1 → ✅ Đã có
+  StreakService -> StreakService : perfect_week?\n  currentStreak >= 7 → ✅ Đã có
+  StreakService -> DB : Đếm check-in theo\ncategory "do-an"
+  activate DB
+  DB --> StreakService : count = 8
+  deactivate DB
+  StreakService -> StreakService : foodie?\n  count >= 10 → ❌ Chưa đạt
+  StreakService -> DB : Đếm số category\nđã check-in
+  activate DB
+  DB --> StreakService : distinctCategories = 3
+  deactivate DB
+  StreakService -> StreakService : explorer?\n  count >= 5 → ❌ Chưa đạt
+end
+
+StreakService -> DB : UserStreak.findByIdAndUpdate({\n  currentStreak, longestStreak,\n  totalCheckins, level,\n  lastCheckinDate, badges\n})
+activate DB
+DB --> StreakService : updated streak
+deactivate DB
+
+StreakService --> DecService : {streak, newBadges: []}
+deactivate StreakService
+
+DecService --> Controller : {decision, streak}
+deactivate DecService
+
+Controller --> API : 200 OK\n{success: true, data: {\n  decision: {..., status: "completed"},\n  streak: {\n    currentStreak: 13,\n    level: 3,\n    newBadges: []\n  }\n}}
+deactivate Controller
+
+API --> CheckinPage : Response
+deactivate API
+
+== Bước 9: Hiển thị kết quả ==
+
+CheckinPage -> CheckinPage : Animation thành công 🎉\nConfetti + success message
+
+CheckinPage --> User : "Check-in thành công!\n🔥 Streak: 13 ngày\n⭐ Level 3 - Decisive"
+deactivate CheckinPage
+
+User -> Dashboard : Quay về Dashboard
+activate Dashboard
+Dashboard --> User : Cập nhật streak mới\nvà lịch sử
+deactivate Dashboard
+
+@enduml

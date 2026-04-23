@@ -1,0 +1,141 @@
+@startuml UseCase_TongQuat
+!theme plain
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+title **BIỂU ĐỒ USE CASE TỔNG QUÁT - DECISION MAKER**
+
+left to right direction
+
+actor "Khách\n(Guest)" as Guest #LightBlue
+actor "Người dùng\n(User)" as User #LightGreen
+actor "Quản trị viên\n(Admin)" as Admin #LightCoral
+
+rectangle "HỆ THỐNG DECISION MAKER" {
+
+  package "Xác thực & Tài khoản" as AuthPkg #E8F5E9 {
+    usecase "UC01: Đăng ký\ntài khoản" as UC01
+    usecase "UC02: Đăng nhập" as UC02
+    usecase "UC03: Đăng xuất" as UC03
+    usecase "UC04: Xem thông tin\ncá nhân" as UC04
+  }
+
+  package "Quản lý Danh mục" as CatPkg #E3F2FD {
+    usecase "UC05: Xem danh sách\ndanh mục" as UC05
+    usecase "UC06: Tạo danh mục\nmới" as UC06
+    usecase "UC07: Sửa danh mục" as UC07
+    usecase "UC08: Xóa danh mục" as UC08
+  }
+
+  package "Quản lý Lựa chọn" as ChoicePkg #FFF3E0 {
+    usecase "UC09: Xem lựa chọn\ntrong danh mục" as UC09
+    usecase "UC10: Thêm lựa chọn" as UC10
+    usecase "UC11: Sửa lựa chọn" as UC11
+    usecase "UC12: Xóa lựa chọn" as UC12
+  }
+
+  package "Vòng quay Quyết định" as SpinPkg #FCE4EC {
+    usecase "UC13: Chọn danh mục\nđể quay" as UC13
+    usecase "UC14: Quay vòng quay\n(Spin Wheel)" as UC14
+    usecase "UC15: Xem kết quả\nquay" as UC15
+    usecase "UC16: Chấp nhận\nkết quả" as UC16
+    usecase "UC17: Quay lại\n(Re-spin)" as UC17
+  }
+
+  package "Check-in" as CheckinPkg #F3E5F5 {
+    usecase "UC18: Upload ảnh\ncheck-in" as UC18
+    usecase "UC19: Đánh giá\ntrải nghiệm" as UC19
+    usecase "UC20: Gửi check-in" as UC20
+  }
+
+  package "Streak & Gamification" as StreakPkg #FFF9C4 {
+    usecase "UC21: Xem streak\nhiện tại" as UC21
+    usecase "UC22: Xem lịch\nstreak" as UC22
+    usecase "UC23: Xem huy hiệu" as UC23
+    usecase "UC24: Xem bảng\nxếp hạng" as UC24
+    usecase "UC25: Tự động\ntính level" as UC25
+    usecase "UC26: Tự động\ncấp badge" as UC26
+  }
+
+  package "Lịch sử & Thống kê" as HistoryPkg #E0F2F1 {
+    usecase "UC27: Xem lịch sử\nquyết định" as UC27
+    usecase "UC28: Lọc lịch sử" as UC28
+    usecase "UC29: Xem thống kê\ncá nhân" as UC29
+  }
+
+  package "Quản trị hệ thống" as AdminPkg #FFEBEE {
+    usecase "UC30: Xem dashboard\nadmin" as UC30
+    usecase "UC31: Quản lý\nngười dùng" as UC31
+    usecase "UC32: Quản lý\nvai trò" as UC32
+  }
+}
+
+' === Guest connections ===
+Guest --> UC01
+Guest --> UC02
+
+' === User connections ===
+User --> UC03
+User --> UC04
+User --> UC05
+User --> UC06
+User --> UC07
+User --> UC08
+User --> UC09
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC13
+User --> UC14
+User --> UC15
+User --> UC16
+User --> UC17
+User --> UC18
+User --> UC19
+User --> UC20
+User --> UC21
+User --> UC22
+User --> UC23
+User --> UC24
+User --> UC27
+User --> UC28
+User --> UC29
+
+' === Admin inherits User ===
+Admin --|> User
+
+' === Admin exclusive ===
+Admin --> UC30
+Admin --> UC31
+Admin --> UC32
+
+' === Relationships ===
+UC14 ..> UC13 : <<include>>
+UC15 ..> UC14 : <<include>>
+UC16 ..> UC15 : <<extend>>
+UC17 ..> UC15 : <<extend>>
+UC20 ..> UC18 : <<include>>
+UC20 ..> UC19 : <<include>>
+UC25 ..> UC20 : <<include>>
+UC26 ..> UC20 : <<include>>
+UC28 ..> UC27 : <<extend>>
+
+note bottom of UC14
+  Thuật toán Smart Random
+  với trọng số (weight),
+  cooldown 3 ngày,
+  boost cho choice mới
+end note
+
+note bottom of UC20
+  Bắt buộc: ảnh + rating
+  Tùy chọn: caption
+  Hạn: 24 giờ sau khi spin
+end note
+
+@enduml
