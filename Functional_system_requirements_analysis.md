@@ -80,8 +80,8 @@
         → Save to DB <br>
         → Xem lại sau<br>
 
-1. RBAC Matrix
-<h2>3.4 Ma trận phân quyền RBAC</h2>
+
+<h2>1. Ma trận phân quyền RBAC</h2>
 
 <table border="1" cellpadding="10" cellspacing="0">
   <thead>
@@ -144,10 +144,9 @@ spin, check-in, xem streak/history.<br>
 Chỉ admin mới có các permission đặc biệt ở bảng trên.
 </p>
 
-2. DFD Level 0 (Context Diagram)
-<h2>3B.1 DFD Mức 0 (Context Diagram)</h2>
 
-<p><b>File PlantUML:</b> diagrams/19_dfd_level0.puml</p>
+<h2>2. DFD Mức 0 (Context Diagram)</h2>
+
 
 <p>
 Sơ đồ mức 0 thể hiện hệ thống Decision Maker như một process duy nhất,
@@ -198,10 +197,9 @@ tương tác với 3 tác nhân bên ngoài (Guest, User, Admin).
   </tbody>
 </table>
 
-3. DFD Level 1 (Phân rã)
-<h2>3B.2 DFD Mức 1 (Phân rã)</h2>
 
-<p><b>File PlantUML:</b> diagrams/20_dfd_level1.puml</p>
+<h2>3. DFD Mức 1 (Phân rã)</h2>
+
 
 <p>Hệ thống được phân rã thành 7 tiến trình con:</p>
 
