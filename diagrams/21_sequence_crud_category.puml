@@ -1,0 +1,131 @@
+@startuml Sequence_CRUD_Category
+!theme plain
+skinparam sequenceArrowThickness 2
+
+title **BIỂU ĐỒ TUẦN TỰ - CRUD DANH MỤC (CATEGORY)**
+
+actor "Người dùng" as User #LightGreen
+participant "Frontend\n(/categories)" as FE #E3F2FD
+participant "API Client\n(Axios)" as API #FCE4EC
+participant "Category\nController" as Ctrl #E8F5E9
+participant "Category\nService" as Svc #C8E6C9
+database "MongoDB" as DB #F3E5F5
+
+== 1. XEM DANH SÁCH DANH MỤC ==
+
+User -> FE : Mở trang /categories
+activate FE
+FE -> API : GET /categories
+activate API
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : getAll(userId)
+activate Svc
+Svc -> DB : Category.find({\n  $or: [{createdBy: userId},\n        {isPublic: true}]\n}).sort({isDefault: -1, name: 1})
+activate DB
+DB --> Svc : categories[]
+deactivate DB
+Svc --> Ctrl : categories[]
+deactivate Svc
+Ctrl --> API : 200 {success: true, data: categories}
+deactivate Ctrl
+API --> FE : categories[]
+deactivate API
+FE --> User : Hiển thị grid danh mục\nvới icon, color, choiceCount
+deactivate FE
+
+== 2. TẠO DANH MỤC MỚI ==
+
+User -> FE : Nhấn "Thêm danh mục"\nNhập: name, icon, color
+activate FE
+FE -> FE : Validate form\n(name required, color hex)
+FE -> API : POST /categories\n{name: "Phim", icon: "🎬",\ncolor: "#E91E63"}
+activate API
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : create({name, icon,\ncolor, createdBy: userId})
+activate Svc
+Svc -> Svc : Tạo slug từ name:\n"phim" (Vietnamese-aware)
+Svc -> DB : Category.findOne({slug: "phim"})
+activate DB
+DB --> Svc : null (chưa tồn tại)
+deactivate DB
+Svc -> DB : Category.create({...})
+activate DB
+DB --> Svc : newCategory
+deactivate DB
+Svc --> Ctrl : newCategory
+deactivate Svc
+Ctrl --> API : 201 Created
+deactivate Ctrl
+API --> FE : newCategory
+deactivate API
+FE --> User : Thông báo "Đã tạo danh mục mới!"\nRefresh danh sách
+deactivate FE
+
+== 3. CẬP NHẬT DANH MỤC ==
+
+User -> FE : Nhấn "Sửa" trên danh mục\nThay đổi: name → "Phim hay"
+activate FE
+FE -> API : PUT /categories/:id\n{name: "Phim hay"}
+activate API
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : update(id, userId, data)
+activate Svc
+Svc -> DB : Category.findById(id)
+activate DB
+DB --> Svc : category
+deactivate DB
+Svc -> Svc : Kiểm tra createdBy == userId
+Svc -> Svc : Tạo slug mới: "phim-hay"
+Svc -> DB : findByIdAndUpdate(id, {...})
+activate DB
+DB --> Svc : updatedCategory
+deactivate DB
+Svc --> Ctrl : updatedCategory
+deactivate Svc
+Ctrl --> API : 200 OK
+deactivate Ctrl
+API --> FE : updatedCategory
+deactivate API
+FE --> User : Thông báo "Đã cập nhật!"\nRefresh danh sách
+deactivate FE
+
+== 4. XÓA DANH MỤC ==
+
+User -> FE : Nhấn "Xóa", xác nhận Popconfirm
+activate FE
+FE -> API : DELETE /categories/:id
+activate API
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : delete(id, userId)
+activate Svc
+Svc -> DB : Category.findById(id)
+activate DB
+DB --> Svc : category
+deactivate DB
+Svc -> Svc : Kiểm tra:\n- createdBy == userId? ✅\n- isDefault == false? ✅
+
+alt isDefault == true
+  Svc --> Ctrl : throw 403\n"Không thể xóa danh mục mặc định"
+  Ctrl --> API : 403 Forbidden
+  API --> FE : Error
+  FE --> User : Thông báo lỗi
+end
+
+Svc -> DB : Category.findByIdAndDelete(id)
+activate DB
+DB --> Svc : deleted
+deactivate DB
+Svc --> Ctrl : OK
+deactivate Svc
+Ctrl --> API : 200 OK
+deactivate Ctrl
+API --> FE : success
+deactivate API
+FE --> User : Thông báo "Đã xóa danh mục"\nRefresh danh sách
+deactivate FE
+
+@enduml

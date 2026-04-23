@@ -1,0 +1,93 @@
+@startuml Sequence_Register
+!theme plain
+skinparam sequenceArrowThickness 2
+
+title **BIỂU ĐỒ TUẦN TỰ - ĐĂNG KÝ TÀI KHOẢN**
+
+actor "Khách\n(Guest)" as Guest #LightBlue
+participant "Browser\n(Next.js)" as Frontend #E3F2FD
+participant "Zustand\nAuth Store" as Store #FFF3E0
+participant "Axios\nClient" as Axios #FCE4EC
+participant "Express\nServer" as Backend #E8F5E9
+participant "Auth\nService" as AuthSvc #C8E6C9
+database "MongoDB" as DB #F3E5F5
+
+== Mở trang đăng ký ==
+
+Guest -> Frontend : Truy cập /login\n(tab Đăng ký)
+activate Frontend
+Frontend --> Guest : Hiển thị form đăng ký\n(name, email, password)
+deactivate Frontend
+
+== Gửi thông tin đăng ký ==
+
+Guest -> Frontend : Nhập thông tin:\n- Tên: "Nguyễn Văn A"\n- Email: "a@example.com"\n- Password: "abc123"\nNhấn "Đăng ký"
+activate Frontend
+
+Frontend -> Frontend : Client-side validation:\n- Name: 2-100 ký tự ✅\n- Email: format hợp lệ ✅\n- Password: >= 6 ký tự ✅
+
+Frontend -> Store : register(name, email, password)
+activate Store
+
+Store -> Axios : POST /api/auth/register\n{name, email, password}
+activate Axios
+
+Axios -> Backend : HTTP POST
+activate Backend
+
+== Server xử lý ==
+
+Backend -> Backend : express-validator:\n- name: isLength(2,100) ✅\n- email: isEmail() ✅\n- password: isLength(6) ✅
+
+Backend -> AuthSvc : register(name, email, password)
+activate AuthSvc
+
+AuthSvc -> DB : User.findOne({email})
+activate DB
+DB --> AuthSvc : null (chưa tồn tại)
+deactivate DB
+
+alt Email đã tồn tại
+  DB --> AuthSvc : existing user
+  AuthSvc --> Backend : throw Error(409)
+  Backend --> Axios : 409 Conflict\n"Email đã được sử dụng"
+  Axios --> Store : Error
+  Store --> Frontend : Error
+  Frontend --> Guest : Hiển thị lỗi:\n"Email đã được sử dụng"
+end
+
+AuthSvc -> AuthSvc : hashedPassword =\nbcrypt.hash(password, 12)
+
+AuthSvc -> DB : User.create({\n  name: "Nguyễn Văn A",\n  email: "a@example.com",\n  password: hashedPassword,\n  role: "viewer",\n  isActive: true\n})
+activate DB
+DB --> AuthSvc : newUser
+deactivate DB
+
+AuthSvc -> DB : UserStreak.create({\n  userId: newUser._id,\n  currentStreak: 0,\n  level: 1\n})
+activate DB
+DB --> AuthSvc : newStreak
+deactivate DB
+
+AuthSvc -> AuthSvc : token = jwt.sign({\n  userId: newUser._id,\n  email: newUser.email,\n  role: "viewer",\n  permissions: []\n}, JWT_SECRET, {expiresIn: '7d'})
+
+AuthSvc --> Backend : {user, token}
+deactivate AuthSvc
+
+Backend --> Axios : 201 Created\n{success: true,\n data: {user, token}}
+deactivate Backend
+
+Axios --> Store : {user, token}
+deactivate Axios
+
+== Lưu trạng thái ==
+
+Store -> Store : set({\n  token: "eyJhbG...",\n  user: {id, name, email, role}\n})\nPersist → localStorage
+
+Store --> Frontend : Đăng ký thành công
+deactivate Store
+
+Frontend -> Frontend : router.push('/dashboard')
+Frontend --> Guest : Redirect → /dashboard\n"Chào mừng Nguyễn Văn A!"
+deactivate Frontend
+
+@enduml

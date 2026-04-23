@@ -1,0 +1,309 @@
+@startuml Class_Diagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  ArrowColor #333333
+}
+
+title **BIỂU ĐỒ LỚP (CLASS DIAGRAM) - DECISION MAKER**
+
+' ==================== MODELS ====================
+
+package "Models" #E8F5E9 {
+
+  class User {
+    - _id: ObjectId
+    - name: String
+    - email: String
+    - password: String
+    - role: String
+    - isActive: Boolean
+    - createdAt: Date
+    - updatedAt: Date
+    --
+    + toJSON(): Object
+  }
+
+  class Category {
+    - _id: ObjectId
+    - name: String
+    - slug: String
+    - icon: String
+    - color: String
+    - description: String
+    - isDefault: Boolean
+    - isPublic: Boolean
+    - createdBy: ObjectId
+    - choiceCount: Number
+    - createdAt: Date
+    - updatedAt: Date
+    --
+    + generateSlug(): String
+  }
+
+  class Choice {
+    - _id: ObjectId
+    - categoryId: ObjectId
+    - name: String
+    - description: String
+    - imageUrl: String
+    - tags: String[]
+    - location: Location
+    - metadata: ChoiceMetadata
+    - weight: Number
+    - isActive: Boolean
+    - createdBy: ObjectId
+    - timesSelected: Number
+    - timesCompleted: Number
+    - lastSelectedAt: Date
+    - createdAt: Date
+    - updatedAt: Date
+  }
+
+  class Decision {
+    - _id: ObjectId
+    - userId: ObjectId
+    - categoryId: ObjectId
+    - choiceId: ObjectId
+    - question: String
+    - status: DecisionStatus
+    - spinCount: Number
+    - checkin: CheckinData
+    - expiresAt: Date
+    - createdAt: Date
+    - updatedAt: Date
+    --
+    + isExpired(): Boolean
+  }
+
+  class UserStreak {
+    - _id: ObjectId
+    - userId: ObjectId
+    - currentStreak: Number
+    - longestStreak: Number
+    - totalDecisions: Number
+    - totalCheckins: Number
+    - lastCheckinDate: Date
+    - streakStartDate: Date
+    - level: Number
+    - badges: Badge[]
+    - createdAt: Date
+    - updatedAt: Date
+    --
+    + calculateLevel(): Number
+  }
+
+  class Role {
+    - _id: ObjectId
+    - name: String
+    - slug: String
+    - description: String
+    - permissions: ObjectId[]
+    - isActive: Boolean
+    - createdAt: Date
+    - updatedAt: Date
+  }
+
+  class Permission {
+    - _id: ObjectId
+    - name: String
+    - slug: String
+    - description: String
+    - module: String
+    - action: String
+    - createdAt: Date
+    - updatedAt: Date
+  }
+}
+
+' ==================== EMBEDDED TYPES ====================
+
+package "Embedded Types" #FFF3E0 {
+
+  class Location <<value object>> {
+    - lat: Number
+    - lng: Number
+    - address: String
+  }
+
+  class ChoiceMetadata <<value object>> {
+    - priceRange: Number
+    - rating: Number
+    - url: String
+  }
+
+  class CheckinData <<value object>> {
+    - imageUrl: String
+    - caption: String
+    - rating: Number
+    - completedAt: Date
+  }
+
+  class Badge <<value object>> {
+    - slug: String
+    - name: String
+    - icon: String
+    - earnedAt: Date
+  }
+
+  enum DecisionStatus {
+    pending
+    completed
+    skipped
+    expired
+  }
+}
+
+' ==================== SERVICES ====================
+
+package "Services" #E3F2FD {
+
+  class AuthService {
+    + register(name, email, password): {user, token}
+    + login(email, password): {user, token}
+    + getProfile(userId): User
+    - generateToken(payload): String
+    - hashPassword(password): String
+    - comparePassword(plain, hashed): Boolean
+  }
+
+  class CategoryService {
+    + getAll(userId): Category[]
+    + getById(id): Category
+    + create(data): Category
+    + update(id, data): Category
+    + delete(id): void
+  }
+
+  class ChoiceService {
+    + getByCategory(categoryId): Choice[]
+    + getById(id): Choice
+    + create(data): Choice
+    + update(id, data): Choice
+    + delete(id): void
+  }
+
+  class DecisionService {
+    + spin(userId, categoryId, question): Decision
+    + getHistory(userId, page, limit): Decision[]
+    + getToday(userId): Decision[]
+    + accept(decisionId): Decision
+    + skip(decisionId): Decision
+    + checkin(decisionId, image, caption, rating): Decision
+    - smartRandom(choices): Choice
+    - applyWeightModifiers(choices): Choice[]
+  }
+
+  class StreakService {
+    + getStreak(userId): UserStreak
+    + getLeaderboard(): UserStreak[]
+    + incrementStreak(userId): UserStreak
+    - calculateLevel(streak): Number
+    - checkAndAwardBadges(userId, streak): Badge[]
+    - isConsecutiveDay(lastDate, now): Boolean
+  }
+}
+
+' ==================== CONTROLLERS ====================
+
+package "Controllers" #FCE4EC {
+
+  class AuthController {
+    + register(req, res): Response
+    + login(req, res): Response
+    + getMe(req, res): Response
+  }
+
+  class CategoryController {
+    + index(req, res): Response
+    + show(req, res): Response
+    + store(req, res): Response
+    + update(req, res): Response
+    + destroy(req, res): Response
+  }
+
+  class ChoiceController {
+    + getByCategory(req, res): Response
+    + show(req, res): Response
+    + store(req, res): Response
+    + update(req, res): Response
+    + destroy(req, res): Response
+  }
+
+  class DecisionController {
+    + spin(req, res): Response
+    + index(req, res): Response
+    + today(req, res): Response
+    + accept(req, res): Response
+    + skip(req, res): Response
+    + checkin(req, res): Response
+  }
+
+  class StreakController {
+    + getMe(req, res): Response
+    + leaderboard(req, res): Response
+  }
+}
+
+' ==================== MIDDLEWARES ====================
+
+package "Middlewares" #F3E5F5 {
+
+  class AuthMiddleware {
+    + authenticate(req, res, next): void
+    - extractToken(req): String
+    - verifyToken(token): Payload
+  }
+
+  class RoleMiddleware {
+    + checkRole(roles: String[]): Middleware
+    + checkPermission(perms: String[]): Middleware
+  }
+
+  class ValidateMiddleware {
+    + validate(req, res, next): void
+  }
+
+  class ErrorMiddleware {
+    + errorHandler(err, req, res, next): void
+  }
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Model relationships
+User "1" -- "0..*" Category : creates >
+User "1" -- "0..*" Choice : creates >
+User "1" -- "0..*" Decision : makes >
+User "1" -- "0..1" UserStreak : has >
+Category "1" -- "0..*" Choice : contains >
+Category "1" -- "0..*" Decision : referenced by <
+Choice "1" -- "0..*" Decision : selected in <
+Role "1" -- "0..*" Permission : has >
+
+' Embedded types
+Choice *-- Location
+Choice *-- ChoiceMetadata
+Decision *-- CheckinData
+Decision *-- DecisionStatus
+UserStreak *-- Badge
+
+' Controller -> Service
+AuthController ..> AuthService : uses
+CategoryController ..> CategoryService : uses
+ChoiceController ..> ChoiceService : uses
+DecisionController ..> DecisionService : uses
+StreakController ..> StreakService : uses
+
+' Service -> Model
+AuthService ..> User : manages
+CategoryService ..> Category : manages
+ChoiceService ..> Choice : manages
+DecisionService ..> Decision : manages
+DecisionService ..> Choice : reads/updates
+DecisionService ..> StreakService : calls
+StreakService ..> UserStreak : manages
+
+@enduml

@@ -1,0 +1,199 @@
+@startuml Component_Diagram
+!theme plain
+skinparam component {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ THÀNH PHẦN (COMPONENT DIAGRAM) - DECISION MAKER**
+
+package "CLIENT LAYER" #E3F2FD {
+
+  package "Browser" {
+    [Landing Page\n(/)] as LP
+    [Login Page\n(/login)] as LoginP
+  }
+
+  package "Next.js 14 Frontend" #BBDEFB {
+
+    package "Pages (App Router)" {
+      [Dashboard\n(/dashboard)] as DashP
+      [Spin Page\n(/spin)] as SpinP
+      [Check-in Page\n(/checkin)] as CheckP
+      [History Page\n(/history)] as HistP
+      [Profile Page\n(/profile)] as ProfP
+      [Categories Page\n(/categories)] as CatP
+      [Users Page\n(/users)] as UserP
+    }
+
+    package "Components" {
+      [SpinWheel\n(Canvas API)] as SpinComp
+      [SpinResult] as ResultComp
+      [StatsCard] as StatsComp
+      [SimpleChart] as ChartComp
+    }
+
+    package "State Management" {
+      [Zustand\nAuth Store] as AuthStore
+      [Zustand\nUI Store] as UIStore
+    }
+
+    package "API Client" {
+      [Axios Instance\n+ Interceptors] as AxiosClient
+      [Auth API] as AuthAPI
+      [Categories API] as CatAPI
+      [Choices API] as ChoiceAPI
+      [Decisions API] as DecAPI
+      [Streaks API] as StreakAPI
+    }
+  }
+}
+
+package "SERVER LAYER" #E8F5E9 {
+
+  package "Express.js Backend" #C8E6C9 {
+
+    package "Middleware Pipeline" {
+      [CORS] as CORS
+      [Morgan\n(Logger)] as Morgan
+      [JSON Parser] as JSONParser
+      [Auth\nMiddleware] as AuthMW
+      [Role\nMiddleware] as RoleMW
+      [Validate\nMiddleware] as ValidMW
+      [Error\nHandler] as ErrorMW
+    }
+
+    package "Modules" {
+      package "Auth Module" {
+        [Auth\nController] as AuthCtrl
+        [Auth\nService] as AuthSvc
+        [Auth\nValidation] as AuthVal
+      }
+
+      package "Category Module" {
+        [Category\nController] as CatCtrl
+        [Category\nService] as CatSvc
+        [Category\nModel] as CatModel
+      }
+
+      package "Choice Module" {
+        [Choice\nController] as ChoiceCtrl
+        [Choice\nService] as ChoiceSvc
+        [Choice\nModel] as ChoiceModel
+      }
+
+      package "Decision Module" {
+        [Decision\nController] as DecCtrl
+        [Decision\nService] as DecSvc
+        [Decision\nModel] as DecModel
+      }
+
+      package "Streak Module" {
+        [Streak\nController] as StreakCtrl
+        [Streak\nService] as StreakSvc
+        [UserStreak\nModel] as StreakModel
+      }
+
+      package "User Module" {
+        [User\nController] as UserCtrl
+        [User\nService] as UserSvc
+        [User\nModel] as UserModel
+      }
+    }
+
+    package "Utils" {
+      [JWT\nHelper] as JWTUtil
+      [Hash\nHelper] as HashUtil
+      [Logger] as LogUtil
+    }
+
+    package "Common" {
+      [Response\nFormatter] as ResFmt
+      [Pagination\nHelper] as PagHelp
+    }
+  }
+}
+
+package "DATA LAYER" #FFF3E0 {
+  database "MongoDB" as MongoDB {
+    [users] as UsersCol
+    [categories] as CatCol
+    [choices] as ChoicesCol
+    [decisions] as DecCol
+    [userstreaks] as StreakCol
+    [roles] as RolesCol
+    [permissions] as PermsCol
+  }
+}
+
+package "EXTERNAL" #F3E5F5 {
+  [File System\n(/uploads)] as FileSystem
+}
+
+' === Frontend internal connections ===
+SpinP --> SpinComp
+SpinP --> ResultComp
+DashP --> StatsComp
+ProfP --> ChartComp
+
+DashP --> DecAPI
+SpinP --> CatAPI
+SpinP --> ChoiceAPI
+SpinP --> DecAPI
+CheckP --> DecAPI
+HistP --> DecAPI
+ProfP --> StreakAPI
+CatP --> CatAPI
+CatP --> ChoiceAPI
+UserP --> AuthAPI
+LoginP --> AuthAPI
+
+AuthAPI --> AxiosClient
+CatAPI --> AxiosClient
+ChoiceAPI --> AxiosClient
+DecAPI --> AxiosClient
+StreakAPI --> AxiosClient
+
+AxiosClient --> AuthStore : Token
+
+' === Client -> Server ===
+AxiosClient ==> CORS : HTTP/REST
+
+' === Middleware chain ===
+CORS --> Morgan
+Morgan --> JSONParser
+JSONParser --> AuthMW
+AuthMW --> RoleMW
+RoleMW --> ValidMW
+
+' === Controller -> Service ===
+AuthCtrl --> AuthSvc
+CatCtrl --> CatSvc
+ChoiceCtrl --> ChoiceSvc
+DecCtrl --> DecSvc
+StreakCtrl --> StreakSvc
+UserCtrl --> UserSvc
+
+' === Service -> Utils ===
+AuthSvc --> JWTUtil
+AuthSvc --> HashUtil
+DecSvc --> StreakSvc
+
+' === Service -> Model -> DB ===
+AuthSvc --> UserModel
+CatSvc --> CatModel
+ChoiceSvc --> ChoiceModel
+DecSvc --> DecModel
+StreakSvc --> StreakModel
+UserSvc --> UserModel
+
+UserModel --> UsersCol
+CatModel --> CatCol
+ChoiceModel --> ChoicesCol
+DecModel --> DecCol
+StreakModel --> StreakCol
+
+' === File upload ===
+DecSvc --> FileSystem : Upload ảnh check-in
+
+@enduml
