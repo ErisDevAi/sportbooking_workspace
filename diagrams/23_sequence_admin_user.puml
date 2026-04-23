@@ -1,0 +1,131 @@
+@startuml Sequence_Admin_User
+!theme plain
+skinparam sequenceArrowThickness 2
+
+title **BIỂU ĐỒ TUẦN TỰ - QUẢN LÝ NGƯỜI DÙNG (ADMIN)**
+
+actor "Admin" as Admin #LightCoral
+participant "Frontend\n(/users)" as FE #E3F2FD
+participant "API Client" as API #FCE4EC
+participant "Auth\nMiddleware" as AuthMW #FFF9C4
+participant "Role\nMiddleware" as RoleMW #FFF9C4
+participant "User\nController" as Ctrl #E8F5E9
+participant "User\nService" as Svc #C8E6C9
+database "MongoDB" as DB #F3E5F5
+
+== XEM DANH SÁCH NGƯỜI DÙNG ==
+
+Admin -> FE : Mở trang /users
+activate FE
+FE -> API : GET /users?page=1&limit=10
+activate API
+API -> AuthMW : Authorization: Bearer <token>
+activate AuthMW
+AuthMW -> AuthMW : jwt.verify(token)\nreq.user = payload
+AuthMW -> RoleMW : next()
+deactivate AuthMW
+activate RoleMW
+RoleMW -> RoleMW : checkPermission("view_user")\nreq.user.permissions\nincludes "view_user"? ✅
+RoleMW -> Ctrl : next()
+deactivate RoleMW
+activate Ctrl
+Ctrl -> Svc : getAll(skip=0, limit=10, page=1)
+activate Svc
+Svc -> DB : User.find()\n.skip(0).limit(10)\n.sort({createdAt: -1})
+activate DB
+DB --> Svc : users[]
+deactivate DB
+Svc -> DB : User.countDocuments()
+activate DB
+DB --> Svc : total = 25
+deactivate DB
+Svc --> Ctrl : {items: users, meta: {page:1, limit:10, total:25, totalPages:3}}
+deactivate Svc
+Ctrl --> API : 200 OK\n{success: true, data: users, meta: {...}}
+deactivate Ctrl
+API --> FE : users[] + pagination
+deactivate API
+FE --> Admin : Hiển thị bảng người dùng\nvới phân trang
+deactivate FE
+
+== TẠO NGƯỜI DÙNG MỚI ==
+
+Admin -> FE : Nhấn "Tạo mới"\nNhập: name, email, password, role
+activate FE
+FE -> API : POST /users\n{name, email, password, role: "editor"}
+activate API
+API -> AuthMW : verify token
+API -> RoleMW : checkRole("admin") +\ncheckPermission("create_user")
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : create({name, email, password, role})
+activate Svc
+Svc -> DB : User.findOne({email})
+activate DB
+DB --> Svc : null (OK, chưa tồn tại)
+deactivate DB
+Svc -> Svc : hashedPw = bcrypt.hash(password, 12)
+Svc -> DB : User.create({name, email,\npassword: hashedPw, role: "editor"})
+activate DB
+DB --> Svc : newUser
+deactivate DB
+Svc --> Ctrl : newUser (không có password)
+deactivate Svc
+Ctrl --> API : 201 Created
+deactivate Ctrl
+API --> FE : newUser
+deactivate API
+FE --> Admin : Thông báo thành công\nRefresh bảng
+deactivate FE
+
+== VÔ HIỆU HÓA TÀI KHOẢN ==
+
+Admin -> FE : Nhấn toggle "Active → Inactive"
+activate FE
+FE -> API : PUT /users/:id\n{isActive: false}
+activate API
+API -> AuthMW : verify
+API -> RoleMW : checkPermission("edit_user")
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : update(id, {isActive: false})
+activate Svc
+Svc -> DB : User.findByIdAndUpdate(id,\n{isActive: false}, {new: true})
+activate DB
+DB --> Svc : updatedUser
+deactivate DB
+Svc --> Ctrl : updatedUser
+deactivate Svc
+Ctrl --> API : 200 OK
+deactivate Ctrl
+API --> FE : updatedUser
+deactivate API
+FE --> Admin : Status đổi sang "Inactive"\nUser này sẽ nhận 403 khi login
+deactivate FE
+
+== XÓA NGƯỜI DÙNG ==
+
+Admin -> FE : Nhấn "Xóa", xác nhận
+activate FE
+FE -> API : DELETE /users/:id
+activate API
+API -> AuthMW : verify
+API -> RoleMW : checkRole("admin") +\ncheckPermission("delete_user")
+API -> Ctrl : request
+activate Ctrl
+Ctrl -> Svc : delete(id)
+activate Svc
+Svc -> DB : User.findByIdAndDelete(id)
+activate DB
+DB --> Svc : deleted
+deactivate DB
+Svc --> Ctrl : OK
+deactivate Svc
+Ctrl --> API : 200 OK
+deactivate Ctrl
+API --> FE : success
+deactivate API
+FE --> Admin : Thông báo "Đã xóa"\nRefresh bảng
+deactivate FE
+
+@enduml

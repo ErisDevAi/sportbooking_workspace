@@ -1,0 +1,192 @@
+@startuml Activity_TongQuat
+!theme plain
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF9C4
+}
+
+title **BIỂU ĐỒ HOẠT ĐỘNG TỔNG QUÁT - DECISION MAKER**\nLuồng chính: Đăng nhập → Quay → Check-in → Streak
+
+|Người dùng|
+start
+
+:Truy cập website
+Decision Maker;
+
+|Hệ thống|
+:Hiển thị Landing Page
+"Không biết chọn gì?
+Để chúng tôi giúp bạn!";
+
+|Người dùng|
+if (Đã có tài khoản?) then (Có)
+  :Nhấn "Đăng nhập";
+else (Chưa)
+  :Nhấn "Đăng ký";
+
+  |Hệ thống|
+  :Hiển thị form đăng ký;
+
+  |Người dùng|
+  :Nhập tên, email, mật khẩu;
+
+  |Hệ thống|
+  :Validate & tạo tài khoản
+  Hash password (bcrypt)
+  Tạo JWT token;
+endif
+
+|Người dùng|
+:Nhập email & mật khẩu;
+
+|Hệ thống|
+:Xác thực thông tin
+So sánh bcrypt hash
+Tạo JWT token;
+
+if (Đăng nhập thành công?) then (Thành công ✅)
+  :Lưu token vào localStorage
+  Redirect → /dashboard;
+else (Thất bại ❌)
+  :Hiển thị lỗi
+  "Email hoặc mật khẩu
+  không chính xác";
+  |Người dùng|
+  :Thử lại;
+  note right: Loop lại đăng nhập
+  stop
+endif
+
+|Hệ thống|
+:Hiển thị **Dashboard**
+- Streak hiện tại
+- Level
+- Tỉ lệ hoàn thành;
+
+:Kiểm tra Decision pending;
+
+if (Có nhiệm vụ pending?) then (Có)
+  :Hiển thị card
+  "Nhiệm vụ hôm nay"
+  với countdown timer;
+
+  |Người dùng|
+  if (Muốn check-in?) then (Check-in 📸)
+    :Nhấn "Check-in ngay";
+    note right
+      Chuyển đến
+      luồng CHECK-IN
+      (Activity_Checkin)
+    end note
+
+    |Hệ thống|
+    :Hiển thị form check-in;
+
+    |Người dùng|
+    :Upload ảnh + đánh giá
+    + caption (tùy chọn);
+
+    :Nhấn "Hoàn thành";
+
+    |Hệ thống|
+    :Xử lý check-in
+    Cập nhật Decision → completed
+    Cập nhật Streak
+    Tính Level + Badge;
+
+    #C8E6C9:Hiển thị thành công!
+    🔥 Streak: X ngày
+    ⭐ Level: Y;
+
+  else (Quay mới 🎰)
+  endif
+else (Không có)
+endif
+
+|Người dùng|
+:Nhấn menu **"Spin"**;
+
+|Hệ thống|
+:Chuyển đến /spin
+Tải danh mục + lựa chọn;
+
+|Người dùng|
+:Chọn danh mục
+(VD: Đồ ăn 🍜);
+
+|Hệ thống|
+:Hiển thị vòng quay
+với các lựa chọn;
+
+|Người dùng|
+:Nhấn **"QUAY NGAY!"** 🎰;
+
+|Hệ thống|
+:Thực hiện Smart Random
+(weighted + cooldown + boost);
+
+:Animation quay 4 giây
+với easing deceleration;
+
+:Hiển thị kết quả
+với confetti 🎉;
+
+|Người dùng|
+if (Chấp nhận kết quả?) then (Chấp nhận ✅)
+  |Hệ thống|
+  :Tạo Decision mới
+  status: "pending"
+  expiresAt: now + 24h;
+
+  :Redirect → /dashboard
+  Hiển thị "Nhiệm vụ hôm nay";
+
+  |Người dùng|
+  :Thực hiện quyết định
+  trong đời thực
+  (VD: đi ăn bún bò);
+
+  :Quay lại website
+  Nhấn "Check-in";
+
+  note right
+    Quay lại luồng
+    CHECK-IN ở trên
+  end note
+
+else (Quay lại 🔄)
+  |Hệ thống|
+  if (Còn lượt re-spin?\n(max 2/ngày)) then (Còn)
+    :Quay lại Smart Random;
+    note right: Loop lại quay
+  else (Hết lượt)
+    :Thông báo hết lượt
+    "Vui lòng chấp nhận";
+  endif
+endif
+
+|Người dùng|
+
+fork
+  :Xem **Lịch sử** (/history)
+  Danh sách quyết định
+  đã quay;
+fork again
+  :Xem **Profile** (/profile)
+  Streak calendar
+  Huy hiệu đã đạt
+  Thống kê danh mục;
+fork again
+  :Xem **Bảng xếp hạng**
+  Top 10 streak;
+fork again
+  :Quản lý **Danh mục**
+  (/categories)
+  Tạo/sửa/xóa danh mục
+  và lựa chọn;
+end fork
+
+stop
+
+@enduml

@@ -44,7 +44,7 @@ Tên món ăn / hoạt động
 Mô tả ngắn
 Nút: “Thử lại” / “Xem chi tiết”
 
-#### 1. User flow: Lọc theo sở thích (Filter)
+#### 2. User flow: Lọc theo sở thích (Filter)
 
 Mục tiêu: Người dùng muốn gợi ý phù hợp hơn
 
@@ -548,4 +548,1246 @@ Người dùng (User)
     <td>Fronend</td>
     <td></td>
   </tr>
+</table>
+
+## Biểu đồ usecase
+
+### 3.1 usecase tổng quát
+
+### 3.2 Đặc tả Use Case chi tiết
+<h1>Đặc tả Use Case chi tiết</h1>
+<h1>UC10: Quay Spin Wheel(Use Case chính)</h1>
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Quay Spin Wheel</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Người dùng chọn danh mục và quay vòng quay để nhận kết quả ngẫu nhiên</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập, danh mục có ít nhất 2 lựa chọn active</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Tạo Decision mới với trạng thái "pending"</td>
+    </tr>
+</table>
+<table> 
+    <tr>
+        <th>Luồng chính (Main Flow)</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Chọn danh mục từ dropdown</td>
+        <td>Tải danh sách lựa chọn thuộc danh mục</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Nhập câu hỏi tùy chọn</td>
+        <td>Hiển thị vòng quay với các lựa chọn</td>
+    </tr>
+    <tr>
+        <td>3<td>Nhấn nút "QUAY NGAY!"</td>
+        <td>Gửi request spin đến API</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>API thực hiện thuật toán random có trọng số</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td></td>
+        <td>Trả về kết quả (choiceId)</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td></td>
+        <td>Hiển thị animation quay 4 giây</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td></td>
+        <td>Hiển thị kết quả với confetti</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td></td>
+        <td>Nhấn "chấp nhận"</td>
+        <td>Cập nhật Decision status, hiển thị nhiệm vụ</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>Luồng thay thế</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>8a</td>
+        <td>Người dùng nhấn "Quay lại" để kiểm tra số lần re-spin còn lại(tối đa 2 lần/ngày). Nếu còn, quay lại bước 4</td>
+    </tr>
+    <tr>
+        <td>8b</td>
+        <td>Hết lượt re-spin: Hiển thị thông báo "đã hết lượt quay lại"</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>Luồng ngoại lệ</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>1a</td>
+        <td>Danh mục ít hơn 2 lựa chọn:thông báo lỗi</td>
+    </tr>
+    <tr>
+        <td>4a</td>
+        <td>Lỗi server: hiển thị thông báo "Vui lòng thử lại"</td>
+    </tr>
+</table>  
+
+<h1>UC13:Check-in</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Check-in xác nhận hoàn thành</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Upload ảnh, đánh giá, xác nhận đã thực hiện quyết định</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Có Decision ở trạng thái "pending", chưa quá hạn 24h</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Decision chuyển sang "completed", cập nhật streak</td> 
+</table>
+
+<table>
+    <tr>
+        <th>Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Nhấn "Check-in ngay" từ dashboard</td>
+        <td>Hiển thị form check-in với thông tin nhiệm vụ</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Chọn ảnh từ thiết bị hoặc chụp mới</td>
+        <td>Preview ảnh đã chọn</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Dánh giá 1-5 sao</td>
+        <td>Lưu đánh giá</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Viết caption (tùy chọn)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Nhấn "Hoàn thành Check-in"</td>
+        <td>Upload ảnh, gửi dữ liệu đến API</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td></td>
+        <td>Cập nhật Decision.status = "completed"</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td></td>
+        <td>Cập nhật UserStreak (streak, level, badges)</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td></td>
+        <td>Hiển thị animation thành công + streak mới</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC01: Đăng ký tài khoản</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Đăng ký tài khoản</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>Guest</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Khách tạo tài khoản mới để sử dụng hệ thống</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Chưa có tài khoản, truy cập trang /login</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Tài khoản được tạo, nhận JWT token, redirect /dashboard</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Nhấn tab "Đăng ký"</td>
+        <td>Hiển thị form đăng ký (tên, email, password)</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Nhập đầy đủ thông tin</td>
+        <td>Validate client-side (tên >= 2 ký tự, email hợp lệ, password >= 6 ký tự)</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Nhấn "Đăng ký"</td>
+        <td>POST /auth/register</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>Kiểm tra email chưa tồn tại</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td></td>
+        <td>Hash password (bcrypt, 12 rounds)</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td></td>
+        <td>Tạo User (role: "viewer")</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td></td>
+        <td>Tạo JWT token</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td></td>
+        <td>Trả về {token, user}</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td></td>
+        <td>Lưu token vào localStorage, redirect /dashboard</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="2">Luồng ngoại lệ</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>4a</td>
+        <td>Email đã tồn tại → 409 "Email đã được sử dụng"</td>
+    </tr>
+    <tr>
+        <td>2a</td>
+        <td>Dữ liệu không hợp lệ → 422 hiển thị lỗi validation</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC02: Đăng nhập</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>Guest</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Xác thực bằng email/password để truy cập hệ thống</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã có tài khoản</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Nhận JWT token, redirect /dashboard</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Nhập email và password</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Nhấn "Đăng nhập"</td>
+        <td>POST /auth/login</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td></td>
+        <td>Tìm user theo email</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>So sánh password (bcrypt)</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td></td>
+        <td>Kiểm tra isActive == true</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td></td>
+        <td>Tra cứu role → lấy permissions[]</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td></td>
+        <td>Tạo JWT token (userId, email, role, permissions)</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td></td>
+        <td>Trả về {token, user}</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td></td>
+        <td>Lưu token, redirect /dashboard</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="2">Luồng ngoại lệ</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>3a</td>
+        <td>Email không tồn tại → 401 "Email hoặc mật khẩu không chính xác"</td>
+    </tr>
+    <tr>
+        <td>4a</td>
+        <td>Password sai → 401 "Email hoặc mật khẩu không chính xác"</td>
+    </tr>
+    <tr>
+        <td>5a</td>
+        <td>Tài khoản bị vô hiệu hóa → 403 "Tài khoản đã bị khóa"</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC03: Đăng xuất</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Đăng xuất</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User, Admin</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Kết thúc phiên đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Token bị xóa, redirect /login</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Nhấn "Đăng xuất" trên sidebar</td>
+        <td>Xóa token khỏi Zustand store + localStorage</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td></td>
+        <td>Redirect về /login</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC05: Xem danh sách danh mục</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Xem danh sách danh mục</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Xem tất cả danh mục (mặc định + tự tạo + public)</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Hiển thị danh sách danh mục</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Mở trang /categories</td>
+        <td>GET /categories</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td></td>
+        <td>Trả về danh mục: createdBy == userId HOẶC isPublic == true</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td></td>
+        <td>Sắp xếp: mặc định trước, theo tên</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>Hiển thị grid cards với icon, color, choiceCount</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC06: Tạo danh mục mới</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Tạo danh mục mới</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Tạo danh mục tùy chỉnh với tên, icon, màu sắc</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Danh mục mới được tạo với slug tự động</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Nhấn "Thêm danh mục"</td>
+        <td>Hiển thị modal form</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Nhập tên, chọn icon (emoji), chọn màu</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Nhấn "Tạo mới"</td>
+        <td>Validate: name required (max 100), color hex</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>Tạo slug từ tên (Vietnamese-aware, unique)</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td></td>
+        <td>POST /categories</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td></td>
+        <td>Trả về danh mục mới, refresh danh sách</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="2">Luồng ngoại lệ</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>4a</td>
+        <td>Slug trùng → thêm hậu tố (-1, -2...)</td>
+    </tr>
+    <tr>
+        <td>3a</td>
+        <td>Validation fail → hiển thị lỗi trên form</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC08: Thêm lựa chọn</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Thêm lựa chọn vào danh mục</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Thêm một lựa chọn mới vào danh mục đã có</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập, đã có danh mục</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Lựa chọn mới được tạo, Category.choiceCount++</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Mở danh mục → nhấn "Thêm lựa chọn"</td>
+        <td>Hiển thị modal form</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Nhập tên, mô tả, mức giá (tùy chọn)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Nhấn "Thêm"</td>
+        <td>Validate: name required (max 200)</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>POST /choices {categoryId, name, description, priceRange}</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td></td>
+        <td>Tăng Category.choiceCount</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td></td>
+        <td>Refresh danh sách lựa chọn</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC14: Xem streak và huy hiệu</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Xem streak, level, huy hiệu</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Xem thống kê cá nhân trên trang Profile</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Hiển thị đầy đủ thông tin streak</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Mở trang /profile</td>
+        <td>GET /streaks/me</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td></td>
+        <td>Trả về: currentStreak, longestStreak, totalDecisions, totalCheckins, level, badges</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td></td>
+        <td>Hiển thị: Stats grid, Level progress bar, Streak calendar, Badge grid</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC15: Xem lịch sử quyết định</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Xem lịch sử quyết định</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>User</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Xem danh sách tất cả quyết định đã quay (phân trang, lọc)</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đã đăng nhập</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Hiển thị timeline quyết định</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Mở trang /history</td>
+        <td>GET /decisions?page=1&limit=10</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td></td>
+        <td>Hiển thị timeline với status icon (completed, skipped, pending, expired)</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Nhấn vào item để mở rộng</td>
+        <td>Hiển thị chi tiết check-in (ảnh, rating, caption)</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Chọn filter (danh mục, trạng thái)</td>
+        <td>Reload với params filter</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC16: Dashboard Admin</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>Xem dashboard admin</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>Admin</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Xem thống kê tổng quan hệ thống</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đăng nhập với role admin, permission "view_dashboard"</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Hiển thị dashboard thống kê</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Mở trang admin dashboard</td>
+        <td>GET /dashboard/stats</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td></td>
+        <td>Kiểm tra permission "view_dashboard"</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td></td>
+        <td>Trả về: tổng users, active users, tổng roles, users theo role, hoạt động 7 ngày</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td>Hiển thị stats cards + biểu đồ</td>
+    </tr>
+</table>
+
+---
+
+<h3>UC17: Quản lý người dùng (Admin)</h3>
+
+<table>
+    <tr>
+        <th>Thuộc tính</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td><b>Tên UC</b></td>
+        <td>CRUD người dùng</td>
+    </tr>
+    <tr>
+        <td><b>Tác nhân</b></td>
+        <td>Admin</td>
+    </tr>
+    <tr>
+        <td><b>Mô tả</b></td>
+        <td>Tạo, xem, sửa, xóa người dùng; gán vai trò</td>
+    </tr>
+    <tr>
+        <td><b>Tiền điều kiện</b></td>
+        <td>Đăng nhập với role admin</td>
+    </tr>
+    <tr>
+        <td><b>Hậu điều kiện</b></td>
+        <td>Dữ liệu người dùng được cập nhật</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="3">Luồng chính</th>
+    </tr>
+    <tr>
+        <th>Bước</th>
+        <th>Tác nhân</th>
+        <th>Hệ thống</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Mở trang /users</td>
+        <td>GET /users (paginated), kiểm tra permission "view_user"</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td></td>
+        <td>Hiển thị bảng: Name, Email, Role, Status, Actions</td>
+    </tr>
+    <tr>
+        <td>3a</td>
+        <td>Nhấn "Tạo" → nhập thông tin</td>
+        <td>POST /users (permission "create_user")</td>
+    </tr>
+    <tr>
+        <td>3b</td>
+        <td>Nhấn "Sửa" → thay đổi role/status</td>
+        <td>PUT /users/:id (permission "edit_user")</td>
+    </tr>
+    <tr>
+        <td>3c</td>
+        <td>Nhấn "Xóa" → xác nhận</td>
+        <td>DELETE /users/:id (role "admin" + permission "delete_user")</td>
+    </tr>
+</table>
+
+---
+
+### 3.3 Ma trận Actor × Chức năng (CRUD Matrix)
+
+<table>
+    <tr>
+        <th>Chức năng</th>
+        <th>Guest</th>
+        <th>User (viewer)</th>
+        <th>Admin</th>
+    </tr>
+    <tr>
+        <td><b>Đăng ký</b></td>
+        <td>C</td>
+        <td>-</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td><b>Đăng nhập</b></td>
+        <td>R</td>
+        <td>-</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td><b>Đăng xuất</b></td>
+        <td>-</td>
+        <td>✓</td>
+        <td>✓</td>
+    </tr>
+    <tr>
+        <td><b>Xem profile</b></td>
+        <td>-</td>
+        <td>R</td>
+        <td>R</td>
+    </tr>
+    <tr>
+        <td><b>Danh mục</b></td>
+        <td>-</td>
+        <td>C R U D (own)</td>
+        <td>C R U D (all)</td>
+    </tr>
+    <tr>
+        <td><b>Lựa chọn</b></td>
+        <td>-</td>
+        <td>C R U D (own)</td>
+        <td>C R U D (all)</td>
+    </tr>
+    <tr>
+        <td><b>Quay Spin</b></td>
+        <td>-</td>
+        <td>C</td>
+        <td>C</td>
+    </tr>
+    <tr>
+        <td><b>Chấp nhận/Bỏ qua</b></td>
+        <td>-</td>
+        <td>U (own)</td>
+        <td>U (own)</td>
+    </tr>
+    <tr>
+        <td><b>Check-in</b></td>
+        <td>-</td>
+        <td>C (own)</td>
+        <td>C (own)</td>
+    </tr>
+    <tr>
+        <td><b>Xem lịch sử</b></td>
+        <td>-</td>
+        <td>R (own)</td>
+        <td>R (own)</td>
+    </tr>
+    <tr>
+        <td><b>Xem streak</b></td>
+        <td>-</td>
+        <td>R (own)</td>
+        <td>R (own)</td>
+    </tr>
+    <tr>
+        <td><b>Xem leaderboard</b></td>
+        <td>-</td>
+        <td>R</td>
+        <td>R</td>
+    </tr>
+    <tr>
+        <td><b>Quản lý users</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>C R U D</td>
+    </tr>
+    <tr>
+        <td><b>Quản lý roles</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>C R U D</td>
+    </tr>
+    <tr>
+        <td><b>Dashboard stats</b></td>
+        <td>-</td>
+        <td>-</td>
+        <td>R</td>
+    </tr>
+</table>
+
+> C = Create, R = Read, U = Update, D = Delete, own = chỉ dữ liệu của mình
+
+### 3.4 Ma trận phân quyền RBAC
+
+<table>
+    <tr>
+        <th>Permission Slug</th>
+        <th>viewer</th>
+        <th>editor</th>
+        <th>admin</th>
+    </tr>
+    <tr>
+        <td>view_user</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>create_user</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>edit_user</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>delete_user</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>manage_roles</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>manage_permissions</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>view_dashboard</td>
+        <td>-</td>
+        <td>-</td>
+        <td>✅</td>
+    </tr>
+</table>
+
+> Tất cả user (viewer, editor, admin) đều có quyền: CRUD category/choice (own), spin, check-in, xem streak/history.
+> Chỉ admin mới có các permission đặc biệt ở bảng trên.
+
+---
+
+## 3B. SƠ ĐỒ LUỒNG DỮ LIỆU (DFD)
+
+### 3B.1 DFD Mức 0 (Context Diagram)
+
+> File PlantUML: `diagrams/19_dfd_level0.puml`
+
+Sơ đồ mức 0 thể hiện hệ thống Decision Maker như một process duy nhất, tương tác với 3 tác nhân bên ngoài (Guest, User, Admin) và 7 kho dữ liệu.
+
+<b>Các luồng dữ liệu chính:</b>
+
+<table>
+    <tr>
+        <th>Từ</th>
+        <th>Đến</th>
+        <th>Dữ liệu</th>
+    </tr>
+    <tr>
+        <td>Guest → Hệ thống</td>
+        <td></td>
+        <td>Thông tin đăng ký/đăng nhập (name, email, password)</td>
+    </tr>
+    <tr>
+        <td>Hệ thống → Guest</td>
+        <td></td>
+        <td>JWT token, thông tin user, thông báo lỗi</td>
+    </tr>
+    <tr>
+        <td>User → Hệ thống</td>
+        <td></td>
+        <td>Spin request, ảnh check-in, dữ liệu CRUD</td>
+    </tr>
+    <tr>
+        <td>Hệ thống → User</td>
+        <td></td>
+        <td>Kết quả spin, streak/badge, lịch sử, bảng xếp hạng</td>
+    </tr>
+    <tr>
+        <td>Admin → Hệ thống</td>
+        <td></td>
+        <td>CRUD users/roles/permissions</td>
+    </tr>
+    <tr>
+        <td>Hệ thống → Admin</td>
+        <td></td>
+        <td>Dashboard thống kê, danh sách users</td>
+    </tr>
+</table>
+
+### 3B.2 DFD Mức 1 (Phân rã)
+
+> File PlantUML: `diagrams/20_dfd_level1.puml`
+
+Hệ thống được phân rã thành 7 tiến trình con:
+
+<table>
+    <tr>
+        <th>Process</th>
+        <th>Tên</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>1.0</td>
+        <td>Xác thực & Phân quyền</td>
+        <td>Đăng ký, đăng nhập, JWT, RBAC</td>
+    </tr>
+    <tr>
+        <td>2.0</td>
+        <td>Quản lý Danh mục</td>
+        <td>CRUD categories, slug generation</td>
+    </tr>
+    <tr>
+        <td>3.0</td>
+        <td>Quản lý Lựa chọn</td>
+        <td>CRUD choices, weight management</td>
+    </tr>
+    <tr>
+        <td>4.0</td>
+        <td>Quay Spin & Quyết định</td>
+        <td>Smart random, accept/skip, history</td>
+    </tr>
+    <tr>
+        <td>5.0</td>
+        <td>Check-in & Upload</td>
+        <td>Upload ảnh, rating, cập nhật decision</td>
+    </tr>
+    <tr>
+        <td>6.0</td>
+        <td>Streak & Gamification</td>
+        <td>Tính streak, level, badges, leaderboard</td>
+    </tr>
+    <tr>
+        <td>7.0</td>
+        <td>Quản trị hệ thống</td>
+        <td>CRUD users/roles, dashboard stats</td>
+    </tr>
+</table>
+
+<b>Các kho dữ liệu:</b>
+
+<table>
+    <tr>
+        <th>Ký hiệu</th>
+        <th>Tên</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>D1</td>
+        <td>Users</td>
+        <td>Thông tin người dùng</td>
+    </tr>
+    <tr>
+        <td>D2</td>
+        <td>Categories</td>
+        <td>Danh mục lựa chọn</td>
+    </tr>
+    <tr>
+        <td>D3</td>
+        <td>Choices</td>
+        <td>Các lựa chọn trong danh mục</td>
+    </tr>
+    <tr>
+        <td>D4</td>
+        <td>Decisions</td>
+        <td>Quyết định (spin results + check-in)</td>
+    </tr>
+    <tr>
+        <td>D5</td>
+        <td>UserStreaks</td>
+        <td>Dữ liệu streak, level, badges</td>
+    </tr>
+    <tr>
+        <td>D6</td>
+        <td>Roles & Permissions</td>
+        <td>Vai trò và quyền hạn</td>
+    </tr>
+    <tr>
+        <td>D7</td>
+        <td>File Storage</td>
+        <td>Ảnh check-in (/uploads)</td>
+    </tr>
 </table>

@@ -1,0 +1,72 @@
+@startuml State_Decision
+!theme plain
+skinparam state {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ TRẠNG THÁI (STATE DIAGRAM)\nVÒNG ĐỜI CỦA DECISION**
+
+[*] --> Pending : Quay Spin\n(POST /decisions/spin)
+
+state Pending #FFF9C4 {
+  Pending : status = "pending"
+  Pending : expiresAt = createdAt + 24h
+  Pending : Chờ người dùng check-in
+  Pending : hoặc bỏ qua
+}
+
+state Completed #C8E6C9 {
+  Completed : status = "completed"
+  Completed : checkin.imageUrl = ảnh
+  Completed : checkin.rating = 1-5
+  Completed : checkin.completedAt = now
+  Completed : → Streak được cập nhật
+}
+
+state Skipped #FFCDD2 {
+  Skipped : status = "skipped"
+  Skipped : Người dùng chủ động bỏ qua
+  Skipped : → Streak bị reset
+}
+
+state Expired #E0E0E0 {
+  Expired : status = "expired"
+  Expired : Quá hạn 24h không check-in
+  Expired : → Streak bị reset
+}
+
+Pending --> Completed : Check-in thành công\n(POST /decisions/:id/checkin)\nUpload ảnh + rating
+Pending --> Skipped : Người dùng bỏ qua\n(PUT /decisions/:id/skip)
+Pending --> Expired : Quá hạn 24h\n(Scheduled job / \nkiểm tra khi truy cập)
+
+Completed --> [*]
+Skipped --> [*]
+Expired --> [*]
+
+note right of Pending
+  **Re-spin:**
+  Trong trạng thái Pending,
+  người dùng có thể quay lại
+  (tối đa 2 lần/ngày).
+  spinCount++ mỗi lần quay lại.
+  Kết quả mới ghi đè choiceId.
+end note
+
+note right of Completed
+  **Cập nhật khi Completed:**
+  - Choice.timesCompleted++
+  - UserStreak.totalCheckins++
+  - Tính streak mới
+  - Kiểm tra badge
+  - Tính level
+end note
+
+note left of Skipped
+  **Khi Skip:**
+  - Streak sẽ bị gián đoạn
+  - Ngày tiếp theo check-in
+    sẽ bắt đầu streak mới = 1
+end note
+
+@enduml
