@@ -191,6 +191,3 @@
         <td>Hiển thị animation thành công + streak mới</td>
     </tr>
 </table>
-
-
-
