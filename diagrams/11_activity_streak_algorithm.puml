@@ -1,0 +1,157 @@
+@startuml Activity_Streak_Algorithm
+!theme plain
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF9C4
+}
+
+title **BIỂU ĐỒ HOẠT ĐỘNG - THUẬT TOÁN CẬP NHẬT STREAK**
+
+|Trigger|
+start
+:Check-in thành công
+(Decision.status = "completed");
+
+|StreakService|
+:Nhận userId từ Decision;
+
+:Truy vấn UserStreak
+từ MongoDB;
+
+if (UserStreak tồn tại?) then (Có)
+  :Lấy streak hiện tại;
+else (Không - User mới)
+  :Tạo UserStreak mới
+  với tất cả = 0;
+endif
+
+:totalCheckins++;
+
+' --- Xác định loại ngày ---
+
+if (lastCheckinDate == null?\n(Lần check-in đầu tiên)) then (Đầu tiên)
+  :currentStreak = 1
+  streakStartDate = today
+  lastCheckinDate = today;
+  :Cấp badge **"First Spin"**;
+else (Đã có lịch sử)
+
+  :Tính khoảng cách ngày:
+  daysDiff = today - lastCheckinDate;
+
+  if (daysDiff == 0?\n(Cùng ngày)) then (Cùng ngày)
+    :Chỉ cập nhật totalCheckins
+    **Không thay đổi streak**
+    (đã check-in hôm nay);
+  elseif (daysDiff == 1?\n(Ngày liên tiếp)) then (Liên tiếp)
+    :currentStreak++
+    **Chuỗi tiếp tục!**;
+    :lastCheckinDate = today;
+  else (daysDiff > 1\nBị gián đoạn)
+    :currentStreak = 1
+    streakStartDate = today
+    **Chuỗi bị reset!**;
+    :lastCheckinDate = today;
+  endif
+
+endif
+
+' --- Cập nhật kỷ lục ---
+
+if (currentStreak > longestStreak?) then (Kỷ lục mới!)
+  :longestStreak = currentStreak;
+else (Chưa vượt)
+endif
+
+' --- Tính Level ---
+
+|Level Calculator|
+
+:Xác định level dựa trên currentStreak;
+
+if (currentStreak <= 2?) then (0-2)
+  :level = 1
+  **Newcomer**;
+elseif (currentStreak <= 6?) then (3-6)
+  :level = 2
+  **Starter**;
+elseif (currentStreak <= 13?) then (7-13)
+  :level = 3
+  **Decisive**;
+elseif (currentStreak <= 29?) then (14-29)
+  :level = 4
+  **Committed**;
+elseif (currentStreak <= 59?) then (30-59)
+  :level = 5
+  **Master**;
+elseif (currentStreak <= 99?) then (60-99)
+  :level = 6
+  **Legend**;
+else (>= 100)
+  :level = 7
+  **Unstoppable**;
+endif
+
+' --- Kiểm tra Badge ---
+
+|Badge Checker|
+
+:newBadges = empty;
+
+if (totalDecisions >= 1\nVÀ chưa có badge "first_spin"?) then (Đạt)
+  :Cấp badge **First Spin**
+  newBadges.push(first_spin);
+else (Không đạt / Đã có)
+endif
+
+if (currentStreak >= 7\nVÀ chưa có badge "perfect_week"?) then (Đạt)
+  :Cấp badge **Perfect Week**
+  newBadges.push(perfect_week);
+else (Không đạt / Đã có)
+endif
+
+if (totalCheckins >= 100\nVÀ chưa có badge "centurion"?) then (Đạt)
+  :Cấp badge **Centurion**
+  newBadges.push(centurion);
+else (Không đạt / Đã có)
+endif
+
+:Truy vấn: Đếm check-in completed
+trong category "do-an" (Đồ ăn);
+
+if (count >= 10\nVÀ chưa có badge "foodie"?) then (Đạt)
+  :Cấp badge **Foodie**
+  newBadges.push(foodie);
+else (Không đạt / Đã có)
+endif
+
+:Truy vấn: Đếm số category
+distinct đã check-in;
+
+if (distinctCount >= 5\nVÀ chưa có badge "explorer"?) then (Đạt)
+  :Cấp badge **Explorer**
+  newBadges.push(explorer);
+else (Không đạt / Đã có)
+endif
+
+' --- Lưu kết quả ---
+
+|StreakService|
+
+:Lưu UserStreak vào MongoDB:
+  currentStreak,
+  longestStreak,
+  totalDecisions,
+  totalCheckins,
+  lastCheckinDate,
+  streakStartDate,
+  level,
+  badges: existing + newBadges;
+
+:Trả về streak, newBadges;
+
+|Trigger|
+stop
+
+@enduml

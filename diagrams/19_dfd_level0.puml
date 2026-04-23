@@ -1,0 +1,58 @@
+@startuml DFD_Level0
+!theme plain
+skinparam rectangle {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **SƠ ĐỒ LUỒNG DỮ LIỆU MỨC 0 (DFD Level 0)\nHỆ THỐNG DECISION MAKER**
+
+' External entities
+rectangle "Khách\n(Guest)" as Guest #E3F2FD
+rectangle "Người dùng\n(User)" as User #C8E6C9
+rectangle "Quản trị viên\n(Admin)" as Admin #FFCDD2
+
+' Main process
+usecase "HỆ THỐNG\nDECISION\nMAKER" as System #FFF9C4
+
+' Data stores
+database "D1: Users" as D1
+database "D2: Categories" as D2
+database "D3: Choices" as D3
+database "D4: Decisions" as D4
+database "D5: UserStreaks" as D5
+database "D6: Roles &\nPermissions" as D6
+storage "D7: File Storage\n(/uploads)" as D7
+
+' Flows from Guest
+Guest -right-> System : Thông tin đăng ký\n(tên, email, password)
+Guest -right-> System : Thông tin đăng nhập\n(email, password)
+System -left-> Guest : JWT Token + Thông tin user\nThông báo lỗi
+
+' Flows from User
+User -right-> System : Chọn danh mục + Câu hỏi\n(spin request)
+User -right-> System : Ảnh check-in + Rating + Caption
+User -right-> System : Dữ liệu danh mục/lựa chọn\n(CRUD)
+User -right-> System : Chấp nhận/Bỏ qua quyết định
+System -left-> User : Kết quả spin\n(choice được chọn)
+System -left-> User : Thông tin streak/level/badge
+System -left-> User : Lịch sử quyết định
+System -left-> User : Danh sách danh mục/lựa chọn
+System -left-> User : Bảng xếp hạng
+
+' Flows from Admin
+Admin -right-> System : Dữ liệu người dùng\n(CRUD)
+Admin -right-> System : Dữ liệu vai trò/quyền\n(CRUD)
+System -left-> Admin : Dashboard thống kê\n(users, spins, check-ins)
+System -left-> Admin : Danh sách người dùng
+
+' Flows to/from data stores
+System --> D1 : Đọc/Ghi user
+System --> D2 : Đọc/Ghi category
+System --> D3 : Đọc/Ghi choice
+System --> D4 : Đọc/Ghi decision
+System --> D5 : Đọc/Ghi streak
+System --> D6 : Đọc/Ghi role, permission
+System --> D7 : Lưu/Đọc ảnh check-in
+
+@enduml

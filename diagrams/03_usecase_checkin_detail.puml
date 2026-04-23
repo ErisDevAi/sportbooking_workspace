@@ -1,0 +1,91 @@
+@startuml UseCase_Checkin_ChiTiet
+!theme plain
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ USE CASE CHI TIẾT - CHECK-IN & STREAK**
+
+left to right direction
+
+actor "Người dùng\n(User)" as User #LightGreen
+actor "Hệ thống" as System #LightYellow
+
+rectangle "CHECK-IN & STREAK SYSTEM" {
+
+  package "Check-in" #F3E5F5 {
+    usecase "Xem nhiệm vụ\nhôm nay" as UC_ViewTask
+    usecase "Upload ảnh\ncheck-in" as UC_Upload
+    usecase "Chụp ảnh từ\ncamera" as UC_Camera
+    usecase "Chọn ảnh từ\nthư viện" as UC_Gallery
+    usecase "Đánh giá trải nghiệm\n(1-5 sao)" as UC_Rate
+    usecase "Viết caption\n(tùy chọn)" as UC_Caption
+    usecase "Gửi check-in" as UC_Submit #C8E6C9
+    usecase "Kiểm tra hạn\ncheck-in (24h)" as UC_CheckExpiry
+    usecase "Thông báo quá hạn" as UC_Expired
+  }
+
+  package "Streak & Gamification" #FFF9C4 {
+    usecase "Cập nhật streak" as UC_UpdateStreak
+    usecase "Tính level mới" as UC_CalcLevel
+    usecase "Kiểm tra & cấp\nbadge mới" as UC_CheckBadge
+    usecase "Xem streak\nhiện tại" as UC_ViewStreak
+    usecase "Xem lịch streak\n(calendar)" as UC_ViewCal
+    usecase "Xem huy hiệu\nđã đạt" as UC_ViewBadge
+    usecase "Xem bảng\nxếp hạng" as UC_Leaderboard
+    usecase "Hiển thị animation\nthành công" as UC_SuccessAnim
+  }
+
+  ' User actions
+  User --> UC_ViewTask
+  User --> UC_Upload
+  User --> UC_Rate
+  User --> UC_Caption
+  User --> UC_Submit
+  User --> UC_ViewStreak
+  User --> UC_ViewCal
+  User --> UC_ViewBadge
+  User --> UC_Leaderboard
+
+  ' System actions
+  System --> UC_CheckExpiry
+  System --> UC_UpdateStreak
+  System --> UC_CalcLevel
+  System --> UC_CheckBadge
+  System --> UC_SuccessAnim
+
+  ' Include
+  UC_Submit ..> UC_Upload : <<include>>
+  UC_Submit ..> UC_Rate : <<include>>
+  UC_Submit ..> UC_CheckExpiry : <<include>>
+  UC_Submit ..> UC_UpdateStreak : <<include>>
+  UC_UpdateStreak ..> UC_CalcLevel : <<include>>
+  UC_UpdateStreak ..> UC_CheckBadge : <<include>>
+
+  ' Extend
+  UC_Camera ..> UC_Upload : <<extend>>
+  UC_Gallery ..> UC_Upload : <<extend>>
+  UC_Caption ..> UC_Submit : <<extend>>
+  UC_Expired ..> UC_CheckExpiry : <<extend>>
+  UC_SuccessAnim ..> UC_Submit : <<extend>>
+}
+
+note right of UC_UpdateStreak
+  **Logic cập nhật streak:**
+  - Cùng ngày → không đổi
+  - Ngày liên tiếp → streak++
+  - Bị gián đoạn → streak = 1
+end note
+
+note right of UC_CheckBadge
+  **Badges:**
+  - First Spin (1 quyết định)
+  - Perfect Week (7 ngày liên tiếp)
+  - Centurion (100 check-in)
+  - Foodie (10 check-in đồ ăn)
+  - Explorer (5+ danh mục)
+end note
+
+@enduml
