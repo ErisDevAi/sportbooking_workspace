@@ -1,0 +1,155 @@
+@startuml Sequence_Spin
+!theme plain
+skinparam sequenceArrowThickness 2
+skinparam maxMessageSize 200
+
+title **BIỂU ĐỒ TUẦN TỰ - QUAY SPIN WHEEL**
+
+actor "Người dùng" as User #LightGreen
+participant "Trang Spin\n(/spin)" as SpinPage #E3F2FD
+participant "SpinWheel\nComponent" as Wheel #FFF3E0
+participant "API Client\n(Axios)" as API #FCE4EC
+participant "DecisionController" as Controller #E8F5E9
+participant "DecisionService" as Service #C8E6C9
+database "MongoDB" as DB #F3E5F5
+
+== Bước 1: Tải trang Spin ==
+
+User -> SpinPage : Truy cập /spin
+activate SpinPage
+
+SpinPage -> API : GET /api/categories
+activate API
+API -> Controller : request
+activate Controller
+Controller -> DB : Category.find({...})
+activate DB
+DB --> Controller : categories[]
+deactivate DB
+Controller --> API : {success: true, data: categories}
+deactivate Controller
+API --> SpinPage : categories[]
+deactivate API
+
+SpinPage --> User : Hiển thị dropdown\ndanh mục
+deactivate SpinPage
+
+== Bước 2: Chọn danh mục & tải choices ==
+
+User -> SpinPage : Chọn danh mục "Đồ ăn"
+activate SpinPage
+
+SpinPage -> API : GET /api/categories/:id/choices
+activate API
+API -> DB : Choice.find({categoryId, isActive: true})
+activate DB
+DB --> API : choices[]
+deactivate DB
+API --> SpinPage : choices[]
+deactivate API
+
+SpinPage -> Wheel : render(choices)
+activate Wheel
+Wheel -> Wheel : Canvas API:\nVẽ vòng tròn\nChia segments\nGắn label + màu
+Wheel --> User : Hiển thị vòng quay\nvới các lựa chọn
+deactivate Wheel
+deactivate SpinPage
+
+== Bước 3: Quay Spin ==
+
+User -> SpinPage : Nhấn "QUAY NGAY!"
+activate SpinPage
+
+SpinPage -> API : POST /api/decisions/spin\n{categoryId, question:\n"Ăn gì hôm nay?"}
+activate API
+
+API -> Controller : spin(req, res)
+activate Controller
+
+Controller -> Service : spin(userId, categoryId, question)
+activate Service
+
+== Thuật toán Smart Random ==
+
+Service -> DB : Choice.find({categoryId,\nisActive: true})
+activate DB
+DB --> Service : activeChoices[]
+deactivate DB
+
+group Smart Random Algorithm
+  Service -> Service : **Bước 1:** Lấy weight gốc\ncủa mỗi choice (1-10)
+  Service -> Service : **Bước 2:** Nếu lastSelectedAt\n< 3 ngày → weight *= 0.5
+  Service -> Service : **Bước 3:** Nếu timesSelected\n== 0 → weight *= 1.5
+  Service -> Service : **Bước 4:** totalWeight =\nSUM(all weights)
+  Service -> Service : **Bước 5:** random =\nMath.random() * totalWeight
+  Service -> Service : **Bước 6:** Duyệt choices,\ncộng dồn → chọn winner
+end
+
+Service -> DB : Choice.findByIdAndUpdate(\nwinnerChoiceId, {\n  $inc: {timesSelected: 1},\n  lastSelectedAt: new Date()\n})
+activate DB
+DB --> Service : updated choice
+deactivate DB
+
+Service -> DB : Decision.create({\n  userId, categoryId,\n  choiceId: winner._id,\n  question,\n  status: "pending",\n  expiresAt: now + 24h\n})
+activate DB
+DB --> Service : new decision
+deactivate DB
+
+Service -> DB : UserStreak.findOneAndUpdate(\n  {userId},\n  {$inc: {totalDecisions: 1}},\n  {upsert: true}\n)
+activate DB
+DB --> Service : streak updated
+deactivate DB
+
+Service --> Controller : {decision, choice}
+deactivate Service
+
+Controller --> API : 201 Created\n{success: true, data: {decision}}
+deactivate Controller
+
+API --> SpinPage : decision with choice details
+deactivate API
+
+== Bước 4: Animation quay ==
+
+SpinPage -> Wheel : startSpin(winnerIndex)
+activate Wheel
+
+Wheel -> Wheel : Tính góc quay:\nbaseRotation = 360° * 5 vòng\n+ góc đến winner segment
+
+loop Animation 4 giây
+  Wheel -> Wheel : requestAnimationFrame()\nCubic easing deceleration\nTick sound effect
+end
+
+Wheel -> Wheel : Dừng tại winner\nConfetti animation 🎉
+
+Wheel --> SpinPage : onSpinComplete(result)
+deactivate Wheel
+
+== Bước 5: Hiển thị kết quả ==
+
+SpinPage --> User : Modal kết quả:\n🍜 "Bún bò Huế"\n⭐⭐⭐⭐☆ $$\n[Chấp nhận] [Quay lại]
+
+== Bước 6a: Chấp nhận ==
+
+User -> SpinPage : Nhấn "Chấp nhận"
+
+SpinPage -> API : PUT /api/decisions/:id/accept
+activate API
+API -> DB : Decision.findByIdAndUpdate(\nid, {status: "pending"})
+activate DB
+DB --> API : updated
+deactivate DB
+API --> SpinPage : {success: true}
+deactivate API
+
+SpinPage --> User : Redirect → /dashboard\n"Nhiệm vụ đã được ghi nhận!"
+deactivate SpinPage
+
+note over User, DB
+  **Hoặc Bước 6b: Quay lại (Re-spin)**
+  - Kiểm tra số lượt re-spin (tối đa 2/ngày)
+  - Nếu còn lượt → spinCount++ → quay lại Bước 3
+  - Nếu hết lượt → thông báo "Đã hết lượt quay lại"
+end note
+
+@enduml

@@ -1,0 +1,159 @@
+@startuml ERD
+!theme plain
+skinparam linetype ortho
+
+title **BIỂU ĐỒ THỰC THỂ QUAN HỆ (ERD) - DECISION MAKER**
+
+entity "**users**" as users #E8F5E9 {
+  *_id : ObjectId <<PK>>
+  --
+  *name : String
+  *email : String <<unique>>
+  *password : String <<hidden>>
+  role : String = "viewer"
+  isActive : Boolean = true
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+entity "**categories**" as categories #E3F2FD {
+  *_id : ObjectId <<PK>>
+  --
+  *name : String
+  *slug : String <<unique>>
+  icon : String = "📁"
+  color : String = "#3498DB"
+  description : String
+  isDefault : Boolean = false
+  isPublic : Boolean = true
+  *createdBy : ObjectId <<FK>>
+  choiceCount : Number = 0
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+entity "**choices**" as choices #FFF3E0 {
+  *_id : ObjectId <<PK>>
+  --
+  *categoryId : ObjectId <<FK, index>>
+  *name : String
+  description : String
+  imageUrl : String
+  tags : String[]
+  location_lat : Number
+  location_lng : Number
+  location_address : String
+  metadata_priceRange : Number [1-5]
+  metadata_rating : Number [1-5]
+  metadata_url : String
+  weight : Number [1-10] = 5
+  isActive : Boolean = true
+  *createdBy : ObjectId <<FK>>
+  timesSelected : Number = 0
+  timesCompleted : Number = 0
+  lastSelectedAt : Date
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+entity "**decisions**" as decisions #FCE4EC {
+  *_id : ObjectId <<PK>>
+  --
+  *userId : ObjectId <<FK, index>>
+  *categoryId : ObjectId <<FK>>
+  *choiceId : ObjectId <<FK>>
+  *question : String
+  *status : Enum <<pending|completed|skipped|expired>>
+  spinCount : Number = 1
+  checkin_imageUrl : String
+  checkin_caption : String [max 500]
+  checkin_rating : Number [1-5]
+  checkin_completedAt : Date
+  *expiresAt : Date <<index>>
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+entity "**userstreaks**" as userstreaks #FFF9C4 {
+  *_id : ObjectId <<PK>>
+  --
+  *userId : ObjectId <<FK, unique, index>>
+  currentStreak : Number = 0
+  longestStreak : Number = 0
+  totalDecisions : Number = 0
+  totalCheckins : Number = 0
+  lastCheckinDate : Date
+  streakStartDate : Date
+  level : Number [1-7] = 1
+  badges : Badge[] <<embedded>>
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+entity "**roles**" as roles #F3E5F5 {
+  *_id : ObjectId <<PK>>
+  --
+  *name : String <<unique>>
+  *slug : String <<unique>>
+  description : String
+  permissions : ObjectId[] <<FK>>
+  isActive : Boolean = true
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+entity "**permissions**" as permissions #E0F2F1 {
+  *_id : ObjectId <<PK>>
+  --
+  *name : String <<unique>>
+  *slug : String <<unique>>
+  description : String
+  module : String
+  action : String
+  createdAt : Date <<auto>>
+  updatedAt : Date <<auto>>
+}
+
+' ==================== RELATIONSHIPS ====================
+
+users ||--o{ categories : "1 user tạo nhiều\ncategory"
+users ||--o{ choices : "1 user tạo nhiều\nchoice"
+users ||--o{ decisions : "1 user có nhiều\ndecision"
+users ||--o| userstreaks : "1 user có 1\nstreak record"
+
+categories ||--o{ choices : "1 category chứa\nnhiều choice"
+categories ||--o{ decisions : "1 category liên quan\nnhiều decision"
+
+choices ||--o{ decisions : "1 choice được chọn\ntrong nhiều decision"
+
+roles ||--o{ permissions : "1 role có\nnhiều permission"
+
+note bottom of decisions
+  **Quy tắc:**
+  - expiresAt = createdAt + 24 giờ
+  - Quá hạn → status = "expired"
+  - Check-in thành công → status = "completed"
+  - Người dùng bỏ qua → status = "skipped"
+end note
+
+note bottom of userstreaks
+  **Embedded Badge:**
+  {
+    slug: "first_spin",
+    name: "First Spin",
+    icon: "🌟",
+    earnedAt: Date
+  }
+end note
+
+note right of choices
+  **Index:**
+  - categoryId (query theo danh mục)
+  - createdBy (query theo user)
+
+  **Denormalized:**
+  - timesSelected (đếm số lần chọn)
+  - timesCompleted (đếm hoàn thành)
+end note
+
+@enduml

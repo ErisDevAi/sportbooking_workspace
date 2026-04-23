@@ -1,0 +1,152 @@
+@startuml Activity_Auth
+!theme plain
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF9C4
+}
+
+title **BIỂU ĐỒ HOẠT ĐỘNG - XÁC THỰC & PHÂN QUYỀN**
+
+start
+
+:Người dùng gửi HTTP Request
+đến một Protected Route;
+
+:Middleware Pipeline bắt đầu;
+
+' --- CORS Middleware ---
+
+if (Origin nằm trong\nCORS_ORIGINS?) then (Cho phép ✅)
+else (Từ chối ❌)
+  :Response 403 Forbidden
+  "CORS policy blocked";
+  stop
+endif
+
+' --- Auth Middleware ---
+
+:Đọc header
+Authorization: Bearer ~<token~>;
+
+if (Header Authorization\ncó tồn tại?) then (Có)
+else (Không có)
+  :Response 401 Unauthorized
+  "Token không được cung cấp";
+  stop
+endif
+
+:Tách token từ header
+token = header.split(" ")(1);
+
+if (Token có giá trị?) then (Có)
+else (Rỗng)
+  :Response 401 Unauthorized
+  "Token không hợp lệ";
+  stop
+endif
+
+:jwt.verify(token, JWT_SECRET);
+
+if (Token hợp lệ\nvà chưa hết hạn?) then (Hợp lệ ✅)
+  :Giải mã payload:
+  userId, email, role, permissions;
+  :Gắn vào request:
+  req.user = payload;
+else (Không hợp lệ / Hết hạn ❌)
+  :Response 401 Unauthorized
+  "Token không hợp lệ
+  hoặc đã hết hạn";
+
+  note right
+    Frontend Axios Interceptor
+    sẽ bắt lỗi 401:
+    → Xóa token
+    → Redirect /login
+  end note
+  stop
+endif
+
+' --- Validation Middleware ---
+
+:express-validator kiểm tra
+body/params/query;
+
+if (Dữ liệu đầu vào\nhợp lệ?) then (Hợp lệ ✅)
+else (Lỗi validation ❌)
+  :Response 400 Bad Request
+  errors: field "email",
+  message "Email không hợp lệ";
+  stop
+endif
+
+' --- Role Middleware (nếu có) ---
+
+if (Route yêu cầu\nkiểm tra role?) then (Có)
+
+  :Đọc req.user.role;
+
+  if (User có role\nphù hợp?) then (Có quyền ✅)
+  else (Không có quyền ❌)
+    :Response 403 Forbidden
+    "Bạn không có quyền
+    truy cập tài nguyên này";
+    stop
+  endif
+
+else (Không cần)
+endif
+
+' --- Permission Middleware (nếu có) ---
+
+if (Route yêu cầu\nkiểm tra permission?) then (Có)
+
+  :Đọc req.user.permissions;
+
+  if (User có permission\ncần thiết?) then (Có quyền ✅)
+  else (Thiếu permission ❌)
+    :Response 403 Forbidden
+    "Bạn không có quyền
+    thực hiện hành động này";
+    stop
+  endif
+
+else (Không cần)
+endif
+
+' --- Controller ---
+
+:Request được chuyển đến
+Controller xử lý;
+
+:Controller gọi Service
+→ xử lý business logic
+→ tương tác Database;
+
+if (Xử lý thành công?) then (Thành công ✅)
+  :Response 200/201 OK
+  success: true, data: ...;
+else (Lỗi ❌)
+  :Error được throw;
+
+  ' --- Error Handler Middleware ---
+
+  :errorHandler(err, req, res, next);
+
+  if (NODE_ENV == "production"?) then (Production)
+    :Ẩn stack trace
+    Chỉ trả message;
+  else (Development)
+    :Hiển thị stack trace
+    chi tiết debug;
+  endif
+
+  :Response với status code
+  phù hợp (400/404/500)
+  success: false,
+  message: "Mô tả lỗi";
+endif
+
+stop
+
+@enduml

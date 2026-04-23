@@ -1,0 +1,99 @@
+@startuml Deployment_Diagram
+!theme plain
+skinparam node {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ TRIỂN KHAI (DEPLOYMENT DIAGRAM) - DECISION MAKER**
+
+node "Client Device" as client #E3F2FD {
+  node "Web Browser" as browser {
+    artifact "Next.js Frontend\n(React SPA + SSR)" as frontend
+    artifact "localStorage\n(JWT Token)" as storage
+  }
+}
+
+cloud "Internet" as internet
+
+node "Frontend Server" as frontendServer #BBDEFB {
+  node "Vercel / Netlify" as vercel {
+    artifact "Next.js Build\n(Static + SSR)" as nextBuild
+    artifact "CDN\n(Static Assets)" as cdn
+  }
+}
+
+node "Backend Server" as backendServer #E8F5E9 {
+  node "Railway / Render / VPS" as railway {
+    node "Node.js Runtime" as nodeRuntime {
+      artifact "Express.js\nApplication" as expressApp
+      artifact "Middleware\nPipeline" as middleware
+      artifact "Business\nModules" as modules
+    }
+    node "File System" as fs {
+      artifact "/uploads\n(Images)" as uploads
+    }
+  }
+}
+
+node "Database Server" as dbServer #FFF3E0 {
+  node "MongoDB Atlas\n(Cloud)" as atlas {
+    database "decision_maker" as db {
+      artifact "users" as usersCol
+      artifact "categories" as catCol
+      artifact "choices" as choicesCol
+      artifact "decisions" as decCol
+      artifact "userstreaks" as streakCol
+      artifact "roles" as rolesCol
+      artifact "permissions" as permsCol
+    }
+  }
+}
+
+' === Connections ===
+browser -down-> internet : HTTPS
+internet -down-> vercel : HTTPS (Port 443)
+internet -down-> railway : HTTPS (Port 443)
+
+nextBuild .down.> expressApp : REST API\n(JSON over HTTPS)
+
+frontend -right-> storage : Read/Write\nJWT Token
+
+expressApp -down-> db : Mongoose\n(mongodb+srv://)
+expressApp -right-> uploads : Multer\n(File I/O)
+
+' === Port info ===
+note right of nodeRuntime
+  **Environment Variables:**
+  PORT=8000
+  NODE_ENV=production
+  MONGODB_URI=mongodb+srv://...
+  JWT_SECRET=<secret>
+  CORS_ORIGINS=https://...
+end note
+
+note right of vercel
+  **Environment Variables:**
+  NEXT_PUBLIC_API_BASE_URL=
+  https://api.decisionmaker.com
+end note
+
+note bottom of atlas
+  **MongoDB Atlas:**
+  - Replica Set (3 nodes)
+  - Auto backup
+  - Monitoring
+  - IP Whitelist
+end note
+
+' === Development ===
+node "Development\n(Local)" as devLocal #F3E5F5 {
+  artifact "localhost:3000\n(Next.js Dev)" as devFE
+  artifact "localhost:8000\n(Express Dev)" as devBE
+  database "localhost:27017\n(MongoDB Local)" as devDB
+
+  devFE .right.> devBE : REST API
+  devBE .right.> devDB : Mongoose
+}
+
+@enduml

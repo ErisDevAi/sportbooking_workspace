@@ -1,0 +1,82 @@
+@startuml UseCase_Spin_ChiTiet
+!theme plain
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ USE CASE CHI TIẾT - VÒNG QUAY QUYẾT ĐỊNH**
+
+left to right direction
+
+actor "Người dùng\n(User)" as User #LightGreen
+actor "Hệ thống" as System #LightYellow
+
+rectangle "VÒNG QUAY QUYẾT ĐỊNH (SPIN WHEEL)" {
+
+  usecase "Chọn danh mục\nđể quay" as UC_SelectCat
+  usecase "Nhập câu hỏi\n(tùy chọn)" as UC_InputQ
+  usecase "Quay vòng quay" as UC_Spin #FFE0B2
+  usecase "Thực hiện thuật toán\nSmart Random" as UC_Algorithm
+  usecase "Hiển thị animation\nquay (4 giây)" as UC_Animation
+  usecase "Hiển thị kết quả\nvới confetti" as UC_Result
+  usecase "Chấp nhận kết quả" as UC_Accept #C8E6C9
+  usecase "Quay lại\n(Re-spin)" as UC_Respin #FFCDD2
+  usecase "Kiểm tra số lượt\nre-spin còn lại" as UC_CheckRespin
+  usecase "Tạo Decision\n(status: pending)" as UC_CreateDec
+  usecase "Cập nhật Choice\n(timesSelected++)" as UC_UpdateChoice
+  usecase "Thông báo hết\nlượt quay lại" as UC_NoRespin
+
+  ' User actions
+  User --> UC_SelectCat
+  User --> UC_InputQ
+  User --> UC_Spin
+  User --> UC_Accept
+  User --> UC_Respin
+
+  ' System actions
+  System --> UC_Algorithm
+  System --> UC_Animation
+  System --> UC_Result
+  System --> UC_CreateDec
+  System --> UC_UpdateChoice
+  System --> UC_CheckRespin
+
+  ' Include relationships
+  UC_Spin ..> UC_SelectCat : <<include>>
+  UC_Spin ..> UC_Algorithm : <<include>>
+  UC_Spin ..> UC_Animation : <<include>>
+  UC_Spin ..> UC_Result : <<include>>
+  UC_Accept ..> UC_CreateDec : <<include>>
+  UC_Accept ..> UC_UpdateChoice : <<include>>
+
+  ' Extend relationships
+  UC_InputQ ..> UC_SelectCat : <<extend>>
+  UC_Respin ..> UC_CheckRespin : <<include>>
+  UC_NoRespin ..> UC_CheckRespin : <<extend>>
+}
+
+note right of UC_Algorithm
+  **Thuật toán Smart Random:**
+  1. weight = choice.weight (1-10)
+  2. Nếu chọn trong 3 ngày gần đây:
+     weight *= 0.5
+  3. Nếu chưa bao giờ được chọn:
+     weight *= 1.5
+  4. Random theo tỉ lệ trọng số
+end note
+
+note right of UC_Respin
+  Giới hạn: 2 lần/ngày (free)
+  Nếu hết lượt → hiện thông báo
+end note
+
+note bottom of UC_CreateDec
+  Decision {
+    status: "pending",
+    expiresAt: now + 24h
+  }
+end note
+
+@enduml

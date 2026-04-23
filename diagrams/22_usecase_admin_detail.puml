@@ -1,0 +1,88 @@
+@startuml UseCase_Admin_Detail
+!theme plain
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ USE CASE CHI TIẾT - QUẢN TRỊ HỆ THỐNG**
+
+left to right direction
+
+actor "Quản trị viên\n(Admin)" as Admin #LightCoral
+actor "Hệ thống" as System #LightYellow
+
+rectangle "QUẢN TRỊ HỆ THỐNG (ADMIN)" {
+
+  package "Quản lý người dùng" #FFEBEE {
+    usecase "Xem danh sách\nngười dùng" as UC_ListUsers
+    usecase "Tạo người dùng\nmới" as UC_CreateUser
+    usecase "Sửa thông tin\nngười dùng" as UC_EditUser
+    usecase "Vô hiệu hóa\ntài khoản" as UC_DisableUser
+    usecase "Xóa người dùng" as UC_DeleteUser
+    usecase "Gán vai trò\ncho người dùng" as UC_AssignRole
+  }
+
+  package "Quản lý vai trò & quyền" #F3E5F5 {
+    usecase "Xem danh sách\nvai trò" as UC_ListRoles
+    usecase "Tạo vai trò mới" as UC_CreateRole
+    usecase "Gán quyền\ncho vai trò" as UC_AssignPerm
+    usecase "Xóa vai trò" as UC_DeleteRole
+    usecase "Xem danh sách\nquyền hạn" as UC_ListPerms
+  }
+
+  package "Dashboard thống kê" #E8F5E9 {
+    usecase "Xem thống kê\ntổng quan" as UC_Stats
+    usecase "Xem thống kê\nngười dùng theo role" as UC_UsersByRole
+    usecase "Xem hoạt động\nhệ thống" as UC_Activity
+  }
+
+  ' Admin actions
+  Admin --> UC_ListUsers
+  Admin --> UC_CreateUser
+  Admin --> UC_EditUser
+  Admin --> UC_DisableUser
+  Admin --> UC_DeleteUser
+  Admin --> UC_AssignRole
+  Admin --> UC_ListRoles
+  Admin --> UC_CreateRole
+  Admin --> UC_AssignPerm
+  Admin --> UC_DeleteRole
+  Admin --> UC_ListPerms
+  Admin --> UC_Stats
+  Admin --> UC_UsersByRole
+  Admin --> UC_Activity
+
+  ' System
+  System --> UC_Stats
+  System --> UC_Activity
+
+  ' Relationships
+  UC_CreateUser ..> UC_AssignRole : <<include>>
+  UC_EditUser ..> UC_AssignRole : <<extend>>
+  UC_AssignPerm ..> UC_ListPerms : <<include>>
+  UC_DeleteRole ..> UC_ListRoles : <<include>>
+}
+
+note right of UC_DeleteRole
+  Không thể xóa
+  vai trò hệ thống
+  (isSystem = true)
+end note
+
+note right of UC_DisableUser
+  Đặt isActive = false
+  User sẽ nhận 403
+  khi đăng nhập
+end note
+
+note right of UC_Stats
+  Thống kê:
+  - Tổng users, active users
+  - Tổng roles, permissions
+  - Users theo role
+  - Hoạt động 7 ngày
+end note
+
+@enduml

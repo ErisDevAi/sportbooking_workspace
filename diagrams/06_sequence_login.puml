@@ -1,0 +1,108 @@
+@startuml Sequence_Login
+!theme plain
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipant underline
+
+title **BIỂU ĐỒ TUẦN TỰ - ĐĂNG NHẬP**
+
+actor "Người dùng" as User #LightGreen
+participant "Browser\n(Next.js)" as Frontend #E3F2FD
+participant "Zustand\nAuth Store" as Store #FFF3E0
+participant "Axios\nClient" as Axios #FCE4EC
+participant "Express\nServer" as Backend #E8F5E9
+database "MongoDB" as DB #F3E5F5
+
+== Bước 1: Người dùng mở trang đăng nhập ==
+
+User -> Frontend : Truy cập /login
+activate Frontend
+Frontend --> User : Hiển thị form đăng nhập\n(email, password)
+deactivate Frontend
+
+== Bước 2: Gửi thông tin đăng nhập ==
+
+User -> Frontend : Nhập email, password\nNhấn "Đăng nhập"
+activate Frontend
+
+Frontend -> Store : login(email, password)
+activate Store
+
+Store -> Axios : POST /api/auth/login\n{email, password}
+activate Axios
+
+Axios -> Backend : HTTP POST /api/auth/login\nContent-Type: application/json
+activate Backend
+
+== Bước 3: Server xử lý xác thực ==
+
+Backend -> Backend : Validate input\n(express-validator)
+
+alt Validation thất bại
+  Backend --> Axios : 400 Bad Request\n{success: false, errors: [...]}
+  Axios --> Store : Error response
+  Store --> Frontend : Throw error
+  Frontend --> User : Hiển thị lỗi validation
+end
+
+Backend -> DB : User.findOne({email})\n.select('+password')
+activate DB
+DB --> Backend : user document\n(hoặc null)
+deactivate DB
+
+alt User không tồn tại
+  Backend --> Axios : 401 Unauthorized\n{message: "Email hoặc mật khẩu\nkhông chính xác"}
+  Axios --> Store : Error response
+  Store --> Frontend : Throw error
+  Frontend --> User : Hiển thị lỗi đăng nhập
+end
+
+Backend -> Backend : bcrypt.compare(\npassword, user.password)
+
+alt Mật khẩu sai
+  Backend --> Axios : 401 Unauthorized\n{message: "Email hoặc mật khẩu\nkhông chính xác"}
+  Axios --> Store : Error response
+  Store --> Frontend : Throw error
+  Frontend --> User : Hiển thị lỗi đăng nhập
+end
+
+== Bước 4: Tạo JWT Token ==
+
+Backend -> Backend : jwt.sign({\n  userId: user._id,\n  email: user.email,\n  role: user.role,\n  permissions: [...]\n}, JWT_SECRET, {expiresIn: '7d'})
+
+Backend --> Axios : 200 OK\n{success: true,\n data: {user, token}}
+deactivate Backend
+
+== Bước 5: Lưu trạng thái đăng nhập ==
+
+Axios --> Store : {user, token}
+deactivate Axios
+
+Store -> Store : set({token, user})\nPersist to localStorage\n(key: "auth-storage")
+
+Store --> Frontend : Login thành công
+deactivate Store
+
+== Bước 6: Chuyển hướng ==
+
+Frontend -> Frontend : router.push('/dashboard')
+Frontend --> User : Redirect → /dashboard
+deactivate Frontend
+
+== Các request tiếp theo (đã đăng nhập) ==
+
+User -> Frontend : Truy cập trang protected
+activate Frontend
+Frontend -> Axios : GET /api/... (any protected route)
+activate Axios
+Axios -> Axios : Interceptor:\nheader.Authorization =\n"Bearer " + token
+Axios -> Backend : HTTP GET với\nAuthorization: Bearer <token>
+activate Backend
+Backend -> Backend : auth.middleware:\njwt.verify(token)\nreq.user = payload
+Backend --> Axios : 200 OK + data
+deactivate Backend
+Axios --> Frontend : Response data
+deactivate Axios
+Frontend --> User : Hiển thị dữ liệu
+deactivate Frontend
+
+@enduml
