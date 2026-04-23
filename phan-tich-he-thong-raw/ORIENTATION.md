@@ -43,3 +43,5 @@ https://www.figma.com/design/wJTwsqdTezDOmlqQ8tm830/%F0%9F%8D%80-Decision-Maker?
 - Email: dunglv270404@gmail.com
 
 ---
+- Đinh Trọng Phúc
+  Email: dtphuc789@gmail.com

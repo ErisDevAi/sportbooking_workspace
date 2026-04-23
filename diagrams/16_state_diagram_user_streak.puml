@@ -1,0 +1,75 @@
+@startuml State_UserStreak
+!theme plain
+skinparam state {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+title **BIỂU ĐỒ TRẠNG THÁI - VÒNG ĐỜI CỦA USER STREAK**
+
+[*] --> NoStreak : User đăng ký tài khoản
+
+state NoStreak #E0E0E0 {
+  NoStreak : currentStreak = 0
+  NoStreak : level = 1 (Newcomer 🌱)
+  NoStreak : Chưa có check-in nào
+}
+
+state ActiveStreak #C8E6C9 {
+  state "Level 1\nNewcomer 🌱\n(0-2 days)" as L1
+  state "Level 2\nStarter ⭐\n(3-6 days)" as L2
+  state "Level 3\nDecisive 🔥\n(7-13 days)" as L3
+  state "Level 4\nCommitted 💪\n(14-29 days)" as L4
+  state "Level 5\nMaster 👑\n(30-59 days)" as L5
+  state "Level 6\nLegend 💎\n(60-99 days)" as L6
+  state "Level 7\nUnstoppable 🏆\n(100+ days)" as L7
+
+  L1 --> L2 : streak >= 3
+  L2 --> L3 : streak >= 7\n🏅 Perfect Week badge
+  L3 --> L4 : streak >= 14
+  L4 --> L5 : streak >= 30
+  L5 --> L6 : streak >= 60
+  L6 --> L7 : streak >= 100
+}
+
+state BrokenStreak #FFCDD2 {
+  BrokenStreak : currentStreak = 1
+  BrokenStreak : streakStartDate = today
+  BrokenStreak : Chuỗi bị gián đoạn
+  BrokenStreak : (bỏ lỡ >= 1 ngày)
+}
+
+NoStreak --> L1 : Check-in\nlần đầu tiên\n🏅 First Spin badge
+
+L1 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày\nhoặc Skip decision
+L2 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày
+L3 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày
+L4 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày
+L5 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày
+L6 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày
+L7 -[dashed]-> BrokenStreak : Bỏ lỡ >= 1 ngày
+
+BrokenStreak --> L1 : Check-in tiếp\n(streak = 1, bắt đầu lại)
+
+note right of ActiveStreak
+  **Check-in hàng ngày:**
+  Mỗi ngày check-in liên tiếp
+  → currentStreak++
+  → kiểm tra level up
+  → kiểm tra badge mới
+
+  **longestStreak** luôn giữ
+  giá trị cao nhất đạt được
+  (không bị reset)
+end note
+
+note bottom of BrokenStreak
+  **Nguyên nhân mất streak:**
+  1. Không check-in trong ngày
+     (decision hết hạn → expired)
+  2. Chủ động skip decision
+  3. Không quay spin cả ngày
+     (không có decision nào)
+end note
+
+@enduml

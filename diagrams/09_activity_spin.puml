@@ -1,0 +1,120 @@
+@startuml Activity_Spin
+!theme plain
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF9C4
+}
+
+title **BIỂU ĐỒ HOẠT ĐỘNG - QUAY SPIN WHEEL**
+
+start
+
+:Người dùng truy cập trang /spin;
+
+:Hệ thống tải danh sách danh mục;
+
+:Người dùng chọn danh mục;
+
+:Hệ thống tải danh sách
+lựa chọn (choices) trong danh mục;
+
+if (Số lựa chọn active >= 2?) then (Có)
+else (Không)
+  #FFCDD2:Thông báo lỗi:
+  "Cần ít nhất 2 lựa chọn
+  để quay spin";
+  stop
+endif
+
+:Hiển thị vòng quay (Spin Wheel)
+với các lựa chọn trên Canvas;
+
+:Người dùng nhập câu hỏi
+(tùy chọn, VD: "Ăn gì hôm nay?");
+
+:Người dùng nhấn nút **"QUAY NGAY!"**;
+
+#E8F5E9:Gửi request POST /api/decisions/spin
+{categoryId, question};
+
+partition "**THUẬT TOÁN SMART RANDOM**" #E3F2FD {
+  :Lấy tất cả choices active
+  trong category;
+
+  while (Còn choice chưa xử lý?) is (Có)
+    :Lấy weight gốc
+    của choice (1-10);
+
+    if (Choice được chọn\ntrong 3 ngày gần đây?) then (Có)
+      :weight = weight × 0.5
+      (Giảm 50% - cooldown);
+    else (Không)
+    endif
+
+    if (Choice chưa bao giờ\nđược chọn?) then (Có)
+      :weight = weight × 1.5
+      (Tăng 50% - boost mới);
+    else (Không)
+    endif
+  endwhile (Hết)
+
+  :Tính totalWeight =
+  SUM(tất cả weights);
+
+  :random = Math.random()
+  × totalWeight;
+
+  :Duyệt choices, cộng dồn weight
+  Chọn choice có cumulative >= random
+  → **WINNER**;
+}
+
+:Cập nhật Choice winner:
+- timesSelected++
+- lastSelectedAt = now;
+
+:Tạo Decision mới:
+- status: "pending"
+- spinCount: 1
+- expiresAt: now + 24h;
+
+:Cập nhật UserStreak:
+- totalDecisions++;
+
+#FFF3E0:Trả kết quả về Frontend;
+
+:Bắt đầu **animation quay**
+(4 giây, cubic easing);
+
+:Hiển thị **kết quả** với
+confetti animation 🎉;
+
+if (Người dùng chọn?) then (Chấp nhận ✅)
+
+  :PUT /api/decisions/:id/accept;
+  :Chuyển đến Dashboard
+  Hiển thị "Nhiệm vụ hôm nay";
+
+else (Quay lại 🔄)
+
+  if (Còn lượt re-spin?\n(tối đa 2 lần/ngày)) then (Còn)
+    :spinCount++;
+    #FFF9C4:Quay lại thuật toán
+    Smart Random;
+    note right
+      Quay lại bước
+      "Gửi request POST"
+      với spinCount tăng
+    end note
+  else (Hết lượt)
+    #FFCDD2:Thông báo:
+    "Đã hết lượt quay lại
+    Vui lòng chấp nhận kết quả";
+  endif
+
+endif
+
+stop
+
+@enduml

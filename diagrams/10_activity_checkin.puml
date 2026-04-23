@@ -1,0 +1,187 @@
+@startuml Activity_Checkin
+!theme plain
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF9C4
+}
+
+title **BIỂU ĐỒ HOẠT ĐỘNG - CHECK-IN XÁC NHẬN**
+
+start
+
+:Người dùng mở Dashboard;
+
+:Hệ thống tải danh sách
+Decision pending hôm nay;
+
+if (Có Decision pending?) then (Có)
+else (Không)
+  :Hiển thị "Không có nhiệm vụ"
+  Đề xuất "Quay spin mới";
+  stop
+endif
+
+:Hiển thị card **"Nhiệm vụ hôm nay"**
+với thời gian còn lại;
+
+:Người dùng nhấn **"Check-in ngay"**;
+
+:Chuyển đến trang /checkin;
+
+:Hiển thị form check-in:
+- Thông tin nhiệm vụ
+- Upload ảnh
+- Đánh giá sao
+- Caption (tùy chọn);
+
+' --- Upload ảnh ---
+
+:Người dùng chọn ảnh;
+
+fork
+  :Chụp ảnh từ camera;
+fork again
+  :Chọn ảnh từ thư viện;
+end fork
+
+if (File hợp lệ?\n(JPEG/PNG, < 5MB)) then (Hợp lệ)
+  :Preview ảnh đã chọn;
+else (Không hợp lệ)
+  :Thông báo lỗi:
+  "File phải là ảnh JPEG/PNG
+  và nhỏ hơn 5MB";<<#FFCDD2>>
+  :Quay lại chọn ảnh;
+  note right: Loop lại bước chọn ảnh
+endif
+
+' --- Đánh giá & Caption ---
+
+:Người dùng chọn đánh giá
+(1-5 sao);
+
+:Người dùng viết caption
+(tùy chọn, tối đa 500 ký tự);
+
+' --- Gửi Check-in ---
+
+:Người dùng nhấn
+**"Hoàn thành Check-in"**;
+
+:Validate form:
+- Ảnh đã chọn?
+- Rating đã chọn?;
+
+if (Form hợp lệ?) then (Hợp lệ)
+else (Thiếu dữ liệu)
+  :Highlight field bị thiếu;<<#FFCDD2>>
+  :Quay lại điền form;
+  note right: Loop lại
+endif
+
+:POST /api/decisions/:id/checkin
+(multipart/form-data);<<#E8F5E9>>
+
+' --- Server xử lý ---
+
+partition "**XỬ LÝ SERVER**" #E3F2FD {
+
+  if (Decision tồn tại\nvà thuộc user?) then (Có)
+  else (Không)
+    :403 Forbidden;<<#FFCDD2>>
+    stop
+  endif
+
+  if (Decision.status\n== "pending"?) then (Đúng)
+  else (Sai)
+    :400 Bad Request
+    "Decision đã hoàn thành
+    hoặc bị bỏ qua";<<#FFCDD2>>
+    stop
+  endif
+
+  if (Decision.expiresAt\n> now? (chưa hết hạn)) then (Chưa hết)
+  else (Đã hết hạn)
+    :Cập nhật status = "expired";
+    :400 Bad Request
+    "Đã quá hạn check-in (24h)";<<#FFCDD2>>
+    stop
+  endif
+
+  :Lưu file ảnh vào server
+  (/uploads/filename.jpg);
+
+  :Cập nhật Decision:
+  - status = "completed"
+  - checkin.imageUrl = path
+  - checkin.caption = caption
+  - checkin.rating = rating
+  - checkin.completedAt = now;
+
+  :Cập nhật Choice:
+  - timesCompleted++;
+}
+
+partition "**CẬP NHẬT STREAK**" #FFF9C4 {
+
+  :Lấy UserStreak của userId;
+
+  :totalCheckins++;
+
+  if (lastCheckinDate\n== hôm nay?) then (Cùng ngày)
+    :Không thay đổi streak
+    (đã check-in hôm nay rồi);
+  elseif (lastCheckinDate\n== hôm qua?) then (Ngày liên tiếp)
+    :currentStreak++
+    (chuỗi tiếp tục);
+    if (currentStreak\n> longestStreak?) then (Có)
+      :longestStreak =
+      currentStreak;
+    else (Không)
+    endif
+  else (Bị gián đoạn)
+    :currentStreak = 1
+    streakStartDate = today
+    (reset chuỗi);
+  endif
+
+  :lastCheckinDate = today;
+
+  :Tính level mới:
+  0-2: Newcomer
+  3-6: Starter
+  7-13: Decisive
+  14-29: Committed
+  30-59: Master
+  60-99: Legend
+  100+: Unstoppable;
+
+  :Kiểm tra & cấp badge mới;
+
+  :Lưu UserStreak vào DB;
+}
+
+' --- Phản hồi ---
+
+:Trả về response:
+{decision, streak, newBadges};<<#C8E6C9>>
+
+:Hiển thị animation thành công;
+
+if (Có badge mới?) then (Có)
+  :Hiển thị popup
+  "Chúc mừng! Bạn đã đạt
+  huy hiệu mới: [badge]";
+else (Không)
+endif
+
+:Hiển thị:
+"Check-in thành công!
+Streak: X ngày
+Level: Y";
+
+:Chuyển về Dashboard;
+
+stop
+
+@enduml
