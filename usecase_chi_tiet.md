@@ -113,7 +113,7 @@
     </tr>
 </table>  
 
-<h1>UC13:Check-in</h1>
+<h1>UC13:Check-in</h3>
 
 <table>
     <tr>
@@ -200,317 +200,320 @@
         <th>Mô tả</th>
     </tr>
     <tr>
-        <td><b>Tên UC</b></td>
-        <td>Đăng ký tài khoản</td>
+      <td><b>Tên UC</b></td>
+      <td>Đăng ký tài khoản</td>
     </tr>
     <tr>
-        <td><b>Tác nhân</b></td>
-        <td>Guest</td>
+      <td><b>Tác nhân</b></td>
+      <td>Guest</td>
     </tr>
     <tr>
-        <td><b>Mô tả</b></td>
-        <td>Khách tạo tài khoản mới để sử dụng hệ thống</td>
+      <td><b>Mô tả</b></td>
+      <td>Khách tạo tài khoản mới để sử dụng hệ thống</td>
     </tr>
     <tr>
-        <td><b>Tiền điều kiện</b></td>
-        <td>Chưa có tài khoản, truy cập trang /login</td>
+      <td><b>Tiền điều kiện</b></td>
+      <td>Chưa có tài khoản, truy cập trang /login</td>
     </tr>
     <tr>
-        <td><b>Hậu điều kiện</b></td>
-        <td>Tài khoản được tạo, nhận JWT token, redirect /dashboard</td>
+      <td><b>Hậu điều kiện</b></td>
+      <td>Tài khoản được tạo, nhận JWT token, redirect /dashboard</td>
     </tr>
-</table>
+  </table>
 
-<table>
+  <table>
     <tr>
-        <th>Luồng chính</th>
+      <th colspan="3" class="section-title">Luồng chính</th>
     </tr>
     <tr>
-        <th>Bước</th>
-        <th>Tác nhân</th>
-        <th>Hệ thống</th>
+      <th>Bước</th>
+      <th>Tác nhân</th>
+      <th>Hệ thống</th>
     </tr>
     <tr>
-        <td>1</td>
-        <td>Nhấn tab "Đăng ký"</td>
-        <td>Hiển thị form đăng ký (tên, email, password)</td>
+      <td>1</td>
+      <td>Nhấn tab "Đăng ký"</td>
+      <td>Hiển thị form đăng ký (tên, email, password)</td>
     </tr>
     <tr>
-        <td>2</td>
-        <td>Nhập đầy đủ thông tin</td>
-        <td>Validate client-side (tên >= 2 ký tự, email hợp lệ, password >= 6 ký tự)</td>
+      <td>2</td>
+      <td>Nhập đầy đủ thông tin</td>
+      <td>Validate client-side (tên &gt;= 2 ký tự, email hợp lệ, password &gt;= 6 ký tự)</td>
     </tr>
     <tr>
-        <td>3</td>
-        <td>Nhấn "Đăng ký"</td>
-        <td>POST /auth/register</td>
+      <td>3</td>
+      <td>Nhấn "Đăng ký"</td>
+      <td>POST /auth/register</td>
     </tr>
     <tr>
-        <td>4</td>
-        <td></td>
-        <td>Kiểm tra email chưa tồn tại</td>
+      <td>4</td>
+      <td></td>
+      <td>Kiểm tra email chưa tồn tại</td>
     </tr>
     <tr>
-        <td>5</td>
-        <td></td>
-        <td>Hash password (bcrypt, 12 rounds)</td>
+      <td>5</td>
+      <td></td>
+      <td>Hash password (bcrypt, 12 rounds)</td>
     </tr>
     <tr>
-        <td>6</td>
-        <td></td>
-        <td>Tạo User (role: "viewer")</td>
+      <td>6</td>
+      <td></td>
+      <td>Tạo User (role: "viewer")</td>
     </tr>
     <tr>
-        <td>7</td>
-        <td></td>
-        <td>Tạo JWT token</td>
+      <td>7</td>
+      <td></td>
+      <td>Tạo JWT token</td>
     </tr>
     <tr>
-        <td>8</td>
-        <td></td>
-        <td>Trả về {token, user}</td>
+      <td>8</td>
+      <td></td>
+      <td>Trả về {token, user}</td>
     </tr>
     <tr>
-        <td>9</td>
-        <td></td>
-        <td>Lưu token vào localStorage, redirect /dashboard</td>
+      <td>9</td>
+      <td></td>
+      <td>Lưu token vào localStorage, redirect /dashboard</td>
     </tr>
-</table>
+  </table>
 
-<table>
+  <table>
     <tr>
-        <th>Luồng ngoại lệ</th>
+      <th colspan="2" class="section-title">Luồng ngoại lệ</th>
     </tr>
     <tr>
-        <th>Bước</th>
-        <th>Mô tả</th>
+      <th>Bước</th>
+      <th>Mô tả</th>
     </tr>
     <tr>
-        <td>4a</td>
-        <td>Email đã tồn tại → 409 "Email đã được sử dụng"</td>
+      <td>4a</td>
+      <td>Email đã tồn tại → 409 "Email đã được sử dụng"</td>
     </tr>
     <tr>
-        <td>2a</td>
-        <td>Dữ liệu không hợp lệ → 422 hiển thị lỗi validation</td>
+      <td>2a</td>
+      <td>Dữ liệu không hợp lệ → 422 hiển thị lỗi validation</td>
     </tr>
-</table>
+  </table>
 
-<h1>UC02: Đăng nhập</h1>
+  <!-- UC02 -->
+  <h3>UC02: Đăng nhập</h3>
 
-<table>
+  <table>
     <tr>
-        <th>Thuộc tính</th>
-        <th>Mô tả</th>
+      <th>Thuộc tính</th>
+      <th>Mô tả</th>
     </tr>
     <tr>
-        <td><b>Tên UC</b></td>
-        <td>Đăng nhập</td>
+      <td><b>Tên UC</b></td>
+      <td>Đăng nhập</td>
     </tr>
     <tr>
-        <td><b>Tác nhân</b></td>
-        <td>Guest</td>
+      <td><b>Tác nhân</b></td>
+      <td>Guest</td>
     </tr>
     <tr>
-        <td><b>Mô tả</b></td>
-        <td>Xác thực bằng email/password để truy cập hệ thống</td>
+      <td><b>Mô tả</b></td>
+      <td>Xác thực bằng email/password để truy cập hệ thống</td>
     </tr>
     <tr>
-        <td><b>Tiền điều kiện</b></td>
-        <td>Đã có tài khoản</td>
+      <td><b>Tiền điều kiện</b></td>
+      <td>Đã có tài khoản</td>
     </tr>
     <tr>
-        <td><b>Hậu điều kiện</b></td>
-        <td>Nhận JWT token, redirect /dashboard</td>
+      <td><b>Hậu điều kiện</b></td>
+      <td>Nhận JWT token, redirect /dashboard</td>
     </tr>
-</table>
+  </table>
 
-<table>
+  <table>
     <tr>
-        <th>Luồng chính</th>
+      <th colspan="3" class="section-title">Luồng chính</th>
     </tr>
     <tr>
-        <th>Bước</th>
-        <th>Tác nhân</th>
-        <th>Hệ thống</th>
+      <th>Bước</th>
+      <th>Tác nhân</th>
+      <th>Hệ thống</th>
     </tr>
     <tr>
-        <td>1</td>
-        <td>Nhập email và password</td>
-        <td></td>
+      <td>1</td>
+      <td>Nhập email và password</td>
+      <td></td>
     </tr>
     <tr>
-        <td>2</td>
-        <td>Nhấn "Đăng nhập"</td>
-        <td>POST /auth/login</td>
+      <td>2</td>
+      <td>Nhấn "Đăng nhập"</td>
+      <td>POST /auth/login</td>
     </tr>
     <tr>
-        <td>3</td>
-        <td></td>
-        <td>Tìm user theo email</td>
+      <td>3</td>
+      <td></td>
+      <td>Tìm user theo email</td>
     </tr>
     <tr>
-        <td>4</td>
-        <td></td>
-        <td>So sánh password (bcrypt)</td>
+      <td>4</td>
+      <td></td>
+      <td>So sánh password (bcrypt)</td>
     </tr>
     <tr>
-        <td>5</td>
-        <td></td>
-        <td>Kiểm tra isActive == true</td>
+      <td>5</td>
+      <td></td>
+      <td>Kiểm tra isActive == true</td>
     </tr>
     <tr>
-        <td>6</td>
-        <td></td>
-        <td>Tra cứu role → lấy permissions[]</td>
+      <td>6</td>
+      <td></td>
+      <td>Tra cứu role → lấy permissions[]</td>
     </tr>
     <tr>
-        <td>7</td>
-        <td></td>
-        <td>Tạo JWT token (userId, email, role, permissions)</td>
+      <td>7</td>
+      <td></td>
+      <td>Tạo JWT token (userId, email, role, permissions)</td>
     </tr>
     <tr>
-        <td>8</td>
-        <td></td>
-        <td>Trả về {token, user}</td>
+      <td>8</td>
+      <td></td>
+      <td>Trả về {token, user}</td>
     </tr>
     <tr>
-        <td>9</td>
-        <td></td>
-        <td>Lưu token, redirect /dashboard</td>
+      <td>9</td>
+      <td></td>
+      <td>Lưu token, redirect /dashboard</td>
     </tr>
-</table>
+  </table>
 
-<table>
+  <table>
     <tr>
-        <th>Luồng ngoại lệ</th>
+      <th colspan="2" class="section-title">Luồng ngoại lệ</th>
     </tr>
     <tr>
-        <th>Bước</th>
-        <th>Mô tả</th>
+      <th>Bước</th>
+      <th>Mô tả</th>
     </tr>
     <tr>
-        <td>3a</td>
-        <td>Email không tồn tại → 401 "Email hoặc mật khẩu không chính xác"</td>
+      <td>3a</td>
+      <td>Email không tồn tại → 401 "Email hoặc mật khẩu không chính xác"</td>
     </tr>
     <tr>
-        <td>4a</td>
-        <td>Password sai → 401 "Email hoặc mật khẩu không chính xác"</td>
+      <td>4a</td>
+      <td>Password sai → 401 "Email hoặc mật khẩu không chính xác"</td>
     </tr>
     <tr>
-        <td>5a</td>
-        <td>Tài khoản bị vô hiệu hóa → 403 "Tài khoản đã bị khóa"</td>
+      <td>5a</td>
+      <td>Tài khoản bị vô hiệu hóa → 403 "Tài khoản đã bị khóa"</td>
     </tr>
-</table>
+  </table>
 
-<h3>UC03: Đăng xuất</h3>
+  <!-- UC03 -->
+  <h3>UC03: Đăng xuất</h3>
 
-<table>
+  <table>
     <tr>
-        <th>Thuộc tính</th>
-        <th>Mô tả</th>
+      <th>Thuộc tính</th>
+      <th>Mô tả</th>
     </tr>
     <tr>
-        <td><b>Tên UC</b></td>
-        <td>Đăng xuất</td>
+      <td><b>Tên UC</b></td>
+      <td>Đăng xuất</td>
     </tr>
     <tr>
-        <td><b>Tác nhân</b></td>
-        <td>User, Admin</td>
+      <td><b>Tác nhân</b></td>
+      <td>User, Admin</td>
     </tr>
     <tr>
-        <td><b>Mô tả</b></td>
-        <td>Kết thúc phiên đăng nhập</td>
+      <td><b>Mô tả</b></td>
+      <td>Kết thúc phiên đăng nhập</td>
     </tr>
     <tr>
-        <td><b>Tiền điều kiện</b></td>
-        <td>Đã đăng nhập</td>
+      <td><b>Tiền điều kiện</b></td>
+      <td>Đã đăng nhập</td>
     </tr>
     <tr>
-        <td><b>Hậu điều kiện</b></td>
-        <td>Token bị xóa, redirect /login</td>
+      <td><b>Hậu điều kiện</b></td>
+      <td>Token bị xóa, redirect /login</td>
     </tr>
-</table>
+  </table>
 
-<table>
+  <table>
     <tr>
-        <th>Luồng chính</th>
+      <th colspan="3" class="section-title">Luồng chính</th>
     </tr>
     <tr>
-        <th>Bước</th>
-        <th>Tác nhân</th>
-        <th>Hệ thống</th>
+      <th>Bước</th>
+      <th>Tác nhân</th>
+      <th>Hệ thống</th>
     </tr>
     <tr>
-        <td>1</td>
-        <td>Nhấn "Đăng xuất" trên sidebar</td>
-        <td>Xóa token khỏi Zustand store + localStorage</td>
+      <td>1</td>
+      <td>Nhấn "Đăng xuất" trên sidebar</td>
+      <td>Xóa token khỏi Zustand store + localStorage</td>
     </tr>
     <tr>
-        <td>2</td>
-        <td></td>
-        <td>Redirect về /login</td>
+      <td>2</td>
+      <td></td>
+      <td>Redirect về /login</td>
     </tr>
-</table>
+  </table>
 
-<h3>UC05: Xem danh sách danh mục</h3>
+  <!-- UC05 -->
+  <h3>UC05: Xem danh sách danh mục</h3>
 
-<table>
+  <table>
     <tr>
-        <th>Thuộc tính</th>
-        <th>Mô tả</th>
+      <th>Thuộc tính</th>
+      <th>Mô tả</th>
     </tr>
     <tr>
-        <td><b>Tên UC</b></td>
-        <td>Xem danh sách danh mục</td>
+      <td><b>Tên UC</b></td>
+      <td>Xem danh sách danh mục</td>
     </tr>
     <tr>
-        <td><b>Tác nhân</b></td>
-        <td>User</td>
+      <td><b>Tác nhân</b></td>
+      <td>User</td>
     </tr>
     <tr>
-        <td><b>Mô tả</b></td>
-        <td>Xem tất cả danh mục (mặc định + tự tạo + public)</td>
+      <td><b>Mô tả</b></td>
+      <td>Xem tất cả danh mục (mặc định + tự tạo + public)</td>
     </tr>
     <tr>
-        <td><b>Tiền điều kiện</b></td>
-        <td>Đã đăng nhập</td>
+      <td><b>Tiền điều kiện</b></td>
+      <td>Đã đăng nhập</td>
     </tr>
     <tr>
-        <td><b>Hậu điều kiện</b></td>
-        <td>Hiển thị danh sách danh mục</td>
+      <td><b>Hậu điều kiện</b></td>
+      <td>Hiển thị danh sách danh mục</td>
     </tr>
-</table>
+  </table>
 
-<table>
+  <table>
     <tr>
-        <th>Luồng chính</th>
+      <th colspan="3" class="section-title">Luồng chính</th>
     </tr>
     <tr>
-        <th>Bước</th>
-        <th>Tác nhân</th>
-        <th>Hệ thống</th>
+      <th>Bước</th>
+      <th>Tác nhân</th>
+      <th>Hệ thống</th>
     </tr>
     <tr>
-        <td>1</td>
-        <td>Mở trang /categories</td>
-        <td>GET /categories</td>
+      <td>1</td>
+      <td>Mở trang /categories</td>
+      <td>GET /categories</td>
     </tr>
     <tr>
-        <td>2</td>
-        <td></td>
-        <td>Trả về danh mục: createdBy == userId HOẶC isPublic == true</td>
+      <td>2</td>
+      <td></td>
+      <td>Trả về danh mục: createdBy == userId HOẶC isPublic == true</td>
     </tr>
     <tr>
-        <td>3</td>
-        <td></td>
-        <td>Sắp xếp: mặc định trước, theo tên</td>
+      <td>3</td>
+      <td></td>
+      <td>Sắp xếp: mặc định trước, theo tên</td>
     </tr>
     <tr>
-        <td>4</td>
-        <td></td>
-        <td>Hiển thị grid cards với icon, color, choiceCount</td>
+      <td>4</td>
+      <td></td>
+      <td>Hiển thị grid cards với icon, color, choiceCount</td>
     </tr>
-</table>
+  </table>
 
 </body>
 </html>
