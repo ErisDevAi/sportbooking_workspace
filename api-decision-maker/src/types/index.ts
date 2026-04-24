@@ -11,4 +11,8 @@ export type PermissionSlug =
   | "view_user"
   | "manage_roles"
   | "manage_permissions"
-  | "view_dashboard";
+  | "view_dashboard"
+  | "create_category"
+  | "edit_category"
+  | "delete_category"
+  | "view_category";
