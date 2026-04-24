@@ -1791,3 +1791,1196 @@ Hệ thống được phân rã thành 7 tiến trình con:
         <td>Ảnh check-in (/uploads)</td>
     </tr>
 </table>
+
+---
+
+## 5. THIẾT KẾ CƠ SỞ DỮ LIỆU
+
+### 5.1 Biểu đồ quan hệ thực thể (ERD)
+
+```
+┌──────────────┐     1:N     ┌──────────────┐     1:N     ┌──────────────┐
+│    User      │────────────▶│   Category   │────────────▶│    Choice    │
+│──────────────│             │──────────────│             │──────────────│
+│ _id (PK)     │             │ _id (PK)     │             │ _id (PK)     │
+│ name         │             │ name         │             │ categoryId(FK)│
+│ email (UQ)   │             │ slug (UQ)    │             │ name         │
+│ password     │             │ icon         │             │ description  │
+│ role         │             │ color        │             │ imageUrl     │
+│ isActive     │             │ description  │             │ tags[]       │
+│ createdAt    │             │ isDefault    │             │ weight       │
+│ updatedAt    │             │ isPublic     │             │ isActive     │
+└──────┬───────┘             │ createdBy(FK)│             │ createdBy(FK)│
+       │                     │ choiceCount  │             │ timesSelected│
+       │                     │ createdAt    │             │ timesCompleted│
+       │                     │ updatedAt    │             │ lastSelectedAt│
+       │                     └──────────────┘             │ location{}   │
+       │                                                  │ metadata{}   │
+       │                                                  │ createdAt    │
+       │                                                  │ updatedAt    │
+       │                                                  └──────────────┘
+       │
+       │         1:N     ┌──────────────┐
+       │────────────────▶│   Decision   │
+       │                 │──────────────│
+       │                 │ _id (PK)     │
+       │                 │ userId (FK)  │──────────────── ref User
+       │                 │ categoryId(FK)│─────────────── ref Category
+       │                 │ choiceId (FK)│──────────────── ref Choice
+       │                 │ question     │
+       │                 │ status       │  enum: pending|completed|skipped|expired
+       │                 │ spinCount    │
+       │                 │ checkin{}    │  { imageUrl, caption, rating, completedAt }
+       │                 │ expiresAt    │  = createdAt + 24h
+       │                 │ createdAt    │
+       │                 │ updatedAt    │
+       │                 └──────────────┘
+       │
+       │         1:1     ┌──────────────┐
+       └────────────────▶│  UserStreak  │
+                         │──────────────│
+                         │ _id (PK)     │
+                         │ userId (FK,UQ)│─────────────── ref User (unique)
+                         │ currentStreak│
+                         │ longestStreak│
+                         │ totalDecisions│
+                         │ totalCheckins│
+                         │ lastCheckinDate│
+                         │ streakStartDate│
+                         │ level        │  1-7
+                         │ badges[]     │  [{ slug, name, icon, earnedAt }]
+                         │ createdAt    │
+                         │ updatedAt    │
+                         └──────────────┘
+
+┌──────────────┐     N:N     ┌──────────────┐
+│    Role      │────────────▶│  Permission  │
+│──────────────│             │──────────────│
+│ _id (PK)     │             │ _id (PK)     │
+│ name (UQ)    │             │ name (UQ)    │
+│ slug (UQ)    │             │ slug (UQ)    │
+│ description  │             │ description  │
+│ permissions[]│─── ref ────▶│ module       │
+│ isActive     │             │ action       │
+│ createdAt    │             │ createdAt    │
+│ updatedAt    │             │ updatedAt    │
+└──────────────┘             └──────────────┘
+```
+
+### 5.2 Chi tiết thiết kế các Collection
+
+#### 5.2.1 Collection: users
+
+```typescript
+// Schema: User
+{
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 2,
+    maxlength: 100
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false           // Không trả về khi query
+  },
+  role: {
+    type: String,
+    default: "viewer"       // Vai trò mặc định
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+}
+// Timestamps: createdAt, updatedAt (auto)
+// Index: email (unique)
+```
+
+#### 5.2.2 Collection: categories
+
+```typescript
+{
+  name: { type: String, required: true, trim: true },
+  slug: { type: String, unique: true },       // Auto-generate từ name
+  icon: { type: String, default: "📁" },       // Emoji icon
+  color: { type: String, default: "#3498DB" }, // Hex color
+  description: { type: String },
+  isDefault: { type: Boolean, default: false },// Danh mục hệ thống
+  isPublic: { type: Boolean, default: true },  // Công khai
+  createdBy: { type: ObjectId, ref: "User" },
+  choiceCount: { type: Number, default: 0 }    // Denormalized
+}
+// Index: slug (unique), createdBy
+```
+
+#### 5.2.3 Collection: choices
+
+```typescript
+{
+  categoryId: { type: ObjectId, ref: "Category", required: true },
+  name: { type: String, required: true },
+  description: { type: String },
+  imageUrl: { type: String },
+  tags: [{ type: String }],
+  location: {
+    lat: Number,
+    lng: Number,
+    address: String
+  },
+  metadata: {
+    priceRange: { type: Number, min: 1, max: 5 },
+    rating: { type: Number, min: 1, max: 5 },
+    url: String
+  },
+  weight: { type: Number, default: 5, min: 1, max: 10 },
+  isActive: { type: Boolean, default: true },
+  createdBy: { type: ObjectId, ref: "User" },
+  timesSelected: { type: Number, default: 0 },
+  timesCompleted: { type: Number, default: 0 },
+  lastSelectedAt: { type: Date }
+}
+// Index: categoryId, createdBy
+```
+
+#### 5.2.4 Collection: decisions
+
+```typescript
+{
+  userId: { type: ObjectId, ref: "User", required: true },
+  categoryId: { type: ObjectId, ref: "Category" },
+  choiceId: { type: ObjectId, ref: "Choice" },
+  question: { type: String, required: true },
+  status: {
+    type: String,
+    enum: ["pending", "completed", "skipped", "expired"],
+    default: "pending"
+  },
+  spinCount: { type: Number, default: 1 },
+  checkin: {
+    imageUrl: { type: String },
+    caption: { type: String, maxlength: 500 },
+    rating: { type: Number, min: 1, max: 5 },
+    completedAt: { type: Date }
+  },
+  expiresAt: { type: Date }                    // createdAt + 24h
+}
+// Index: userId, expiresAt, status
+```
+
+#### 5.2.5 Collection: userstreaks
+
+```typescript
+{
+  userId: { type: ObjectId, ref: "User", unique: true },
+  currentStreak: { type: Number, default: 0 },
+  longestStreak: { type: Number, default: 0 },
+  totalDecisions: { type: Number, default: 0 },
+  totalCheckins: { type: Number, default: 0 },
+  lastCheckinDate: { type: Date },
+  streakStartDate: { type: Date },
+  level: { type: Number, default: 1, min: 1, max: 7 },
+  badges: [{
+    slug: String,          // "first_spin", "perfect_week"
+    name: String,          // "First Spin", "Perfect Week"
+    icon: String,          // "🌟", "🔥"
+    earnedAt: Date
+  }]
+}
+// Index: userId (unique)
+```
+
+### 5.3 Từ điển dữ liệu
+
+#### Bảng Users
+
+<table>
+    <tr>
+        <th>Trường</th>
+        <th>Kiểu dữ liệu</th>
+        <th>Ràng buộc</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>_id</td>
+        <td>ObjectId</td>
+        <td>PK, auto</td>
+        <td>Khóa chính</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>Required, 2-100 ký tự</td>
+        <td>Tên hiển thị</td>
+    </tr>
+    <tr>
+        <td>email</td>
+        <td>String</td>
+        <td>Required, Unique, Lowercase</td>
+        <td>Email đăng nhập</td>
+    </tr>
+    <tr>
+        <td>password</td>
+        <td>String</td>
+        <td>Required, Hidden</td>
+        <td>Mật khẩu (bcrypt hash)</td>
+    </tr>
+    <tr>
+        <td>role</td>
+        <td>String</td>
+        <td>Default: "viewer"</td>
+        <td>Vai trò người dùng</td>
+    </tr>
+    <tr>
+        <td>isActive</td>
+        <td>Boolean</td>
+        <td>Default: true</td>
+        <td>Trạng thái tài khoản</td>
+    </tr>
+    <tr>
+        <td>createdAt</td>
+        <td>Date</td>
+        <td>Auto</td>
+        <td>Ngày tạo</td>
+    </tr>
+    <tr>
+        <td>updatedAt</td>
+        <td>Date</td>
+        <td>Auto</td>
+        <td>Ngày cập nhật</td>
+    </tr>
+</table>
+
+#### Bảng Categories
+
+<table>
+    <tr>
+        <th>Trường</th>
+        <th>Kiểu dữ liệu</th>
+        <th>Ràng buộc</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>_id</td>
+        <td>ObjectId</td>
+        <td>PK, auto</td>
+        <td>Khóa chính</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Tên danh mục</td>
+    </tr>
+    <tr>
+        <td>slug</td>
+        <td>String</td>
+        <td>Unique</td>
+        <td>Slug URL-friendly</td>
+    </tr>
+    <tr>
+        <td>icon</td>
+        <td>String</td>
+        <td>Default: "📁"</td>
+        <td>Icon emoji</td>
+    </tr>
+    <tr>
+        <td>color</td>
+        <td>String</td>
+        <td>Default: "#3498DB"</td>
+        <td>Mã màu hex</td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>String</td>
+        <td>Optional</td>
+        <td>Mô tả danh mục</td>
+    </tr>
+    <tr>
+        <td>isDefault</td>
+        <td>Boolean</td>
+        <td>Default: false</td>
+        <td>Danh mục mặc định hệ thống</td>
+    </tr>
+    <tr>
+        <td>isPublic</td>
+        <td>Boolean</td>
+        <td>Default: true</td>
+        <td>Công khai/riêng tư</td>
+    </tr>
+    <tr>
+        <td>createdBy</td>
+        <td>ObjectId</td>
+        <td>FK → Users</td>
+        <td>Người tạo</td>
+    </tr>
+    <tr>
+        <td>choiceCount</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Số lựa chọn (denormalized)</td>
+    </tr>
+</table>
+
+#### Bảng Choices
+
+<table>
+    <tr>
+        <th>Trường</th>
+        <th>Kiểu dữ liệu</th>
+        <th>Ràng buộc</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>_id</td>
+        <td>ObjectId</td>
+        <td>PK, auto</td>
+        <td>Khóa chính</td>
+    </tr>
+    <tr>
+        <td>categoryId</td>
+        <td>ObjectId</td>
+        <td>FK → Categories, Required</td>
+        <td>Danh mục chứa</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Tên lựa chọn</td>
+    </tr>
+    <tr>
+        <td>description</td>
+        <td>String</td>
+        <td>Optional</td>
+        <td>Mô tả</td>
+    </tr>
+    <tr>
+        <td>imageUrl</td>
+        <td>String</td>
+        <td>Optional</td>
+        <td>URL ảnh minh họa</td>
+    </tr>
+    <tr>
+        <td>tags</td>
+        <td>String[]</td>
+        <td>Optional</td>
+        <td>Nhãn phân loại</td>
+    </tr>
+    <tr>
+        <td>weight</td>
+        <td>Number</td>
+        <td>1-10, Default: 5</td>
+        <td>Trọng số random</td>
+    </tr>
+    <tr>
+        <td>isActive</td>
+        <td>Boolean</td>
+        <td>Default: true</td>
+        <td>Trạng thái hoạt động</td>
+    </tr>
+    <tr>
+        <td>createdBy</td>
+        <td>ObjectId</td>
+        <td>FK → Users</td>
+        <td>Người tạo</td>
+    </tr>
+    <tr>
+        <td>timesSelected</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Số lần được chọn</td>
+    </tr>
+    <tr>
+        <td>timesCompleted</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Số lần hoàn thành</td>
+    </tr>
+    <tr>
+        <td>lastSelectedAt</td>
+        <td>Date</td>
+        <td>Optional</td>
+        <td>Lần cuối được chọn</td>
+    </tr>
+</table>
+
+#### Bảng Decisions
+
+<table>
+    <tr>
+        <th>Trường</th>
+        <th>Kiểu dữ liệu</th>
+        <th>Ràng buộc</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>_id</td>
+        <td>ObjectId</td>
+        <td>PK, auto</td>
+        <td>Khóa chính</td>
+    </tr>
+    <tr>
+        <td>userId</td>
+        <td>ObjectId</td>
+        <td>FK → Users, Required</td>
+        <td>Người quay</td>
+    </tr>
+    <tr>
+        <td>categoryId</td>
+        <td>ObjectId</td>
+        <td>FK → Categories</td>
+        <td>Danh mục</td>
+    </tr>
+    <tr>
+        <td>choiceId</td>
+        <td>ObjectId</td>
+        <td>FK → Choices</td>
+        <td>Lựa chọn được random</td>
+    </tr>
+    <tr>
+        <td>question</td>
+        <td>String</td>
+        <td>Required</td>
+        <td>Câu hỏi đặt ra</td>
+    </tr>
+    <tr>
+        <td>status</td>
+        <td>Enum</td>
+        <td>pending/completed/skipped/expired</td>
+        <td>Trạng thái</td>
+    </tr>
+    <tr>
+        <td>spinCount</td>
+        <td>Number</td>
+        <td>Default: 1</td>
+        <td>Số lần quay</td>
+    </tr>
+    <tr>
+        <td>checkin</td>
+        <td>Object</td>
+        <td>Optional</td>
+        <td>Dữ liệu check-in</td>
+    </tr>
+    <tr>
+        <td>checkin.imageUrl</td>
+        <td>String</td>
+        <td>Required (khi check-in)</td>
+        <td>URL ảnh check-in</td>
+    </tr>
+    <tr>
+        <td>checkin.caption</td>
+        <td>String</td>
+        <td>Optional, max 500</td>
+        <td>Mô tả check-in</td>
+    </tr>
+    <tr>
+        <td>checkin.rating</td>
+        <td>Number</td>
+        <td>1-5, Required (khi check-in)</td>
+        <td>Đánh giá</td>
+    </tr>
+    <tr>
+        <td>checkin.completedAt</td>
+        <td>Date</td>
+        <td>Auto</td>
+        <td>Thời điểm check-in</td>
+    </tr>
+    <tr>
+        <td>expiresAt</td>
+        <td>Date</td>
+        <td>Auto (createdAt + 24h)</td>
+        <td>Hạn check-in</td>
+    </tr>
+</table>
+
+#### Bảng UserStreaks
+
+<table>
+    <tr>
+        <th>Trường</th>
+        <th>Kiểu dữ liệu</th>
+        <th>Ràng buộc</th>
+        <th>Mô tả</th>
+    </tr>
+    <tr>
+        <td>_id</td>
+        <td>ObjectId</td>
+        <td>PK, auto</td>
+        <td>Khóa chính</td>
+    </tr>
+    <tr>
+        <td>userId</td>
+        <td>ObjectId</td>
+        <td>FK → Users, Unique</td>
+        <td>Người dùng</td>
+    </tr>
+    <tr>
+        <td>currentStreak</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Chuỗi hiện tại</td>
+    </tr>
+    <tr>
+        <td>longestStreak</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Chuỗi dài nhất</td>
+    </tr>
+    <tr>
+        <td>totalDecisions</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Tổng quyết định</td>
+    </tr>
+    <tr>
+        <td>totalCheckins</td>
+        <td>Number</td>
+        <td>Default: 0</td>
+        <td>Tổng check-in</td>
+    </tr>
+    <tr>
+        <td>lastCheckinDate</td>
+        <td>Date</td>
+        <td>Optional</td>
+        <td>Ngày check-in cuối</td>
+    </tr>
+    <tr>
+        <td>streakStartDate</td>
+        <td>Date</td>
+        <td>Optional</td>
+        <td>Ngày bắt đầu chuỗi</td>
+    </tr>
+    <tr>
+        <td>level</td>
+        <td>Number</td>
+        <td>1-7, Default: 1</td>
+        <td>Level hiện tại</td>
+    </tr>
+    <tr>
+        <td>badges</td>
+        <td>Array</td>
+        <td>Embedded</td>
+        <td>Danh sách huy hiệu</td>
+    </tr>
+</table>
+
+---
+
+## 6. THIẾT KẾ API
+
+### 6.1 Quy ước chung
+
+- **Base URL:** `http://localhost:8000/api`
+- **Format:** JSON
+- **Authentication:** Bearer Token (JWT) trong header `Authorization`
+- **Pagination:** Query params `page` và `limit`
+- **HTTP Methods:** GET (đọc), POST (tạo), PUT (cập nhật), DELETE (xóa)
+
+### 6.2 Format Response chuẩn
+
+```typescript
+// Thành công
+{
+  "success": true,
+  "data": { ... },           // Object hoặc Array
+  "message": "Thành công",
+  "pagination": {            // Chỉ có khi trả về danh sách
+    "page": 1,
+    "limit": 10,
+    "total": 50,
+    "totalPages": 5
+  }
+}
+
+// Lỗi
+{
+  "success": false,
+  "message": "Mô tả lỗi",
+  "errors": [                // Chi tiết lỗi validation
+    { "field": "email", "message": "Email không hợp lệ" }
+  ]
+}
+```
+
+### 6.3 Danh sách API Endpoints
+
+#### 6.3.1 Authentication (<code>/api/auth</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+        <th>Request Body</th>
+        <th>Response</th>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/auth/register</code></td>
+        <td>Đăng ký tài khoản</td>
+        <td>No</td>
+        <td><code>{ name, email, password }</code></td>
+        <td><code>{ user, token }</code></td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/auth/login</code></td>
+        <td>Đăng nhập</td>
+        <td>No</td>
+        <td><code>{ email, password }</code></td>
+        <td><code>{ user, token }</code></td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/auth/me</code></td>
+        <td>Lấy thông tin user đang đăng nhập</td>
+        <td>Yes</td>
+        <td>-</td>
+        <td><code>{ user }</code></td>
+    </tr>
+</table>
+
+<b>Chi tiết:</b>
+
+```
+POST /api/auth/register
+─────────────────────────
+Request:
+{
+  "name": "Nguyễn Văn A",
+  "email": "user@example.com",
+  "password": "matkhau123"
+}
+
+Response (201):
+{
+  "success": true,
+  "data": {
+    "user": {
+      "_id": "...",
+      "name": "Nguyễn Văn A",
+      "email": "user@example.com",
+      "role": "viewer"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+  }
+}
+
+Validation:
+- name: 2-100 ký tự, bắt buộc
+- email: format email hợp lệ, chưa tồn tại trong hệ thống
+- password: tối thiểu 6 ký tự
+```
+
+```
+POST /api/auth/login
+─────────────────────
+Request:
+{
+  "email": "user@example.com",
+  "password": "matkhau123"
+}
+
+Response (200):
+{
+  "success": true,
+  "data": {
+    "user": { "_id", "name", "email", "role" },
+    "token": "eyJhbGci..."
+  }
+}
+
+Error (401):
+{
+  "success": false,
+  "message": "Email hoặc mật khẩu không chính xác"
+}
+```
+
+#### 6.3.2 Categories (<code>/api/categories</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+        <th>Params/Body</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/categories</code></td>
+        <td>Danh sách danh mục (own + public)</td>
+        <td>Yes</td>
+        <td>Query: <code>?page=1&limit=10</code></td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/categories/:id</code></td>
+        <td>Chi tiết 1 danh mục</td>
+        <td>Yes</td>
+        <td>Param: <code>id</code></td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/categories</code></td>
+        <td>Tạo danh mục mới</td>
+        <td>Yes</td>
+        <td>Body: <code>{ name, icon, color, description, isPublic }</code></td>
+    </tr>
+    <tr>
+        <td>PUT</td>
+        <td><code>/categories/:id</code></td>
+        <td>Cập nhật danh mục</td>
+        <td>Yes</td>
+        <td>Body: fields cần update</td>
+    </tr>
+    <tr>
+        <td>DELETE</td>
+        <td><code>/categories/:id</code></td>
+        <td>Xóa danh mục (chỉ tùy chỉnh)</td>
+        <td>Yes</td>
+        <td>Param: <code>id</code></td>
+    </tr>
+</table>
+
+#### 6.3.3 Choices (<code>/api/choices</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+        <th>Params/Body</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/categories/:categoryId/choices</code></td>
+        <td>Danh sách lựa chọn trong danh mục</td>
+        <td>Yes</td>
+        <td>Param: <code>categoryId</code></td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/choices/:id</code></td>
+        <td>Chi tiết lựa chọn</td>
+        <td>Yes</td>
+        <td>Param: <code>id</code></td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/choices</code></td>
+        <td>Tạo lựa chọn mới</td>
+        <td>Yes</td>
+        <td>Body: <code>{ categoryId, name, description, tags, weight, ... }</code></td>
+    </tr>
+    <tr>
+        <td>PUT</td>
+        <td><code>/choices/:id</code></td>
+        <td>Cập nhật lựa chọn</td>
+        <td>Yes</td>
+        <td>Body: fields cần update</td>
+    </tr>
+    <tr>
+        <td>DELETE</td>
+        <td><code>/choices/:id</code></td>
+        <td>Xóa lựa chọn</td>
+        <td>Yes</td>
+        <td>Param: <code>id</code></td>
+    </tr>
+</table>
+
+#### 6.3.4 Decisions — Spin & History (<code>/api/decisions</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+        <th>Params/Body</th>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/decisions/spin</code></td>
+        <td>Quay spin wheel</td>
+        <td>Yes</td>
+        <td>Body: <code>{ categoryId, question }</code></td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/decisions</code></td>
+        <td>Lịch sử quyết định (phân trang)</td>
+        <td>Yes</td>
+        <td>Query: <code>?page&limit&status</code></td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/decisions/today</code></td>
+        <td>Quyết định hôm nay (pending)</td>
+        <td>Yes</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>PUT</td>
+        <td><code>/decisions/:id/accept</code></td>
+        <td>Chấp nhận kết quả</td>
+        <td>Yes</td>
+        <td>Param: <code>id</code></td>
+    </tr>
+    <tr>
+        <td>PUT</td>
+        <td><code>/decisions/:id/skip</code></td>
+        <td>Bỏ qua kết quả</td>
+        <td>Yes</td>
+        <td>Param: <code>id</code></td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/decisions/:id/checkin</code></td>
+        <td>Check-in (upload ảnh)</td>
+        <td>Yes</td>
+        <td>Multipart: <code>image, caption, rating</code></td>
+    </tr>
+</table>
+
+<b>Chi tiết Spin API:</b>
+
+```
+POST /api/decisions/spin
+────────────────────────
+Request:
+{
+  "categoryId": "664abc123...",
+  "question": "Ăn gì hôm nay?"
+}
+
+Response (201):
+{
+  "success": true,
+  "data": {
+    "_id": "...",
+    "userId": "...",
+    "categoryId": "...",
+    "choiceId": "...",
+    "question": "Ăn gì hôm nay?",
+    "status": "pending",
+    "spinCount": 1,
+    "expiresAt": "2026-04-20T10:00:00Z",
+    "choice": {                         // Populated
+      "name": "Bún bò Huế",
+      "description": "Quán bún bò gần nhà",
+      "imageUrl": "...",
+      "metadata": { "priceRange": 2, "rating": 4.5 }
+    }
+  }
+}
+```
+
+<b>Chi tiết Check-in API:</b>
+
+```
+POST /api/decisions/:id/checkin
+───────────────────────────────
+Content-Type: multipart/form-data
+
+Fields:
+  image: File (JPEG/PNG, max 5MB) [bắt buộc]
+  caption: String (max 500) [tùy chọn]
+  rating: Number (1-5) [bắt buộc]
+
+Response (200):
+{
+  "success": true,
+  "data": {
+    "decision": { ... status: "completed", checkin: { ... } },
+    "streak": {
+      "currentStreak": 13,
+      "level": 3,
+      "newBadges": []
+    }
+  }
+}
+```
+
+#### 6.3.5 Streaks (<code>/api/streaks</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/streaks/me</code></td>
+        <td>Streak của user đang đăng nhập</td>
+        <td>Yes</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/streaks/leaderboard</code></td>
+        <td>Top 10 bảng xếp hạng</td>
+        <td>Yes</td>
+    </tr>
+</table>
+
+#### 6.3.6 Users — Admin (<code>/api/users</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+        <th>Role</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/users</code></td>
+        <td>Danh sách người dùng</td>
+        <td>Yes</td>
+        <td>Admin</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/users/:id</code></td>
+        <td>Chi tiết người dùng</td>
+        <td>Yes</td>
+        <td>Admin</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/users</code></td>
+        <td>Tạo người dùng</td>
+        <td>Yes</td>
+        <td>Admin</td>
+    </tr>
+    <tr>
+        <td>PUT</td>
+        <td><code>/users/:id</code></td>
+        <td>Cập nhật người dùng</td>
+        <td>Yes</td>
+        <td>Admin</td>
+    </tr>
+    <tr>
+        <td>DELETE</td>
+        <td><code>/users/:id</code></td>
+        <td>Xóa người dùng</td>
+        <td>Yes</td>
+        <td>Admin</td>
+    </tr>
+</table>
+
+#### 6.3.7 Dashboard — Admin (<code>/api/dashboard</code>)
+
+<table>
+    <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Mô tả</th>
+        <th>Auth</th>
+        <th>Role</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/dashboard/stats</code></td>
+        <td>Thống kê tổng quan</td>
+        <td>Yes</td>
+        <td>Admin</td>
+    </tr>
+</table>
+
+---
+
+## 6B. PSEUDOCODE THUẬT TOÁN
+
+### 6B.1 Thuật toán Smart Random (Weighted Random Selection)
+
+```text
+FUNCTION smartRandom(categoryId, userId):
+    // Bước 1: Lấy tất cả choices active
+    choices ← Choice.find({categoryId, isActive: true})
+    IF choices.length == 0:
+        THROW Error("Không có lựa chọn nào")
+
+    // Bước 2: Tính weight cho từng choice
+    now ← currentTime()
+    threeDaysAgo ← now - 3 ngày
+
+    FOR EACH choice IN choices:
+        w ← choice.weight                    // weight gốc (1-10)
+
+        // Giảm weight nếu chọn gần đây (cooldown)
+        IF choice.lastSelectedAt > threeDaysAgo:
+            w ← MAX(1, FLOOR(w × 0.5))       // giảm 50%, tối thiểu 1
+
+        // Tăng weight nếu chưa bao giờ chọn (boost)
+        IF choice.timesSelected == 0:
+            w ← CEIL(w × 1.5)                // tăng 50%
+
+        weightedChoices.add({choice, weight: w})
+
+    // Bước 3: Random có trọng số
+    totalWeight ← SUM(weightedChoices[].weight)
+    rand ← RANDOM(0, totalWeight)
+
+    cumulative ← 0
+    FOR EACH entry IN weightedChoices:
+        cumulative ← cumulative + entry.weight
+        IF cumulative >= rand:
+            selected ← entry.choice
+            BREAK
+
+    // Bước 4: Cập nhật thống kê
+    selected.timesSelected++
+    selected.lastSelectedAt ← now
+
+    RETURN selected
+```
+
+<b>Ví dụ minh họa:</b>
+
+<table>
+    <tr>
+        <th>Choice</th>
+        <th>Weight gốc</th>
+        <th>Cooldown?</th>
+        <th>Boost?</th>
+        <th>Weight cuối</th>
+        <th>Xác suất</th>
+    </tr>
+    <tr>
+        <td>Bún bò</td>
+        <td>5</td>
+        <td>Có (chọn hôm qua)</td>
+        <td>-</td>
+        <td>2</td>
+        <td>2/19 = 10.5%</td>
+    </tr>
+    <tr>
+        <td>Phở</td>
+        <td>5</td>
+        <td>Không</td>
+        <td>Không</td>
+        <td>5</td>
+        <td>5/19 = 26.3%</td>
+    </tr>
+    <tr>
+        <td>Cơm tấm</td>
+        <td>5</td>
+        <td>Không</td>
+        <td>Có (chưa chọn)</td>
+        <td>8</td>
+        <td>8/19 = 42.1%</td>
+    </tr>
+    <tr>
+        <td>Pizza</td>
+        <td>4</td>
+        <td>Không</td>
+        <td>Không</td>
+        <td>4</td>
+        <td>4/19 = 21.1%</td>
+    </tr>
+    <tr>
+        <td><b>Tổng</b></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><b>19</b></td>
+        <td><b>100%</b></td>
+    </tr>
+</table>
+
+### 6B.2 Thuật toán cập nhật Streak
+
+```text
+FUNCTION incrementStreak(userId):
+    streak ← UserStreak.findOrCreate(userId)
+    streak.totalCheckins++
+
+    today ← startOfDay(now())
+
+    IF streak.lastCheckinDate == NULL:
+        // Lần đầu tiên check-in
+        streak.currentStreak ← 1
+        streak.streakStartDate ← today
+
+    ELSE IF isSameDay(streak.lastCheckinDate, today):
+        // Đã check-in hôm nay rồi → không thay đổi streak
+        // Chỉ tăng totalCheckins
+
+    ELSE IF isYesterday(streak.lastCheckinDate, today):
+        // Ngày liên tiếp → tăng streak
+        streak.currentStreak++
+
+    ELSE:
+        // Bị gián đoạn → reset
+        streak.currentStreak ← 1
+        streak.streakStartDate ← today
+
+    streak.lastCheckinDate ← today
+
+    // Cập nhật kỷ lục
+    IF streak.currentStreak > streak.longestStreak:
+        streak.longestStreak ← streak.currentStreak
+
+    // Tính level
+    streak.level ← calculateLevel(streak.currentStreak)
+
+    // Kiểm tra badges
+    newBadges ← checkBadges(streak, userId)
+    streak.badges.addAll(newBadges)
+
+    streak.save()
+    RETURN {streak, newBadges}
+
+FUNCTION calculateLevel(currentStreak):
+    thresholds ← [0, 3, 7, 14, 30, 60, 100]
+    FOR i FROM 6 DOWNTO 0:
+        IF currentStreak >= thresholds[i]:
+            RETURN i + 1
+    RETURN 1
+
+FUNCTION checkBadges(streak, userId):
+    newBadges ← []
+    existingSlugs ← streak.badges.map(b → b.slug)
+
+    // Badge: First Spin
+    IF streak.totalDecisions >= 1 AND "first_spin" NOT IN existingSlugs:
+        newBadges.add({slug: "first_spin", name: "First Spin", icon: "🌟"})
+
+    // Badge: Perfect Week
+    IF streak.currentStreak >= 7 AND "perfect_week" NOT IN existingSlugs:
+        newBadges.add({slug: "perfect_week", name: "Perfect Week", icon: "🔥"})
+
+    // Badge: Centurion
+    IF streak.totalCheckins >= 100 AND "centurion" NOT IN existingSlugs:
+        newBadges.add({slug: "centurion", name: "Centurion", icon: "💯"})
+
+    // Badge: Foodie (10 check-in ở danh mục "đồ ăn")
+    foodCount ← Decision.count({userId, status: "completed",
+                                categoryId.slug: "do-an"})
+    IF foodCount >= 10 AND "foodie" NOT IN existingSlugs:
+        newBadges.add({slug: "foodie", name: "Foodie", icon: "🍜"})
+
+    // Badge: Explorer (check-in ở 5+ danh mục khác nhau)
+    distinctCats ← Decision.distinct("categoryId", {userId, status: "completed"})
+    IF distinctCats.length >= 5 AND "explorer" NOT IN existingSlugs:
+        newBadges.add({slug: "explorer", name: "Explorer", icon: "🧭"})
+
+    RETURN newBadges
+```

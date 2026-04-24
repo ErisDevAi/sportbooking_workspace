@@ -17,6 +17,7 @@ import { env } from "../configs/env";
 import { User } from "../modules/users/user.model";
 import { Role } from "../modules/roles/role.model";
 import { Permission } from "../modules/permissions/permission.model";
+import { Category } from "../modules/categories/category.model";
 import { hashPassword } from "../utils/hash";
 import { logger } from "../utils/logger";
 
@@ -29,6 +30,7 @@ async function seed() {
     User.deleteMany({}),
     Role.deleteMany({}),
     Permission.deleteMany({}),
+    Category.deleteMany({}),
   ]);
   logger.info("Cleared existing data");
 
@@ -41,6 +43,10 @@ async function seed() {
     { slug: "manage_roles",        label: "Manage Roles",        module: "roles",       description: "Can create, update, delete roles" },
     { slug: "manage_permissions",  label: "Manage Permissions",  module: "permissions", description: "Can create and delete permissions" },
     { slug: "view_dashboard",      label: "View Dashboard",      module: "dashboard",   description: "Can view dashboard stats" },
+    { slug: "create_category",     label: "Create Category",     module: "categories",  description: "Can create categories" },
+    { slug: "edit_category",       label: "Edit Category",       module: "categories",  description: "Can edit own categories" },
+    { slug: "delete_category",     label: "Delete Category",     module: "categories",  description: "Can delete own categories" },
+    { slug: "view_category",       label: "View Categories",     module: "categories",  description: "Can list and view categories" },
   ];
   await Permission.insertMany(permDefs);
   logger.info(`Created ${permDefs.length} permissions`);
@@ -56,13 +62,13 @@ async function seed() {
     {
       name: "editor",
       label: "Editor",
-      permissions: ["view_user", "edit_user", "view_dashboard"],
+      permissions: ["view_user", "edit_user", "view_dashboard", "create_category", "edit_category", "delete_category", "view_category"],
       isSystem: true,
     },
     {
       name: "viewer",
       label: "Viewer",
-      permissions: ["view_user", "view_dashboard"],
+      permissions: ["view_user", "view_dashboard", "view_category"],
       isSystem: true,
     },
   ]);
@@ -76,6 +82,21 @@ async function seed() {
     { name: "Viewer User", email: "viewer@example.com", password, role: "viewer", isActive: true },
   ]);
   logger.info("Created 3 users");
+
+  // ── Default Categories ───────────────────────────────────────────────────
+  const adminUser = await User.findOne({ email: "admin@example.com" });
+  const defaultCategories = [
+    { name: "Cuộc sống",     slug: "cuoc-song",     icon: "🏠", color: "#2ECC71", description: "Quyết định liên quan đến cuộc sống hàng ngày",         isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Công việc",     slug: "cong-viec",     icon: "💼", color: "#3498DB", description: "Quyết định liên quan đến công việc và sự nghiệp",      isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Tài chính",     slug: "tai-chinh",     icon: "💰", color: "#F1C40F", description: "Quyết định liên quan đến tài chính và đầu tư",         isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Sức khỏe",      slug: "suc-khoe",      icon: "❤️", color: "#E74C3C", description: "Quyết định liên quan đến sức khỏe và thể chất",       isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Học tập",       slug: "hoc-tap",       icon: "📚", color: "#9B59B6", description: "Quyết định liên quan đến học tập và phát triển bản thân", isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Giải trí",      slug: "giai-tri",      icon: "🎮", color: "#E67E22", description: "Quyết định liên quan đến giải trí và thư giãn",        isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Mối quan hệ",   slug: "moi-quan-he",   icon: "👥", color: "#1ABC9C", description: "Quyết định liên quan đến các mối quan hệ xã hội",      isDefault: true, isPublic: true, createdBy: adminUser!._id },
+    { name: "Khác",          slug: "khac",          icon: "📁", color: "#95A5A6", description: "Các quyết định không thuộc danh mục cụ thể",           isDefault: true, isPublic: true, createdBy: adminUser!._id },
+  ];
+  await Category.insertMany(defaultCategories);
+  logger.info(`Created ${defaultCategories.length} default categories`);
 
   logger.info(`
 ──────────────────────────────────────────────────────
