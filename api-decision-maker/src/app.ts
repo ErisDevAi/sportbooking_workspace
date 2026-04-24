@@ -28,6 +28,7 @@ import userRoutes        from "./modules/users/user.route";
 import roleRoutes        from "./modules/roles/role.route";
 import permissionRoutes  from "./modules/permissions/permission.route";
 import dashboardRoutes   from "./modules/dashboard/dashboard.route";
+import categoryRoutes    from "./modules/categories/category.route";
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/users",       userRoutes);
 app.use("/roles",       roleRoutes);
 app.use("/permissions", permissionRoutes);
 app.use("/dashboard",   dashboardRoutes);
+app.use("/categories",  categoryRoutes);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {
@@ -80,6 +82,7 @@ async function start() {
     logger.info("  GET    /roles           POST /roles        PUT /roles/:id   DELETE /roles/:id");
     logger.info("  GET    /permissions     POST /permissions  DELETE /permissions/:id");
     logger.info("  GET    /dashboard/stats");
+    logger.info("  GET    /categories      POST /categories   PUT /categories/:id   DELETE /categories/:id");
   });
 }
 

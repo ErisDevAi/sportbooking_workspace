@@ -21,7 +21,9 @@ import { UserRole, PermissionSlug } from "../types";
 
 export function checkRole(...roles: UserRole[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
+    console.log(req,'req')
     if (!req.user) return next(new AppError("Authentication required", 401));
+    if (req.user.role == 'admin') return next();
     if (!roles.includes(req.user.role as UserRole)) {
       return next(
         new AppError(
@@ -36,7 +38,10 @@ export function checkRole(...roles: UserRole[]) {
 
 export function checkPermission(...perms: PermissionSlug[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
+    console.log(req,'req')
     if (!req.user) return next(new AppError("Authentication required", 401));
+    if (req.user.role == 'admin') return next();
+
     const userPerms = req.user.permissions ?? [];
     const hasAny = perms.some((p) => userPerms.includes(p));
     if (!hasAny) {
