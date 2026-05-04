@@ -15,4 +15,10 @@ export type PermissionSlug =
   | "create_category"
   | "edit_category"
   | "delete_category"
-  | "view_category";
+  | "view_category"
+  | "create_wheel_content"
+  | "edit_wheel_content"
+  | "delete_wheel_content"
+  | "view_wheel_content"
+  | "create_spin"
+  | "view_spin_history";
