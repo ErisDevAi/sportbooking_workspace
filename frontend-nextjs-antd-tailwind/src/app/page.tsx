@@ -112,20 +112,20 @@ export default function Home() {
       </main>
 
       {/* FOOTER - Design based on image_d36c18.png */}
-      <footer className="bg-white border-t border-gray-100 pt-16 pb-12 mt-20">
+      <footer className="bg-slate-50 border-t border-slate-200 pt-20 pb-10">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            {/* Logo & Description */}
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr from-orange-400 to-yellow-400">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+            {/* Cột 1: Brand & Intro (Chiếm 4/12 cột) */}
+            <div className="md:col-span-4 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 shadow-md shadow-orange-200">
                   <svg
-                    width="18"
-                    height="18"
+                    width="22"
+                    height="22"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="white"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
@@ -136,19 +136,44 @@ export default function Home() {
                     <path d="M6 12h6" />
                   </svg>
                 </div>
-                <span className="font-bold text-slate-700">Lucky-Wheel.io</span>
+                <span className="text-xl font-black text-slate-800 tracking-tight">
+                  Lucky-Wheel<span className="text-orange-500">.io</span>
+                </span>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
+
+              <p className="text-slate-500 text-[15px] leading-relaxed max-w-sm">
                 Free online spinning wheel for random selection, decision
                 making, classroom activities, and giveaways. Create custom
-                wheels instantly.
+                wheels instantly with 100% fair results.
               </p>
+
+              {/* Social Icons - Thêm vào cho đẹp */}
+              <div className="flex gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-9 w-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-orange-500 hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                    </svg>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Links Columns */}
-            <div className="grid grid-cols-2 md:grid-cols-3 col-span-1 md:col-span-2 gap-8">
+            {/* Các cột Links (Chiếm 8/12 cột) */}
+            <div className="md:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
+              {/* Cột Product */}
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-6">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.1em] mb-7">
                   Product
                 </h3>
                 <ul className="space-y-4">
@@ -156,16 +181,19 @@ export default function Home() {
                     <li key={link}>
                       <a
                         href="#"
-                        className="text-sm text-slate-500 hover:text-purple-600"
+                        className="text-[15px] text-slate-500 hover:text-orange-500 hover:translate-x-1 flex items-center transition-all duration-200 group"
                       >
+                        <span className="h-[1.5px] w-0 bg-orange-500 mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-200"></span>
                         {link}
                       </a>
                     </li>
                   ))}
                 </ul>
               </div>
+
+              {/* Cột Legal */}
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-6">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.1em] mb-7">
                   Legal
                 </h3>
                 <ul className="space-y-4">
@@ -173,31 +201,34 @@ export default function Home() {
                     <li key={link}>
                       <a
                         href="#"
-                        className="text-sm text-slate-500 hover:text-purple-600"
+                        className="text-[15px] text-slate-500 hover:text-orange-500 hover:translate-x-1 flex items-center transition-all duration-200 group"
                       >
+                        <span className="h-[1.5px] w-0 bg-orange-500 mr-0 group-hover:w-3 group-hover:mr-2 transition-all duration-200"></span>
                         {link}
                       </a>
                     </li>
                   ))}
                 </ul>
               </div>
+
+              {/* Cột Support */}
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-6">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.1em] mb-7">
                   Support
                 </h3>
                 <ul className="space-y-4">
                   <li>
                     <a
                       href="#"
-                      className="text-sm text-slate-500 hover:text-purple-600"
+                      className="text-[15px] text-slate-500 hover:text-orange-500 flex items-center transition-all"
                     >
-                      Contact
+                      Contact Us
                     </a>
                   </li>
                   <li>
                     <a
                       href="mailto:support@lucky-wheels.io"
-                      className="text-sm text-slate-500 hover:text-purple-600"
+                      className="text-[15px] text-slate-600 font-semibold hover:text-orange-500 transition-all underline underline-offset-4 decoration-slate-200 hover:decoration-orange-200"
                     >
                       support@lucky-wheels.io
                     </a>
@@ -207,10 +238,19 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-16 pt-8 border-t border-gray-50 text-center">
-            <p className="text-xs text-slate-400">
+          {/* Bottom Bar */}
+          <div className="mt-20 pt-8 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-slate-400 font-medium italic">
               © {new Date().getFullYear()} Lucky-Wheel.io. All rights reserved.
             </p>
+            <div className="flex gap-6 text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <a href="#" className="hover:text-slate-600 transition-colors">
+                Status
+              </a>
+              <a href="#" className="hover:text-slate-600 transition-colors">
+                Security
+              </a>
+            </div>
           </div>
         </div>
       </footer>
