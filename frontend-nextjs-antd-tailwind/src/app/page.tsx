@@ -1,78 +1,15 @@
-'use client';
-
-import {
-  Form,
-  Input,
-  Button,
-  Card,
-  message,
-} from'antd'; 
-
-import { 
-  UserOutlined, 
-  LockOutlined, 
-  MailOutlined, 
-} from '@ant-design/icons';
-
-import{useRouter} from 'next/navigation';
-import{useState} from 'react';
-
-interface LoginForm{
-  useName: string;
-  password:string;
-  email:string;
-}
-
-interface RegisterForm{
-  fullName: string;
-  email:string;
-  password:string;
-}
-
-export default function HomePage() {
-  const router = useRouter();
-}
-
-//SWITCH LOGIN / REGISTER
-const [isLogin, setIsLogin] = useState(true); 
-
-//LOGIN
-const onLogin = async (values: LoginForm) =>{
-  try{
-    console.log('Login:',values);
-    message.success('Đăng nhập thành công');
-    router.push('/dashboard');
-  }
-  catch{
-    message.error('Sai tài khoản hoặc mật khẩu');
-  }
-};
-
-//REGISTER
-const onRegister = async(values: RegisterForm)=>{
-  try{
-    console.log()
-  }
-}
-
-
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth';
-
 export default function Home() {
-  const router = useRouter();
-  const token = useAuthStore((s) => s.token);
-
-  useEffect(() => {
-    if (token) {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/login');
-    }
-  }, [token, router]);
-
-  return null;
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+      <h1 className="text-4xl font-bold mb-4">
+        Welcome to the Decision Maker Platform
+      </h1>
+      <p className="text-lg text-gray-600 mb-8">
+        Make informed decisions with ease.
+      </p>
+      <button className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
+        Get Started
+      </button>
+    </div>
+  );
 }
-
