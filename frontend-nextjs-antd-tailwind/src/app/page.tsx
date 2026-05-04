@@ -1,8 +1,6 @@
-import { Moon, Globe, ChevronDown } from "lucide-react";
-
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-sans text-slate-900">
       {/* NAVBAR */}
       <nav className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -10,9 +8,28 @@ export default function Home() {
             {/* Left Side: Logo & Links */}
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
-                {/* Thay thế bằng icon hoặc img logo của bạn */}
+                {/* Logo Icon bằng SVG */}
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-orange-400 to-yellow-400 text-xl shadow-sm">
-                  🎡
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2v10" />
+                    <path d="m16.2 7.8-2.9 2.9" />
+                    <path d="M18 12h-6" />
+                    <path d="m16.2 16.2-2.9-2.9" />
+                    <path d="M12 22v-10" />
+                    <path d="m7.8 16.2 2.9-2.9" />
+                    <path d="M6 12h6" />
+                    <path d="m7.8 7.8 2.9 2.9" />
+                  </svg>
                 </div>
                 <span className="text-sm font-bold text-slate-700 tracking-tight">
                   Lucky-Wheel.io
@@ -59,15 +76,54 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right Side: Icons */}
+            {/* Right Side: Icons (Dùng SVG thủ công) */}
             <div className="flex items-center gap-5 text-slate-600">
+              {/* Moon Icon */}
               <button className="hover:text-purple-600 transition-colors">
-                <Moon size={20} />
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
               </button>
+
+              {/* Language Selector */}
               <div className="flex items-center gap-1 cursor-pointer hover:text-purple-600 transition-colors font-bold text-sm">
-                <Globe size={20} />
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20" />
+                  <path d="M2 12h20" />
+                  <path d="M12 2a14.5 14.5 0 0 1 0 20" />
+                </svg>
                 <span className="ml-1">EN</span>
-                <ChevronDown size={14} />
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </div>
             </div>
           </div>
