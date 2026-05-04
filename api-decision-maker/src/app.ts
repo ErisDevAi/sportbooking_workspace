@@ -17,18 +17,21 @@ import "./configs/env"; // must be first
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import path from "path";
 
 import { connectDB } from "./configs/db";
 import { env } from "./configs/env";
 import { logger } from "./utils/logger";
 import { errorHandler } from "./middlewares/error.middleware";
 
-import authRoutes        from "./modules/auth/auth.route";
-import userRoutes        from "./modules/users/user.route";
-import roleRoutes        from "./modules/roles/role.route";
-import permissionRoutes  from "./modules/permissions/permission.route";
-import dashboardRoutes   from "./modules/dashboard/dashboard.route";
-import categoryRoutes    from "./modules/categories/category.route";
+import authRoutes           from "./modules/auth/auth.route";
+import userRoutes           from "./modules/users/user.route";
+import roleRoutes           from "./modules/roles/role.route";
+import permissionRoutes     from "./modules/permissions/permission.route";
+import dashboardRoutes      from "./modules/dashboard/dashboard.route";
+import categoryRoutes       from "./modules/categories/category.route";
+import wheelContentRoutes   from "./modules/wheel-contents/wheel-content.route";
+import spinHistoryRoutes    from "./modules/spin-histories/spin-histories.route";
 
 const app = express();
 
@@ -37,6 +40,9 @@ app.use(cors({ origin: env.corsOrigins, credentials: true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.isDev ? "dev" : "combined"));
+
+// ── Static files (uploads) ────────────────────────────────────────────────────
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
@@ -58,7 +64,9 @@ app.use("/users",       userRoutes);
 app.use("/roles",       roleRoutes);
 app.use("/permissions", permissionRoutes);
 app.use("/dashboard",   dashboardRoutes);
-app.use("/categories",  categoryRoutes);
+app.use("/categories",      categoryRoutes);
+app.use("/wheel-contents",  wheelContentRoutes);
+app.use("/spin-history",    spinHistoryRoutes);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {
@@ -83,6 +91,8 @@ async function start() {
     logger.info("  GET    /permissions     POST /permissions  DELETE /permissions/:id");
     logger.info("  GET    /dashboard/stats");
     logger.info("  GET    /categories      POST /categories   PUT /categories/:id   DELETE /categories/:id");
+    logger.info("  GET    /wheel-contents  POST /wheel-contents PUT /wheel-contents/:id DELETE /wheel-contents/:id");
+    logger.info("  POST   /spin-history    GET /spin-history   GET /spin-history/streak  GET /spin-history/stats/:categoryId");
   });
 }
 
