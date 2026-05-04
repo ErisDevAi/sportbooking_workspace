@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "Bash(mv spin-history:*)",
+      "Bash(mv spin-history.model.ts spin-histories.model.ts)",
+      "Bash(mv spin-history.service.ts spin-histories.service.ts)",
+      "Bash(mv spin-history.controller.ts spin-histories.controller.ts)",
+      "Bash(mv spin-history.validation.ts spin-histories.validation.ts)",
+      "Bash(mv spin-history.route.ts spin-histories.route.ts)"
+    ]
+  }
+}
