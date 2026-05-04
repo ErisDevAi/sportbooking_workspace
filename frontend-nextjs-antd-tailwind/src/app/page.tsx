@@ -30,7 +30,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <span className="text-sm font-bold text-slate-700 tracking-tight">
-                  Lucky-Wheel.io
+                  Decision Maker.io
                 </span>
               </div>
               <div className="hidden md:flex items-center space-x-6">
@@ -137,7 +137,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <span className="text-xl font-black text-slate-800 tracking-tight">
-                  Lucky-Wheel<span className="text-orange-500">.io</span>
+                  Decision Maker<span className="text-orange-500">.io</span>
                 </span>
               </div>
 
@@ -230,7 +230,7 @@ export default function Home() {
                       href="mailto:support@lucky-wheels.io"
                       className="text-[15px] text-slate-600 font-semibold hover:text-orange-500 transition-all underline underline-offset-4 decoration-slate-200 hover:decoration-orange-200"
                     >
-                      support@lucky-wheels.io
+                      support@Decision Maker.io
                     </a>
                   </li>
                 </ul>
@@ -241,7 +241,7 @@ export default function Home() {
           {/* Bottom Bar */}
           <div className="mt-20 pt-8 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-slate-400 font-medium italic">
-              © {new Date().getFullYear()} Lucky-Wheel.io. All rights reserved.
+              © {new Date().getFullYear()} Decision Maker. All rights reserved.
             </p>
             <div className="flex gap-6 text-xs font-bold text-slate-400 uppercase tracking-widest">
               <a href="#" className="hover:text-slate-600 transition-colors">

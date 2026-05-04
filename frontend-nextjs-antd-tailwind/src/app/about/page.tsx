@@ -26,7 +26,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
                 <span className="text-sm font-bold text-slate-700">
-                  Lucky-Wheel.io
+                  Decision Maker.io
                 </span>
               </div>
               <div className="hidden md:flex items-center space-x-6">
