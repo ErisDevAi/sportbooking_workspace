@@ -230,8 +230,6 @@ export default function WheelPage() {
             </div>
 
             <div className="rounded-[28px] border border-yellow-200/60 bg-yellow-100 p-5 text-sm font-medium text-yellow-900 shadow-xl">
-              💡 Gợi ý: Chức năng này phù hợp với dự án Decision Maker vì người dùng
-              có thể tự nhập lựa chọn, quay ngẫu nhiên và lưu lại kết quả sau này.
             </div>
           </div>
         </div>
