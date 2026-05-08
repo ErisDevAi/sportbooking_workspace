@@ -228,9 +228,6 @@ export default function WheelPage() {
                 </div>
               )}
             </div>
-
-            <div className="rounded-[28px] border border-yellow-200/60 bg-yellow-100 p-5 text-sm font-medium text-yellow-900 shadow-xl">
-            </div>
           </div>
         </div>
       </div>
