@@ -1,14 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Wheel } from 'react-custom-roulette';
 
-export default function WheelPage() {
-  const [inputValue, setInputValue] = useState('');
-  const [items, setItems] = useState<string[]>([]);
-  const [mustSpin, setMustSpin] = useState(false);
-  const [prizeNumber, setPrizeNumber] = useState(0);
-  const [result, setResult] = useState('');
+export default function WheelPage() { 
+  const [inputValue, setInputValue] = useState(''); 
+  const [items, setItems] = useState<string[]>([]); 
+  const [mustSpin, setMustSpin] = useState(false); 
+  const [prizeNumber, setPrizeNumber] = useState(0); 
+  const [result, setResult] = useState(''); 
+  const [history, setHistory] = useState<any[]>([]);
+
+  // LOAD LOCAL STORAGE
+  useEffect(() => { 
+    const savedItems = localStorage.getItem('wheel-items'); 
+    const savedHistory = localStorage.getItem('spin-history'); 
+    if (savedItems) { 
+      setItems(JSON.parse(savedItems)); 
+    } 
+    if (savedHistory) { 
+      setHistory(JSON.parse(savedHistory)); 
+    } 
+  }, []);
+
+  // SAVE ITEMS
+  useEffect(() => {
+    localStorage.setItem('wheel-items', JSON.stringify(items));
+  }, [items]);
+
+  // SAVE HISTORY
+  useEffect(() => {
+    localStorage.setItem('spin-history', JSON.stringify(history));
+  }, [history]
+);
 
   const defaultWheelData = [
     { option: 'Nhập lựa chọn' },
@@ -36,11 +60,15 @@ export default function WheelPage() {
 
   const spinWheel = () => {
     if (items.length === 0) {
-      alert('Bạn cần nhập ít nhất 1 lựa chọn trước khi quay!');
+      alert(
+        'Bạn cần nhập ít nhất 1 lựa chọn trước khi quay!'
+      );
+      
       return;
     }
 
-    const randomIndex = Math.floor(Math.random() * items.length);
+    const randomIndex = Math.floor(
+      Math.random() * items.length);
 
     setPrizeNumber(randomIndex);
     setMustSpin(true);
@@ -221,21 +249,22 @@ export default function WheelPage() {
                         onClick={() => removeItem(index)}
                         className="rounded-xl px-3 py-1 text-sm font-bold text-red-500 transition hover:bg-red-50"
                       >
-                        Xóa
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-[28px] border border-yellow-200/60 bg-yellow-100 p-5 text-sm font-medium text-yellow-900 shadow-xl">
-              💡 Gợi ý: Chức năng này phù hợp với dự án Decision Maker vì người dùng
-              có thể tự nhập lựa chọn, quay ngẫu nhiên và lưu lại kết quả sau này.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                        Xóa 
+                      </button> 
+                    </div> 
+                  ) 
+                )} 
+              </div>
+            )}
+          </div> 
+          <div className="rounded-[28px] border border-white/15 bg-white/95 p-5 text-gray-900 shadow-xl"> 
+            <h2 className="mb-4 text-2xl font-extrabold"> Lịch sử quay </h2> 
+            {history.length === 0 ? ( 
+              <p className="text-gray-500"> Chưa có lịch sử. </p> 
+            ) : ( 
+              <div className="max-h-60 space-y-3 overflow-y-auto"> {history.map( ( item, index ) => ( <div key={index} className="rounded-2xl border border-gray-100 bg-gray-50 p-4" > 
+              <p className="font-bold text-purple-700"> { item.result } </p> <p className="text-sm text-gray-500"> { item.time } </p> 
+              </div> 
+              ) )} </div> )} 
+              </div> </div>
+               </div> </div> </div> ); }
