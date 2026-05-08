@@ -1,270 +1,476 @@
 'use client';
 
-import { useState,useEffect } from 'react';
-import { Wheel } from 'react-custom-roulette';
+import { useState } from 'react';
+import {
+  Select,
+  Button,
+  Modal,
+  Typography,
+  Statistic,
+  Space,
+  Rate,
+  Upload,
+  Input,
+  message,
+} from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
-export default function WheelPage() { 
-  const [inputValue, setInputValue] = useState(''); 
-  const [items, setItems] = useState<string[]>([]); 
-  const [mustSpin, setMustSpin] = useState(false); 
-  const [prizeNumber, setPrizeNumber] = useState(0); 
-  const [result, setResult] = useState(''); 
-  const [history, setHistory] = useState<any[]>([]);
+const { Title, Text } = Typography;
 
-  // LOAD LOCAL STORAGE
-  useEffect(() => { 
-    const savedItems = localStorage.getItem('wheel-items'); 
-    const savedHistory = localStorage.getItem('spin-history'); 
-    if (savedItems) { 
-      setItems(JSON.parse(savedItems)); 
-    } 
-    if (savedHistory) { 
-      setHistory(JSON.parse(savedHistory)); 
-    } 
-  }, []);
+// ===== MOCK DATA =====
+const mockCategories = [
+  { _id: '1', name: 'Ăn gì', icon: '🍔' },
+  { _id: '2', name: 'Làm gì', icon: '🎯' },
+];
 
-  // SAVE ITEMS
-  useEffect(() => {
-    localStorage.setItem('wheel-items', JSON.stringify(items));
-  }, [items]);
+const mockItemsByCategory: Record<string, any[]> = {
+  '1': [
+    {
+      _id: 'w1',
+      label: 'Ăn phở',
+      color: '#E74C3C',
+      weight: 1,
+      description: 'Phở bò tái chín',
+    },
+    {
+      _id: 'w2',
+      label: 'Ăn bún chả',
+      color: '#3498DB',
+      weight: 2,
+      description: 'Bún chả Hàng Mành',
+    },
+    {
+      _id: 'w3',
+      label: 'Ăn pizza',
+      color: '#2ECC71',
+      weight: 1,
+      description: 'Pizza hải sản',
+    },
+  ],
+  '2': [
+    {
+      _id: 'w4',
+      label: 'Đi gym',
+      color: '#F39C12',
+      weight: 2,
+      description: 'Tập 45 phút',
+    },
+    {
+      _id: 'w5',
+      label: 'Xem phim',
+      color: '#9B59B6',
+      weight: 3,
+      description: 'Netflix and chill',
+    },
+  ],
+};
 
-  // SAVE HISTORY
-  useEffect(() => {
-    localStorage.setItem('spin-history', JSON.stringify(history));
-  }, [history]
-);
+const mockStreak = {
+  currentStreak: 3,
+  maxStreak: 7,
+  totalSpins: 25,
+};
 
-  const defaultWheelData = [
-    { option: 'Nhập lựa chọn' },
-    { option: 'Thêm dữ liệu' },
-    { option: 'Quay thử nhé' },
-    { option: 'Decision' },
-    { option: 'Maker' },
-    { option: '🎯' },
-  ];
+export default function SpinPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [items, setItems] = useState<any[]>([]);
+  const [rotation, setRotation] = useState(0);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [showCheckin, setShowCheckin] = useState(false);
 
-  const wheelData =
-    items.length > 0
-      ? items.map((item) => ({ option: item }))
-      : defaultWheelData;
+  const selectedCategoryInfo = mockCategories.find(
+    (category) => category._id === selectedCategory
+  );
 
-  const addItem = () => {
-    const value = inputValue.trim();
+  const handleSelectCategory = (catId: string) => {
+    setSelectedCategory(catId);
+    setResult(null);
+    setRotation(0);
 
-    if (!value) return;
-
-    setItems([...items, value]);
-    setInputValue('');
-    setResult('');
+    const categoryItems = mockItemsByCategory[catId] || [];
+    setItems(categoryItems);
   };
 
-  const spinWheel = () => {
+  const getWheelGradient = () => {
     if (items.length === 0) {
-      alert(
-        'Bạn cần nhập ít nhất 1 lựa chọn trước khi quay!'
-      );
-      
-      return;
+      return 'conic-gradient(#7C3AED 0deg 90deg, #EC4899 90deg 180deg, #F59E0B 180deg 270deg, #10B981 270deg 360deg)';
     }
 
-    const randomIndex = Math.floor(
-      Math.random() * items.length);
+    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+    const parts: string[] = [];
+    let current = 0;
 
-    setPrizeNumber(randomIndex);
-    setMustSpin(true);
-    setResult('');
+    items.forEach((item) => {
+      const angle = (item.weight / totalWeight) * 360;
+
+      parts.push(`${item.color} ${current}deg ${current + angle}deg`);
+
+      current += angle;
+    });
+
+    return `conic-gradient(${parts.join(', ')})`;
   };
 
-  const handleStopSpinning = () => {
-    const selectedItem = items[prizeNumber];
+  const handleSpin = () => {
+    if (isSpinning || items.length < 2) return;
 
-    setResult(selectedItem);
-    setMustSpin(false);
+    setIsSpinning(true);
+    setResult(null);
 
-    setItems((prev) => prev.filter((_, index) => index !== prizeNumber));
+    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+    let rand = Math.random() * totalWeight;
+    let selectedIndex = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      rand -= items[i].weight;
+
+      if (rand <= 0) {
+        selectedIndex = i;
+        break;
+      }
+    }
+
+    let targetAngle = 0;
+
+    for (let i = 0; i < selectedIndex; i++) {
+      targetAngle += (items[i].weight / totalWeight) * 360;
+    }
+
+    targetAngle += ((items[selectedIndex].weight / totalWeight) * 360) / 2;
+
+    const spins = 360 * 5;
+    const stopAngle = 360 - targetAngle;
+    const totalRotation = rotation + spins + stopAngle;
+
+    setRotation(totalRotation);
+
+    setTimeout(() => {
+      setResult(items[selectedIndex]);
+      setIsSpinning(false);
+    }, 4200);
   };
 
-  const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
+  const handleAccept = () => {
+    if (!result) return;
 
-  const resetWheel = () => {
-    setItems([]);
-    setResult('');
-    setInputValue('');
-    setPrizeNumber(0);
+    message.success(`Đã chọn: ${result.label}! 🔥`);
+    setResult(null);
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-800 px-5 py-8 text-white">
-      <div className="pointer-events-none fixed left-[-80px] top-[-80px] h-72 w-72 rounded-full bg-pink-400/30 blur-3xl" />
-      <div className="pointer-events-none fixed bottom-[-100px] right-[-80px] h-80 w-80 rounded-full bg-yellow-300/30 blur-3xl" />
-
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-800 px-4 py-8 text-white">
       <div className="relative mx-auto max-w-6xl">
+        {/* HEADER */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 w-fit rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold backdrop-blur">
-            Decision Maker App
+            Decision Maker Platform
           </div>
 
-          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
-            Vòng quay quyết định 🎯
-          </h1>
-
-          <p className="mx-auto mt-4 max-w-2xl text-sm text-white/75 md:text-base">
-            Nhập các lựa chọn bạn đang phân vân, hệ thống sẽ quay và chọn giúp bạn.
-            Sau khi trúng, lựa chọn đó sẽ tự động biến mất khỏi vòng quay.
-          </p>
+          <Title
+            level={1}
+            style={{
+              color: '#fff',
+              fontWeight: 900,
+            }}
+          >
+            🎰 Vòng quay quyết định
+          </Title>
         </div>
 
-        <div className="grid gap-8 rounded-[32px] border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-xl md:grid-cols-[1.1fr_0.9fr] md:p-8">
-          <div className="flex flex-col items-center justify-center rounded-[28px] bg-white/10 p-6 shadow-inner">
-            <div className="mb-5 rounded-2xl bg-black/20 px-5 py-3 text-center">
-              <p className="text-sm text-white/70">Trạng thái vòng quay</p>
-              <p className="text-lg font-bold">
-                {items.length > 0
-                  ? `${items.length} lựa chọn đang chờ`
-                  : 'Đang hiển thị dữ liệu mẫu'}
-              </p>
-            </div>
-
-            <div className="rounded-full bg-white p-4 shadow-[0_0_60px_rgba(255,255,255,0.35)]">
-              <Wheel
-                mustStartSpinning={mustSpin}
-                prizeNumber={items.length > 0 ? prizeNumber : 0}
-                data={wheelData}
-                backgroundColors={[
-                  '#FF6B6B',
-                  '#4ECDC4',
-                  '#45B7D1',
-                  '#FFA502',
-                  '#9B59B6',
-                  '#2ECC71',
-                ]}
-                textColors={['#ffffff']}
-                outerBorderColor="#111827"
-                outerBorderWidth={5}
-                radiusLineColor="#ffffff"
-                radiusLineWidth={2}
-                fontSize={15}
-                onStopSpinning={handleStopSpinning}
-              />
-            </div>
-
-            <button
-              onClick={spinWheel}
-              disabled={mustSpin}
-              className="mt-8 rounded-full bg-gradient-to-r from-yellow-300 via-orange-400 to-pink-500 px-10 py-4 text-lg font-extrabold text-gray-950 shadow-xl transition hover:scale-105 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {mustSpin ? 'Đang quay...' : 'Quay ngay 🎰'}
-            </button>
-
-            {result && (
-              <div className="mt-6 w-full max-w-md rounded-3xl border border-green-300/40 bg-green-400/20 p-5 text-center shadow-xl">
-                <p className="text-sm font-medium text-green-100">
-                  Kết quả được chọn
-                </p>
-                <p className="mt-2 text-3xl font-extrabold text-white">
-                  {result}
-                </p>
-              </div>
-            )}
+        {/* STREAK */}
+        <div className="mb-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl bg-white/95 p-5 text-center text-slate-900 shadow-xl">
+            <Statistic
+              title="🔥 Streak"
+              value={mockStreak.currentStreak}
+              suffix="ngày"
+            />
           </div>
 
+          <div className="rounded-3xl bg-white/95 p-5 text-center text-slate-900 shadow-xl">
+            <Statistic
+              title="🏆 Kỷ lục"
+              value={mockStreak.maxStreak}
+              suffix="ngày"
+            />
+          </div>
+
+          <div className="rounded-3xl bg-white/95 p-5 text-center text-slate-900 shadow-xl">
+            <Statistic title="🎯 Tổng quay" value={mockStreak.totalSpins} />
+          </div>
+        </div>
+
+        <div className="grid gap-8 rounded-[32px] border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-xl lg:grid-cols-[0.9fr_1.1fr]">
+          {/* LEFT */}
           <div className="space-y-5">
-            <div className="rounded-[28px] border border-white/15 bg-white/95 p-5 text-gray-900 shadow-xl">
-              <h2 className="text-2xl font-extrabold">Thêm lựa chọn</h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Ví dụ: Phở, Bún chả, Đi cafe, Làm bài tập...
-              </p>
+            {/* CATEGORY */}
+            <div className="rounded-[28px] bg-white/95 p-5 text-slate-900 shadow-xl">
+              <h2 className="text-2xl font-extrabold">Chọn danh mục</h2>
 
-              <div className="mt-5 flex gap-3">
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') addItem();
-                  }}
-                  placeholder="Nhập lựa chọn..."
-                  className="min-w-0 flex-1 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-800 outline-none transition focus:border-purple-500 focus:bg-white focus:ring-4 focus:ring-purple-100"
-                />
-
-                <button
-                  onClick={addItem}
-                  className="rounded-2xl bg-gray-950 px-5 py-3 font-bold text-white transition hover:bg-purple-700"
-                >
-                  Thêm
-                </button>
-              </div>
+              <Select
+                placeholder="Chọn danh mục..."
+                className="mt-5 w-full"
+                onChange={handleSelectCategory}
+                size="large"
+                value={selectedCategory || undefined}
+              >
+                {mockCategories.map((cat) => (
+                  <Select.Option key={cat._id} value={cat._id}>
+                    {cat.icon} {cat.name}
+                  </Select.Option>
+                ))}
+              </Select>
             </div>
 
-            <div className="rounded-[28px] border border-white/15 bg-white/95 p-5 text-gray-900 shadow-xl">
+            {/* LIST */}
+            <div className="rounded-[28px] bg-white/95 p-5 text-slate-900 shadow-xl">
               <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-extrabold">
-                    Danh sách lựa chọn
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Các ô sẽ xuất hiện trong vòng quay
-                  </p>
-                </div>
+                <h2 className="text-2xl font-extrabold">Danh sách lựa chọn</h2>
 
-                {items.length > 0 && (
-                  <button
-                    onClick={resetWheel}
-                    className="rounded-xl bg-red-50 px-3 py-2 text-sm font-bold text-red-500 transition hover:bg-red-100"
-                  >
-                    Xóa hết
-                  </button>
-                )}
+                <span className="rounded-full bg-purple-100 px-3 py-1 text-sm font-bold text-purple-700">
+                  {items.length} mục
+                </span>
               </div>
 
               {items.length === 0 ? (
-                <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-                  <p className="text-4xl">📝</p>
-                  <p className="mt-3 font-semibold text-gray-600">
-                    Chưa có lựa chọn nào
-                  </p>
-                  <p className="mt-1 text-sm text-gray-400">
-                    Hãy nhập dữ liệu để vòng quay bắt đầu hoạt động.
+                <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+                  <p className="text-4xl">🧭</p>
+
+                  <p className="mt-3 font-bold text-slate-600">
+                    Chưa chọn danh mục
                   </p>
                 </div>
               ) : (
-                <div className="max-h-80 space-y-3 overflow-y-auto pr-1">
-                  {items.map((item, index) => (
+                <div className="space-y-3">
+                  {items.map((item) => (
                     <div
-                      key={`${item}-${index}`}
-                      className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gradient-to-r from-gray-50 to-white px-4 py-3 shadow-sm"
+                      key={item._id}
+                      className="flex items-center justify-between rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-3 shadow-sm"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-sm font-extrabold text-purple-700">
-                          {index + 1}
-                        </span>
+                        <span
+                          className="h-4 w-4 rounded-full"
+                          style={{
+                            backgroundColor: item.color,
+                          }}
+                        />
 
-                        <span className="font-semibold text-gray-700">
-                          {item}
-                        </span>
+                        <div>
+                          <p className="font-bold text-slate-800">
+                            {item.label}
+                          </p>
+
+                          <p className="text-xs text-slate-500">
+                            {item.description}
+                          </p>
+                        </div>
                       </div>
 
-                      <button
-                        onClick={() => removeItem(index)}
-                        className="rounded-xl px-3 py-1 text-sm font-bold text-red-500 transition hover:bg-red-50"
-                      >
-                        Xóa 
-                      </button> 
-                    </div> 
-                  ) 
-                )} 
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-slate-600 shadow-sm">
+                        x{item.weight}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT */}
+          <div className="flex flex-col items-center justify-center rounded-[28px] bg-white/10 p-5 shadow-inner">
+            <div className="mb-5 rounded-2xl bg-black/20 px-5 py-3 text-center">
+              <p className="text-sm text-white/70">Khu vực vòng quay</p>
+
+              <p className="text-lg font-bold">
+                {selectedCategoryInfo
+                  ? `${selectedCategoryInfo.icon} ${selectedCategoryInfo.name}`
+                  : 'Chưa chọn danh mục'}
+              </p>
+            </div>
+
+            {/* WHEEL */}
+            <div className="relative mb-8 h-[320px] w-[320px] md:h-[380px] md:w-[380px]">
+              {/* POINTER */}
+              <div
+                className="absolute left-1/2 top-[-12px] z-20 -translate-x-1/2"
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderLeft: '16px solid transparent',
+                  borderRight: '16px solid transparent',
+                  borderTop: '32px solid #FACC15',
+                }}
+              />
+
+              <div
+                className="relative h-full w-full rounded-full border-[8px] border-white"
+                style={{
+                  background: getWheelGradient(),
+                  transform: `rotate(${rotation}deg)`,
+                  transition: isSpinning
+                    ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)'
+                    : 'none',
+                }}
+              >
+                {/* LABELS */}
+                {items.map((item, index) => {
+                  const totalWeight = items.reduce(
+                    (sum, currentItem) => sum + currentItem.weight,
+                    0
+                  );
+
+                  let startAngle = 0;
+
+                  for (let i = 0; i < index; i++) {
+                    startAngle += (items[i].weight / totalWeight) * 360;
+                  }
+
+                  const sliceAngle = (item.weight / totalWeight) * 360;
+                  const midAngle = startAngle + sliceAngle / 2;
+                  const rad = (midAngle * Math.PI) / 180;
+                  const radius = 125;
+
+                  return (
+                    <div
+                      key={item._id}
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '50%',
+                        transform: `translate(-50%, -50%) translate(${
+                          Math.sin(rad) * radius
+                        }px, ${-Math.cos(rad) * radius}px) rotate(${midAngle}deg)`,
+                        fontSize: 12,
+                        fontWeight: 900,
+                        color: '#fff',
+                        textShadow: '1px 2px 4px rgba(0,0,0,0.8)',
+                        whiteSpace: 'nowrap',
+                        pointerEvents: 'none',
+                        maxWidth: 100,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                  );
+                })}
+
+                {/* CENTER */}
+                <div className="absolute left-1/2 top-1/2 z-10 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[6px] border-slate-900 bg-white text-lg font-black text-slate-900 shadow-xl">
+                  GO
+                </div>
+              </div>
+            </div>
+
+            {/* BUTTON */}
+            <Button
+              type="primary"
+              size="large"
+              onClick={handleSpin}
+              disabled={isSpinning || items.length < 2}
+              className="!h-14 !min-w-[240px] !rounded-full !bg-gradient-to-r !from-yellow-300 !via-orange-400 !to-pink-500 !text-lg !font-black !text-slate-950"
+            >
+              {isSpinning ? '⏳ Đang quay...' : '🎰 QUAY NGAY!'}
+            </Button>
+
+            {items.length < 2 && (
+              <div className="mt-4 rounded-2xl bg-yellow-100 px-5 py-3 text-sm font-bold text-yellow-900">
+                Cần ít nhất 2 lựa chọn để quay
               </div>
             )}
-          </div> 
-          <div className="rounded-[28px] border border-white/15 bg-white/95 p-5 text-gray-900 shadow-xl"> 
-            <h2 className="mb-4 text-2xl font-extrabold"> Lịch sử quay </h2> 
-            {history.length === 0 ? ( 
-              <p className="text-gray-500"> Chưa có lịch sử. </p> 
-            ) : ( 
-              <div className="max-h-60 space-y-3 overflow-y-auto"> {history.map( ( item, index ) => ( <div key={index} className="rounded-2xl border border-gray-100 bg-gray-50 p-4" > 
-              <p className="font-bold text-purple-700"> { item.result } </p> <p className="text-sm text-gray-500"> { item.time } </p> 
-              </div> 
-              ) )} </div> )} 
-              </div> </div>
-               </div> </div> </div> ); }
+          </div>
+        </div>
+      </div>
+
+      {/* RESULT MODAL */}
+      <Modal open={!!result} onCancel={() => setResult(null)} footer={null} centered>
+        {result && (
+          <div className="text-center">
+            <Title level={3}>{result.label}</Title>
+
+            <Text type="secondary">{result.description}</Text>
+
+            <div className="mt-5">
+              <Space>
+                <Button type="primary" onClick={handleAccept}>
+                  ✅ Chấp nhận
+                </Button>
+
+                <Button onClick={() => setResult(null)}>🔄 Quay lại</Button>
+              </Space>
+            </div>
+
+            <div className="mt-4">
+              <Button
+                type="link"
+                onClick={() => {
+                  setResult(null);
+                  setShowCheckin(true);
+                }}
+              >
+                📸 Check-in ngay
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* CHECKIN MODAL */}
+      <Modal
+        title="📸 Check-in xác nhận"
+        open={showCheckin}
+        onCancel={() => setShowCheckin(false)}
+        footer={null}
+        centered
+      >
+        <div className="py-2">
+          <Upload
+            listType="picture-card"
+            maxCount={1}
+            accept="image/*"
+            beforeUpload={() => false}
+          >
+            <div>
+              <UploadOutlined />
+
+              <div
+                style={{
+                  marginTop: 4,
+                }}
+              >
+                Upload
+              </div>
+            </div>
+          </Upload>
+
+          <div className="mt-4">
+            <Rate />
+          </div>
+
+          <Input.TextArea
+            rows={3}
+            placeholder="Hôm nay thế nào?"
+            maxLength={500}
+            showCount
+            className="mt-4"
+          />
+
+          <Button
+            type="primary"
+            block
+            size="large"
+            className="mt-4"
+            onClick={() => {
+              message.success('Check-in thành công! 🎉');
+              setShowCheckin(false);
+            }}
+          >
+            ✅ Hoàn thành Check-in
+          </Button>
+        </div>
+      </Modal>
+    </div>
+  );
+}
