@@ -5,8 +5,8 @@ import { antdTheme } from '@/utils/theme';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard',
-  description: 'Next.js + Ant Design + TailwindCSS Admin Dashboard',
+  title: 'Decision Maker',
+  description: 'Hệ thống hỗ trợ đưa ra quyết định thông minh',
 };
 
 export default function RootLayout({
@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="vi">
+      <body class name="bg-gray">
         <AntdRegistry>
           <ConfigProvider theme={antdTheme}>
             {children}
