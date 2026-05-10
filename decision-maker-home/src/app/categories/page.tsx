@@ -13,7 +13,11 @@ import {
   Empty,
   App,
 } from "antd";
-import { PlusOutlined, ArrowLeftOutlined, LogoutOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  ArrowLeftOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
@@ -99,7 +103,8 @@ export default function CategoriesPage() {
     e.stopPropagation();
     modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa danh mục này? Tất cả lựa chọn bên trong cũng sẽ bị xóa.",
+      content:
+        "Bạn có chắc chắn muốn xóa danh mục này? Tất cả lựa chọn bên trong cũng sẽ bị xóa.",
       okText: "Xóa",
       cancelText: "Hủy",
       okType: "danger",
@@ -129,22 +134,38 @@ export default function CategoriesPage() {
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-slate-400 hover:text-slate-600 transition-colors">
+            <Link
+              href="/"
+              className="text-slate-400 hover:text-slate-600 transition-colors"
+            >
               <ArrowLeftOutlined className="text-lg" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-slate-800">Danh mục quyết định</h1>
-              <p className="text-sm text-slate-500">Quản lý các thư mục phân loại quyết định</p>
+              <h1 className="text-xl font-bold text-slate-800">
+                Danh mục quyết định
+              </h1>
+              <p className="text-sm text-slate-500">
+                Quản lý các thư mục phân loại quyết định
+              </p>
             </div>
           </div>
           <div className="flex gap-3">
-            <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="!rounded-lg !font-semibold">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={showAddModal}
+              size="large"
+              className="!rounded-lg !font-semibold"
+            >
               Tạo danh mục
             </Button>
             {user && (
               <Button
                 icon={<LogoutOutlined />}
-                onClick={() => { logout(); router.push('/'); }}
+                onClick={() => {
+                  logout();
+                  router.push("/");
+                }}
                 size="large"
                 className="!rounded-lg"
               >
@@ -158,11 +179,12 @@ export default function CategoriesPage() {
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {categories.length === 0 ? (
-          <Empty
-            description="Chưa có danh mục nào"
-            className="py-20"
-          >
-            <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal}>
+          <Empty description="Chưa có danh mục nào" className="py-20">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={showAddModal}
+            >
               Tạo danh mục đầu tiên
             </Button>
           </Empty>
@@ -171,11 +193,12 @@ export default function CategoriesPage() {
             {categories.map((item) => (
               <Col xs={24} sm={12} md={8} lg={6} key={item._id}>
                 <Link href={`/categories/${item._id}`} className="block">
-                  <div
-                    className="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer"
-                  >
+                  <div className="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
                     {/* Color bar */}
-                    <div className="h-2" style={{ backgroundColor: item.color }} />
+                    <div
+                      className="h-2"
+                      style={{ backgroundColor: item.color }}
+                    />
                     <div className="p-5">
                       <div className="flex items-start justify-between mb-3">
                         <span className="text-3xl">{item.icon || "📁"}</span>
@@ -183,12 +206,18 @@ export default function CategoriesPage() {
                           {item.choiceCount || 0} lựa chọn
                         </span>
                       </div>
-                      <h3 className="font-bold text-slate-800 text-base mb-1">{item.name}</h3>
+                      <h3 className="font-bold text-slate-800 text-base mb-1">
+                        {item.name}
+                      </h3>
                       {item.description && (
-                        <p className="text-xs text-slate-400 line-clamp-2">{item.description}</p>
+                        <p className="text-xs text-slate-400 line-clamp-2">
+                          {item.description}
+                        </p>
                       )}
                       <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50">
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${item.isPublic ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
+                        <span
+                          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${item.isPublic ? "bg-green-50 text-green-600" : "bg-slate-100 text-slate-500"}`}
+                        >
                           {item.isPublic ? "Công khai" : "Riêng t��"}
                         </span>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -246,9 +275,16 @@ export default function CategoriesPage() {
             <ColorPicker showText />
           </Form.Item>
           <Form.Item name="description" label="Mô tả">
-            <Input.TextArea rows={3} placeholder="Mô tả ngắn gọn về danh mục này..." />
+            <Input.TextArea
+              rows={3}
+              placeholder="Mô tả ngắn gọn về danh mục này..."
+            />
           </Form.Item>
-          <Form.Item name="isPublic" label="Công khai cho mọi người" valuePropName="checked">
+          <Form.Item
+            name="isPublic"
+            label="Công khai cho mọi người"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </Form>

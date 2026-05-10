@@ -255,6 +255,40 @@ export default function AboutPage() {
             <p>We built the tool we wished existed when we needed it.</p>
           </div>
         </div>
+        {/* CALL TO ACTION SECTION */}
+        <section className="mx-auto max-w-6xl px-4 py-12">
+          <div className="rounded-2xl bg-[#F5F3FF] px-8 py-16 text-center shadow-sm">
+            <h2 className="mb-4 text-3xl font-extrabold text-slate-900 md:text-4xl">
+              Ready to Spin?
+            </h2>
+            <p className="mx-auto mb-10 max-w-2xl text-lg font-medium text-slate-500 leading-relaxed">
+              Join thousands of teachers, event organizers, and decision-makers
+              who trust Lucky Wheel for fair random selection.
+            </p>
+            <button className="rounded-xl bg-[#7C3AED] px-8 py-4 text-lg font-bold text-white transition-all hover:bg-[#6D28D9] hover:shadow-lg active:scale-95">
+              Try Lucky Wheel Now - It's Free!
+            </button>
+          </div>
+
+          {/* FOOTER / CONTACT INFO */}
+          <footer className="mt-12 text-center text-slate-500">
+            <p className="mb-2 text-[15px] font-medium">
+              Questions? Suggestions? Just want to say hi?
+            </p>
+            <p className="mb-4 text-[15px] font-medium">
+              Email us at{" "}
+              <a
+                href="mailto:support@lucky-wheels.io"
+                className="text-[#7C3AED] font-semibold hover:underline"
+              >
+                support@lucky-wheels.io
+              </a>
+            </p>
+            <p className="text-sm font-medium text-slate-400">
+              Founded September 2025 • Based in San Francisco, CA
+            </p>
+          </footer>
+        </section>
       </main>
     </div>
   );
