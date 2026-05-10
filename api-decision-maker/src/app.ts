@@ -23,6 +23,8 @@ import { connectDB } from "./configs/db";
 import { env } from "./configs/env";
 import { logger } from "./utils/logger";
 import { errorHandler } from "./middlewares/error.middleware";
+import { swaggerSpec } from "./configs/swagger";
+import swaggerUi from "swagger-ui-express";
 
 import authRoutes           from "./modules/auth/auth.route";
 import userRoutes           from "./modules/users/user.route";
@@ -43,6 +45,16 @@ app.use(morgan(env.isDev ? "dev" : "combined"));
 
 // ── Static files (uploads) ────────────────────────────────────────────────────
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+// ── Swagger UI ───────────────────────────────────────────────────────────────
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Decision Maker API Docs',
+}));
+app.get("/api-docs.json", (_req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
@@ -82,6 +94,7 @@ async function start() {
 
   app.listen(env.port, () => {
     logger.info(`Server → http://localhost:${env.port}  [${env.nodeEnv}]`);
+    logger.info(`Swagger → http://localhost:${env.port}/api-docs`);
     logger.info(`CORS allowed origins: ${env.corsOrigins.join(", ")}`);
     logger.info("Endpoints:");
     logger.info("  GET    /health");

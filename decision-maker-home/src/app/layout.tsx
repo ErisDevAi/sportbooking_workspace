@@ -5,8 +5,8 @@ import { antdTheme } from '@/utils/theme';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CMS - Decision Maker',
-  description: 'Hệ thống quản trị Decision Maker',
+  title: 'Decision Maker',
+  description: 'Hệ thống hỗ trợ đưa ra quyết định thông minh',
 };
 
 export default function RootLayout({

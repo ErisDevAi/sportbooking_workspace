@@ -140,13 +140,10 @@ export const spinHistoryService = {
   /**
    * Get streak info for a user across all categories or a specific one.
    */
-  async getStreak(userId: string, categoryId?: string): Promise<IStreakTracker | IStreakTracker[]> {
+  async getStreak(userId: string, categoryId?: string): Promise<IStreakTracker | IStreakTracker[] | null> {
     if (categoryId) {
       const tracker = await StreakTracker.findOne({ userId, categoryId })
         .populate("categoryId", "name slug icon");
-      if (!tracker) {
-        return { currentStreak: 0, maxStreak: 0, lastSpinDate: "", totalSpins: 0 } as unknown as IStreakTracker;
-      }
       return tracker;
     }
 

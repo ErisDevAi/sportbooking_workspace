@@ -45,7 +45,8 @@ export const categoryController = {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const cat = await categoryService.update(req.params.id, req.body, req.user!.userId);
+      const isAdmin = req.user!.role === 'admin';
+      const cat = await categoryService.update(req.params.id, req.body, req.user!.userId, isAdmin);
       respond.ok(res, cat, "Category updated");
     } catch (e) {
       next(e);
@@ -54,7 +55,8 @@ export const categoryController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await categoryService.delete(req.params.id, req.user!.userId);
+      const isAdmin = req.user!.role === 'admin';
+      await categoryService.delete(req.params.id, req.user!.userId, isAdmin);
       respond.ok(res, null, "Category deleted");
     } catch (e) {
       next(e);

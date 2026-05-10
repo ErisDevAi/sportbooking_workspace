@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Form, Input, Button, App } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
 
 interface LoginForm {
@@ -20,7 +21,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (token) {
-      router.replace('/admin/dashboard');
+      router.replace('/wheels');
     }
   }, [token, router]);
 
@@ -28,19 +29,19 @@ export default function LoginPage() {
     try {
       await login(values.email, values.password);
       message.success('Đăng nhập thành công');
-      router.push('/admin/dashboard');
+      router.push('/wheels');
     } catch {
       message.error('Sai email hoặc mật khẩu');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-purple-50 px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 shadow-lg">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-purple-200">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 2v10" />
@@ -49,18 +50,15 @@ export default function LoginPage() {
                 <path d="M6 12h6" />
               </svg>
             </div>
-            <div className="text-left">
-              <span className="text-xl font-black text-white block leading-tight">Decision Maker</span>
-              <span className="text-xs text-purple-300 font-medium">Hệ thống quản trị</span>
-            </div>
-          </div>
+            <span className="text-xl font-black text-slate-800">Decision Maker</span>
+          </Link>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-slate-800">Đăng nhập quản trị</h1>
-            <p className="text-slate-500 mt-1 text-sm">Nhập thông tin để truy cập hệ thống CMS</p>
+            <h1 className="text-2xl font-bold text-slate-800">Đăng nhập</h1>
+            <p className="text-slate-500 mt-1 text-sm">Chào mừng bạn quay lại!</p>
           </div>
 
           <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off" size="large">
@@ -72,11 +70,7 @@ export default function LoginPage() {
                 { type: 'email', message: 'Email không hợp lệ' },
               ]}
             >
-              <Input
-                prefix={<UserOutlined className="text-slate-300" />}
-                placeholder="admin@example.com"
-                className="!rounded-lg"
-              />
+              <Input prefix={<UserOutlined className="text-slate-300" />} placeholder="your@email.com" className="!rounded-lg" />
             </Form.Item>
 
             <Form.Item
@@ -84,11 +78,7 @@ export default function LoginPage() {
               label="Mật khẩu"
               rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
             >
-              <Input.Password
-                prefix={<LockOutlined className="text-slate-300" />}
-                placeholder="Nhập mật khẩu"
-                className="!rounded-lg"
-              />
+              <Input.Password prefix={<LockOutlined className="text-slate-300" />} placeholder="Nhập mật khẩu" className="!rounded-lg" />
             </Form.Item>
 
             <Form.Item className="mb-0">
@@ -98,10 +88,11 @@ export default function LoginPage() {
             </Form.Item>
           </Form>
 
-          <div className="mt-6 text-center">
-            <p className="text-xs text-slate-400">
-              Liên hệ quản trị viên nếu bạn chưa có tài khoản
-            </p>
+          <div className="text-center mt-6 text-sm text-slate-500">
+            Chưa có tài khoản?{' '}
+            <Link href="/register" className="text-purple-600 font-semibold hover:text-purple-700">
+              Đăng ký ngay
+            </Link>
           </div>
         </div>
       </div>

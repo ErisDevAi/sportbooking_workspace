@@ -26,7 +26,7 @@ const UserSchema = new Schema<IUser>(
       match: [/^\S+@\S+\.\S+$/, "Invalid email"],
     },
     password: { type: String, required: true, select: false },
-    role: { type: String, default: "viewer" },
+    role: { type: String, default: "viewer", enum: ["admin", "editor", "viewer"] },
     isActive: { type: Boolean, default: true },
   },
   {

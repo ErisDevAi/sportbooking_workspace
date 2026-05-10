@@ -24,7 +24,11 @@ async function getRolePermissions(roleName: string): Promise<string[]> {
   return role?.permissions ?? [];
 }
 
-export const authService = {
+export const authService: {
+  register(dto: RegisterDto): Promise<AuthResult>;
+  login(dto: LoginDto): Promise<AuthResult>;
+  me(userId: string): Promise<Record<string, unknown>>;
+} = {
   async register(dto: RegisterDto): Promise<AuthResult> {
     if (await User.findOne({ email: dto.email })) {
       throw new AppError("Email already registered", 409);
