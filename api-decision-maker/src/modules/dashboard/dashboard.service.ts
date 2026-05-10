@@ -8,14 +8,18 @@
 import { User } from "../users/user.model";
 import { Role } from "../roles/role.model";
 import { Permission } from "../permissions/permission.model";
+import { Category } from "../categories/category.model";
+import { SpinHistory } from "../spin-histories/spin-histories.model";
 
 export const dashboardService = {
   async getStats() {
-    const [totalUsers, activeUsers, totalRoles, totalPermissions] = await Promise.all([
+    const [totalUsers, activeUsers, totalRoles, totalPermissions, totalCategories, totalSpins] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ isActive: true }),
       Role.countDocuments(),
       Permission.countDocuments(),
+      Category.countDocuments(),
+      SpinHistory.countDocuments(),
     ]);
 
     // Users by role
@@ -23,21 +27,33 @@ export const dashboardService = {
       { $group: { _id: "$role", count: { $sum: 1 } } },
     ]);
 
-    // Mock 7-day activity
+    // 7-day spin activity from real data
     const now = new Date();
+    const sevenDaysAgo = new Date(now);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const dailySpins = await SpinHistory.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
     const activity = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(now);
       d.setDate(d.getDate() - (6 - i));
-      return {
-        date: d.toISOString().slice(0, 10),
-        newUsers: Math.floor(Math.random() * 8),
-        logins: Math.floor(Math.random() * 50) + 5,
-        apiCalls: Math.floor(Math.random() * 300) + 50,
-      };
+      const dateStr = d.toISOString().slice(0, 10);
+      const found = dailySpins.find((s) => s._id === dateStr);
+      return { date: dateStr, spins: found ? found.count : 0 };
     });
 
     return {
-      totals: { users: totalUsers, activeUsers, roles: totalRoles, permissions: totalPermissions },
+      totals: { users: totalUsers, activeUsers, roles: totalRoles, permissions: totalPermissions, categories: totalCategories, spins: totalSpins },
       usersByRole: byRole.map((r) => ({ role: r._id as string, count: r.count as number })),
       activity,
       system: {

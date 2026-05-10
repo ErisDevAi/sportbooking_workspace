@@ -8,6 +8,7 @@
  */
 
 import { Category, ICategory } from "./category.model";
+import { WheelContent } from "../wheel-contents/wheel-content.model";
 import { AppError } from "../../middlewares/error.middleware";
 import { PaginationMeta } from "../../common/pagination";
 
@@ -120,10 +121,10 @@ export const categoryService = {
     return Category.create({ ...dto, slug, createdBy: userId });
   },
 
-  async update(id: string, dto: UpdateCategoryDto, userId: string): Promise<ICategory> {
+  async update(id: string, dto: UpdateCategoryDto, userId: string, isAdmin = false): Promise<ICategory> {
     const cat = await Category.findById(id);
     if (!cat) throw new AppError("Category not found", 404);
-    if (String(cat.createdBy) !== userId) {
+    if (!isAdmin && String(cat.createdBy) !== userId) {
       throw new AppError("You can only edit your own categories", 403);
     }
 
@@ -141,15 +142,17 @@ export const categoryService = {
     return updated;
   },
 
-  async delete(id: string, userId: string): Promise<void> {
+  async delete(id: string, userId: string, isAdmin = false): Promise<void> {
     const cat = await Category.findById(id);
     if (!cat) throw new AppError("Category not found", 404);
-    if (String(cat.createdBy) !== userId) {
+    if (!isAdmin && String(cat.createdBy) !== userId) {
       throw new AppError("You can only delete your own categories", 403);
     }
     if (cat.isDefault) {
       throw new AppError("Cannot delete a default category", 400);
     }
+    // Cascade: xóa tất cả wheel-contents thuộc category này
+    await WheelContent.deleteMany({ categoryId: id });
     await Category.findByIdAndDelete(id);
   },
 };

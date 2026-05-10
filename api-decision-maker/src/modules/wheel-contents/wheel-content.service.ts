@@ -93,10 +93,10 @@ export const wheelContentService = {
     return item;
   },
 
-  async update(id: string, dto: UpdateWheelContentDto, userId: string): Promise<IWheelContent> {
+  async update(id: string, dto: UpdateWheelContentDto, userId: string, isAdmin = false): Promise<IWheelContent> {
     const item = await WheelContent.findById(id);
     if (!item) throw new AppError("Wheel content not found", 404);
-    if (String(item.createdBy) !== userId) {
+    if (!isAdmin && String(item.createdBy) !== userId) {
       throw new AppError("You can only edit your own wheel contents", 403);
     }
 
@@ -117,10 +117,10 @@ export const wheelContentService = {
     return updated;
   },
 
-  async delete(id: string, userId: string): Promise<void> {
+  async delete(id: string, userId: string, isAdmin = false): Promise<void> {
     const item = await WheelContent.findById(id);
     if (!item) throw new AppError("Wheel content not found", 404);
-    if (String(item.createdBy) !== userId) {
+    if (!isAdmin && String(item.createdBy) !== userId) {
       throw new AppError("You can only delete your own wheel contents", 403);
     }
 

@@ -71,7 +71,8 @@ export const wheelContentController = {
       if (req.file) {
         req.body.image = `/uploads/${req.file.filename}`;
       }
-      const item = await wheelContentService.update(req.params.id, req.body, req.user!.userId);
+      const isAdmin = req.user!.role === 'admin';
+      const item = await wheelContentService.update(req.params.id, req.body, req.user!.userId, isAdmin);
       respond.ok(res, item, "Wheel content updated");
     } catch (e) {
       next(e);
@@ -80,7 +81,8 @@ export const wheelContentController = {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await wheelContentService.delete(req.params.id, req.user!.userId);
+      const isAdmin = req.user!.role === 'admin';
+      await wheelContentService.delete(req.params.id, req.user!.userId, isAdmin);
       respond.ok(res, null, "Wheel content deleted");
     } catch (e) {
       next(e);
