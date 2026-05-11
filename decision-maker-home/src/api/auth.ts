@@ -6,7 +6,7 @@ interface LoginRequest {
 }
 
 interface AuthUser {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   role: string;

@@ -1,12 +1,14 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { authApi } from '@/api/auth';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { authApi } from "@/api/auth";
 
 interface AuthUser {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   role: string;
+  isActive: boolean;
+  permissions: string[];
 }
 
 interface AuthState {
@@ -33,7 +35,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage',
-    }
-  )
+      name: "auth-storage",
+    },
+  ),
 );
