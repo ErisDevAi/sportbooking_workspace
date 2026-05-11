@@ -13,22 +13,21 @@ import {
   Empty,
   App,
 } from "antd";
+<<<<<<< HEAD:decision-maker-home/src/app/categories/page.tsx
 import {
   PlusOutlined,
   ArrowLeftOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+=======
+import { PlusOutlined } from "@ant-design/icons";
+>>>>>>> origin/ErisDevAi:decision-maker-home/src/app/(main)/categories/page.tsx
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/auth";
 import { categoriesApi } from "@/api/categories";
 import type { Category } from "@/types/category";
 
 export default function CategoriesPage() {
-  const router = useRouter();
   const { message, modal } = App.useApp();
-  const logout = useAuthStore((s) => s.logout);
-  const user = useAuthStore((s) => s.user);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,8 +128,9 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div>
       {/* Header */}
+<<<<<<< HEAD:decision-maker-home/src/app/categories/page.tsx
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -173,7 +173,16 @@ export default function CategoriesPage() {
               </Button>
             )}
           </div>
+=======
+      <div className="max-w-6xl mx-auto px-4 pt-8 pb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">Danh mục quyết định</h1>
+          <p className="text-sm text-slate-500">Quản lý các thư mục phân loại quyết định</p>
+>>>>>>> origin/ErisDevAi:decision-maker-home/src/app/(main)/categories/page.tsx
         </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="!rounded-lg !font-semibold">
+          Tạo danh mục
+        </Button>
       </div>
 
       {/* Content */}

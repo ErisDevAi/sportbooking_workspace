@@ -9,6 +9,22 @@ import { parsePagination } from "../../common/pagination";
 
 export const spinHistoryController = {
   /**
+   * POST /spin-history/smart-spin — server-side smart random selection
+   */
+  async smartSpin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { categoryId } = req.body;
+      if (!categoryId) {
+        return respond.fail(res, "categoryId is required", 400);
+      }
+      const result = await spinHistoryService.smartSpin(categoryId, req.user!.userId);
+      respond.created(res, result, "Smart spin completed");
+    } catch (e) {
+      next(e);
+    }
+  },
+
+  /**
    * POST /spin-history — record a spin result
    */
   async recordSpin(req: Request, res: Response, next: NextFunction) {
@@ -22,13 +38,16 @@ export const spinHistoryController = {
 
   /**
    * GET /spin-history — get user's spin history
+   * Admin users can pass ?all=true to see all users' history
    */
   async getHistory(req: Request, res: Response, next: NextFunction) {
     try {
       const { skip, limit, page, buildMeta } = parsePagination(req.query);
       const categoryId = req.query.categoryId as string | undefined;
+      const isAdmin = req.user!.role === "admin";
+      const showAll = req.query.all === "true" && isAdmin;
       const { items, meta } = await spinHistoryService.getHistory(
-        req.user!.userId,
+        showAll ? undefined : req.user!.userId,
         skip,
         limit,
         page,

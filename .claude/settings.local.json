@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git rm:*)",
+      "Bash(GIT_COMMITTER_DATE=\"2026-05-04 21:57:30 +0700\" git commit --amend --no-edit --date=\"2026-05-04 21:57:30 +0700\")",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(GIT_COMMITTER_DATE=\"2026-05-04 09:19:15 +0700\" git commit --amend --no-edit --date=\"2026-05-04 09:19:15 +0700\")",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000/health)",
+      "Bash(curl -s -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@example.com\",\"password\":\"password123\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill:*)",
+      "Bash(curl -s -I -X OPTIONS http://localhost:3000/auth/login -H \"Origin: http://localhost:8001\" -H \"Access-Control-Request-Method: POST\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'API running - uptime: {d[\\\\\"data\\\\\"][\\\\\"uptime\\\\\"]}s'\\)\")",
+      "Bash(python3 -c \"import sys,json; print\\(json.load\\(sys.stdin\\)['data']['token']\\)\")",
+      "Bash(curl -s http://localhost:3000/dashboard/stats -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWZmZWJiZThmMmFkZDU3ZTBmNDViMDUiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6ImFkbWluIiwicGVybWlzc2lvbnMiOlsiY3JlYXRlX3VzZXIiLCJlZGl0X3VzZXIiLCJkZWxldGVfdXNlciIsInZpZXdfdXNlciIsIm1hbmFnZV9yb2xlcyIsIm1hbmFnZV9wZXJtaXNzaW9ucyIsInZpZXdfZGFzaGJvYXJkIiwiY3JlYXRlX2NhdGVnb3J5IiwiZWRpdF9jYXRlZ29yeSIsImRlbGV0ZV9jYXRlZ29yeSIsInZpZXdfY2F0ZWdvcnkiLCJjcmVhdGVfd2hlZWxfY29udGVudCIsImVkaXRfd2hlZWxfY29udGVudCIsImRlbGV0ZV93aGVlbF9jb250ZW50Iiwidmlld193aGVlbF9jb250ZW50IiwiY3JlYXRlX3NwaW4iLCJ2aWV3X3NwaW5faGlzdG9yeSJdLCJpYXQiOjE3NzgzODA5MDgsImV4cCI6MTc3ODk4NTcwOH0.bpiGpI8vSAZ0rDq3neIRX1VGLYesfw1h3KIvOuuuc8c')",
+      "Bash(npm install:*)",
+      "Bash(curl -s http://localhost:3000/api-docs.json)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Swagger OK: {d[\\\\\"info\\\\\"][\\\\\"title\\\\\"]} v{d[\\\\\"info\\\\\"][\\\\\"version\\\\\"]}'\\)\")",
+      "Bash(npx tsc:*)",
+      "Bash(mkdir -p \"\\(main\\)\")",
+      "Bash(mv page.tsx \"\\(main\\)/page.tsx\")",
+      "Bash(mv about:*)",
+      "Bash(mv categories:*)",
+      "Bash(npx next:*)",
+      "Bash(mv \\(protected\\)_ignore:*)",
+      "Bash(ls -la /Users/deveris/HUMG_Workspace/decision-maker-platform/cms-decision-maker/.env*)"
+    ]
+  }
+}

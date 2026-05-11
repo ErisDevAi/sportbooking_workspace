@@ -16,6 +16,8 @@ export interface IWheelContent extends Document {
   categoryId: Types.ObjectId;
   createdBy: Types.ObjectId;
   isActive: boolean;
+  timesSelected: number; // how many times this choice was selected
+  lastSelectedAt: Date | null; // when it was last selected
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +32,8 @@ const WheelContentSchema = new Schema<IWheelContent>(
     categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     isActive: { type: Boolean, default: true },
+    timesSelected: { type: Number, default: 0, min: 0 },
+    lastSelectedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

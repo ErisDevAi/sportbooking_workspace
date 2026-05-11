@@ -14,7 +14,15 @@ import { checkPermission } from "../../middlewares/role.middleware";
 
 const router = Router();
 
-// POST /spin-history — record spin result
+// POST /spin-history/smart-spin — server-side smart random selection + record
+router.post(
+  "/smart-spin",
+  authenticate,
+  checkPermission("create_spin"),
+  spinHistoryController.smartSpin
+);
+
+// POST /spin-history — record spin result (client-side selection)
 router.post(
   "/",
   authenticate,

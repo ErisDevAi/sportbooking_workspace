@@ -41,7 +41,76 @@ function yesterdayStr(): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * Smart Random (Weighted Random Selection) algorithm.
+ *
+ * Adjusts base weights with:
+ *   - Cooldown: if selected within last 3 days → weight × 0.5 (min 1)
+ *   - Boost: if never selected → weight × 1.5
+ *
+ * Returns the selected content after updating its stats.
+ */
+async function smartRandom(categoryId: string): Promise<typeof WheelContent.prototype> {
+  const choices = await WheelContent.find({ categoryId, isActive: true });
+  if (choices.length === 0) {
+    throw new AppError("Không có lựa chọn nào trong danh mục", 400);
+  }
+
+  const now = new Date();
+  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+
+  // Calculate adjusted weights
+  const weighted = choices.map((choice) => {
+    let w = choice.weight;
+
+    // Cooldown: recently selected → reduce weight
+    if (choice.lastSelectedAt && choice.lastSelectedAt > threeDaysAgo) {
+      w = Math.max(1, Math.floor(w * 0.5));
+    }
+
+    // Boost: never selected → increase weight
+    if (choice.timesSelected === 0) {
+      w = Math.ceil(w * 1.5);
+    }
+
+    return { choice, weight: w };
+  });
+
+  // Weighted random selection
+  const totalWeight = weighted.reduce((sum, e) => sum + e.weight, 0);
+  let rand = Math.random() * totalWeight;
+
+  let selected = weighted[0].choice;
+  for (const entry of weighted) {
+    rand -= entry.weight;
+    if (rand <= 0) {
+      selected = entry.choice;
+      break;
+    }
+  }
+
+  // Update stats on the selected content
+  selected.timesSelected += 1;
+  selected.lastSelectedAt = now;
+  await selected.save();
+
+  return selected;
+}
+
 export const spinHistoryService = {
+  /**
+   * Smart spin: use smartRandom algorithm to pick a choice,
+   * then record the result and update streak.
+   */
+  async smartSpin(categoryId: string, userId: string): Promise<{ history: ISpinHistory; streak: IStreakTracker; selected: any }> {
+    const selected = await smartRandom(categoryId);
+    const result = await this.recordSpin(
+      { categoryId, selectedContentId: String(selected._id) },
+      userId
+    );
+    return { ...result, selected };
+  },
+
   /**
    * Record a spin result and update streak.
    */
@@ -52,6 +121,11 @@ export const spinHistoryService = {
     if (String(content.categoryId) !== dto.categoryId) {
       throw new AppError("Selected content does not belong to this category", 400);
     }
+
+    // Update selection stats on the content
+    content.timesSelected = (content.timesSelected || 0) + 1;
+    content.lastSelectedAt = new Date();
+    await content.save();
 
     // Calculate streak
     const today = todayStr();
@@ -110,19 +184,22 @@ export const spinHistoryService = {
 
   /**
    * Get spin history for a user, optionally filtered by category.
+   * If userId is undefined, returns all users' history (admin).
    */
   async getHistory(
-    userId: string,
+    userId: string | undefined,
     skip: number,
     limit: number,
     page: number,
     categoryId?: string
   ): Promise<SpinHistoryPage> {
-    const filter: Record<string, unknown> = { userId };
+    const filter: Record<string, unknown> = {};
+    if (userId) filter.userId = userId;
     if (categoryId) filter.categoryId = categoryId;
 
     const [items, total] = await Promise.all([
       SpinHistory.find(filter)
+        .populate("userId", "name email")
         .populate("categoryId", "name slug icon")
         .populate("selectedContentId", "label image color")
         .skip(skip)
