@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Select,
@@ -24,11 +24,19 @@ import { wheelContentsApi } from '@/api/wheel-contents';
 import { spinHistoryApi } from '@/api/spin-histories';
 import type { Category } from '@/types/category';
 import type { WheelContent } from '@/types/wheel-contents';
-import type { Streak } from '@/types/spin-histories';
+import type { Streak, SpinHistory } from '@/types/spin-histories';
 
 const { Title, Text } = Typography;
 
-export default function SpinPage() {
+export default function SpinPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-900"><Spin size="large" /></div>}>
+      <SpinPage />
+    </Suspense>
+  );
+}
+
+function SpinPage() {
   const router = useRouter();
   const { message } = App.useApp();
   const logout = useAuthStore((s) => s.logout);
@@ -58,6 +66,9 @@ export default function SpinPage() {
   const [itemForm] = Form.useForm();
   const [itemSubmitting, setItemSubmitting] = useState(false);
 
+  // Spin History
+  const [spinHistories, setSpinHistories] = useState<SpinHistory[]>([]);
+
   useEffect(() => {
     const fetchInitial = async () => {
       try {
@@ -73,6 +84,13 @@ export default function SpinPage() {
           const res = await wheelContentsApi.getForWheel(preselectedCategory);
           setItems(res.data.data);
         }
+
+        // Load spin histories
+        try {
+          const historyRes = await spinHistoryApi.getAll({ limit: 20 });
+          setSpinHistories(historyRes.data.data);
+        } catch {}
+
       } catch {
         message.error('Không thể tải dữ liệu');
       } finally {
@@ -203,50 +221,53 @@ export default function SpinPage() {
     return `conic-gradient(${parts.join(', ')})`;
   };
 
-  const handleSpin = () => {
-    if (isSpinning || items.length < 2) return;
+  const handleSpin = async () => {
+    if (isSpinning || items.length < 2 || !selectedCategory) return;
     setIsSpinning(true);
     setResult(null);
 
-    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
-    let rand = Math.random() * totalWeight;
-    let selectedIndex = 0;
-    for (let i = 0; i < items.length; i++) {
-      rand -= items[i].weight;
-      if (rand <= 0) { selectedIndex = i; break; }
-    }
+    try {
+      // Smart Random: server chọn kết quả dựa trên thuật toán cooldown + boost
+      const res = await spinHistoryApi.smartSpin(selectedCategory);
+      const selected = res.data.data.selected;
 
-    let targetAngle = 0;
-    for (let i = 0; i < selectedIndex; i++) {
-      targetAngle += (items[i].weight / totalWeight) * 360;
-    }
-    targetAngle += ((items[selectedIndex].weight / totalWeight) * 360) / 2;
+      // Tìm index của kết quả trong danh sách items để xoay vòng quay đúng vị trí
+      const selectedIndex = items.findIndex((item) => item._id === selected._id);
+      const idx = selectedIndex >= 0 ? selectedIndex : 0;
 
-    const spins = 360 * 5;
-    const stopAngle = 360 - targetAngle;
-    const totalRotation = rotation + spins + stopAngle;
-    setRotation(totalRotation);
+      const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+      let targetAngle = 0;
+      for (let i = 0; i < idx; i++) {
+        targetAngle += (items[i].weight / totalWeight) * 360;
+      }
+      targetAngle += ((items[idx].weight / totalWeight) * 360) / 2;
 
-    setTimeout(() => {
-      setResult(items[selectedIndex]);
+      const spins = 360 * 5;
+      const stopAngle = 360 - targetAngle;
+      const totalRotation = rotation + spins + stopAngle;
+      setRotation(totalRotation);
+
+      // Refresh streak & history ngay (server đã ghi)
+      const [streakRes, historyRes] = await Promise.all([
+        spinHistoryApi.getStreak(),
+        spinHistoryApi.getAll({ limit: 20 }),
+      ]);
+      setStreaks(streakRes.data.data);
+      setSpinHistories(historyRes.data.data);
+
+      setTimeout(() => {
+        setResult(items[idx] || { ...selected, _id: selected._id, label: selected.label, color: selected.color, description: selected.description, weight: selected.weight });
+        setIsSpinning(false);
+      }, 4200);
+    } catch {
+      message.error('Quay thất bại, vui lòng thử lại');
       setIsSpinning(false);
-    }, 4200);
+    }
   };
 
   const handleAccept = async () => {
-    if (!result || !selectedCategory) return;
-    try {
-      await spinHistoryApi.create({
-        categoryId: selectedCategory,
-        selectedContentId: result._id,
-      });
-      // Refresh streak
-      const streakRes = await spinHistoryApi.getStreak();
-      setStreaks(streakRes.data.data);
-      message.success(`Đã chấp nhận: ${result.label}`);
-    } catch {
-      message.error('Lưu kết quả thất bại, vui lòng thử lại');
-    }
+    if (!result) return;
+    message.success(`Đã chấp nhận: ${result.label}`);
     setResult(null);
   };
 
@@ -491,6 +512,47 @@ export default function SpinPage() {
           </div>
         </div>
       </div>
+
+      {/* SPIN HISTORY */}
+        {spinHistories.length > 0 && (
+          <div className="max-w-6xl mx-auto mt-8">
+            <div className="rounded-2xl bg-white/5 backdrop-blur border border-white/10 p-5">
+              <h2 className="text-base font-bold text-white/90 mb-4">Lịch sử quay</h2>
+              <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                {spinHistories.map((history) => {
+                  const cat = categories.find((c) => c._id === history.categoryId);
+                  return (
+                    <div
+                      key={history._id}
+                      className="flex items-center justify-between rounded-xl bg-white/5 border border-white/5 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-sm">
+                          {cat?.icon || '🎯'}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-white/90 text-sm">{history.selectedLabel}</p>
+                          <p className="text-xs text-white/40">
+                            {cat?.name || 'Danh mục'} &middot; Streak: {history.currentStreak}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-xs text-white/30">
+                        {new Date(history.createdAt).toLocaleDateString('vi-VN', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
       {/* RESULT MODAL */}
       <Modal open={!!result} onCancel={() => setResult(null)} footer={null} centered width={400}>

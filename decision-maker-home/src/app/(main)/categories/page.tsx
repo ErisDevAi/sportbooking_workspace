@@ -13,18 +13,13 @@ import {
   Empty,
   App,
 } from "antd";
-import { PlusOutlined, ArrowLeftOutlined, LogoutOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/auth";
 import { categoriesApi } from "@/api/categories";
 import type { Category } from "@/types/category";
 
 export default function CategoriesPage() {
-  const router = useRouter();
   const { message, modal } = App.useApp();
-  const logout = useAuthStore((s) => s.logout);
-  const user = useAuthStore((s) => s.user);
   const [form] = Form.useForm();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,35 +119,16 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div>
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-slate-400 hover:text-slate-600 transition-colors">
-              <ArrowLeftOutlined className="text-lg" />
-            </Link>
-            <div>
-              <h1 className="text-xl font-bold text-slate-800">Danh mục quyết định</h1>
-              <p className="text-sm text-slate-500">Quản lý các thư mục phân loại quyết định</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="!rounded-lg !font-semibold">
-              Tạo danh mục
-            </Button>
-            {user && (
-              <Button
-                icon={<LogoutOutlined />}
-                onClick={() => { logout(); router.push('/'); }}
-                size="large"
-                className="!rounded-lg"
-              >
-                Đăng xuất
-              </Button>
-            )}
-          </div>
+      <div className="max-w-6xl mx-auto px-4 pt-8 pb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">Danh mục quyết định</h1>
+          <p className="text-sm text-slate-500">Quản lý các thư mục phân loại quyết định</p>
         </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" className="!rounded-lg !font-semibold">
+          Tạo danh mục
+        </Button>
       </div>
 
       {/* Content */}

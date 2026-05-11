@@ -14,7 +14,13 @@ export const spinHistoryApi = {
       data
     ),
 
-  getAll: (params?: { categoryId?: string; page?: number; limit?: number }) =>
+  smartSpin: (categoryId: string) =>
+    apiClient.post<ApiResponse<{ history: SpinHistory; streak: Streak; selected: any }>>(
+      '/spin-history/smart-spin',
+      { categoryId }
+    ),
+
+  getAll: (params?: { categoryId?: string; page?: number; limit?: number; all?: string }) =>
     apiClient.get<ApiResponse<SpinHistory[]>>('/spin-history', { params }),
 
   getStreak: (categoryId?: string) =>

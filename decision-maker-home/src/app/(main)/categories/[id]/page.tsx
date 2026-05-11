@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Spin, Empty, Modal, Form, Input, InputNumber, ColorPicker, App } from "antd";
 import { ArrowLeftOutlined, PlusOutlined, PlayCircleOutlined } from "@ant-design/icons";
-import Link from "next/link";
 import { categoriesApi } from "@/api/categories";
 import { wheelContentsApi } from "@/api/wheel-contents";
 import type { Category } from "@/types/category";
@@ -126,36 +125,34 @@ export default function CategoryDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div>
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/categories" className="text-slate-400 hover:text-slate-600 transition-colors">
-              <ArrowLeftOutlined className="text-lg" />
-            </Link>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{category.icon || "📁"}</span>
-              <div>
-                <h1 className="text-lg font-bold text-slate-800">{category.name}</h1>
-                <p className="text-xs text-slate-500">{items.length} lựa chọn</p>
-              </div>
+      <div className="max-w-4xl mx-auto px-4 pt-8 pb-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button onClick={() => router.back()} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <ArrowLeftOutlined className="text-lg" />
+          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{category.icon || "📁"}</span>
+            <div>
+              <h1 className="text-lg font-bold text-slate-800">{category.name}</h1>
+              <p className="text-xs text-slate-500">{items.length} lựa chọn</p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <Button icon={<PlusOutlined />} onClick={showAddModal} className="!rounded-lg">
-              Thêm
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlayCircleOutlined />}
-              onClick={() => router.push(`/wheels?category=${id}`)}
-              className="!rounded-lg !font-semibold"
-              disabled={items.length < 2}
-            >
-              Quay ngay
-            </Button>
-          </div>
+        </div>
+        <div className="flex gap-3">
+          <Button icon={<PlusOutlined />} onClick={showAddModal} className="!rounded-lg">
+            Thêm
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlayCircleOutlined />}
+            onClick={() => router.push(`/wheels?category=${id}`)}
+            className="!rounded-lg !font-semibold"
+            disabled={items.length < 2}
+          >
+            Quay ngay
+          </Button>
         </div>
       </div>
 

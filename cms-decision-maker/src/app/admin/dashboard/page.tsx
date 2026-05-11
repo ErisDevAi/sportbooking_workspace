@@ -19,7 +19,7 @@ interface DashboardData {
     categories: number;
     spins: number;
   };
-  usersByRole: { role: string; count: number }[];
+  usersByRole: { _id: string; count: number }[];
   system: {
     status: string;
     version: string;
@@ -120,8 +120,8 @@ export default function DashboardPage() {
           <h3 className="font-bold text-slate-800 mb-4">Phân bổ vai trò</h3>
           <div className="space-y-3">
             {data?.usersByRole.map((item) => (
-              <div key={item.role} className="flex justify-between items-center">
-                <span className="text-sm text-slate-600 capitalize">{item.role}</span>
+              <div key={item._id} className="flex justify-between items-center">
+                <span className="text-sm text-slate-600 capitalize">{item._id}</span>
                 <span className="text-sm font-bold text-slate-800 bg-slate-100 rounded-full px-3 py-1">
                   {item.count} người
                 </span>
