@@ -22,7 +22,7 @@ interface EndpointGroup {
 const API_GROUPS: EndpointGroup[] = [
   {
     title: 'Auth - Xác thực',
-    color: '#7C3AED',
+    color: '#E53E3E',
     endpoints: [
       { method: 'POST', path: '/auth/register', label: 'Đăng ký tài khoản', auth: false, body: '{\n  "name": "Test User",\n  "email": "test@test.com",\n  "password": "123456"\n}' },
       { method: 'POST', path: '/auth/login', label: 'Đăng nhập', auth: false, body: '{\n  "email": "admin@example.com",\n  "password": "password123"\n}' },
@@ -42,7 +42,7 @@ const API_GROUPS: EndpointGroup[] = [
   },
   {
     title: 'Roles - Vai trò',
-    color: '#8b5cf6',
+    color: '#E53E3E',
     endpoints: [
       { method: 'GET', path: '/roles', label: 'Danh sách vai trò', auth: true },
       { method: 'GET', path: '/roles/{id}', label: 'Chi tiết vai trò', auth: true },
@@ -66,7 +66,7 @@ const API_GROUPS: EndpointGroup[] = [
     endpoints: [
       { method: 'GET', path: '/categories', label: 'Danh sách danh mục', auth: true },
       { method: 'GET', path: '/categories/{id}', label: 'Chi tiết danh mục', auth: true },
-      { method: 'POST', path: '/categories', label: 'Tạo danh mục', auth: true, body: '{\n  "name": "Test Category",\n  "icon": "🎯",\n  "color": "#7C3AED",\n  "description": "Mô tả",\n  "isPublic": true\n}' },
+      { method: 'POST', path: '/categories', label: 'Tạo danh mục', auth: true, body: '{\n  "name": "Test Category",\n  "icon": "🎯",\n  "color": "#E53E3E",\n  "description": "Mô tả",\n  "isPublic": true\n}' },
       { method: 'PUT', path: '/categories/{id}', label: 'Cập nhật danh mục', auth: true, body: '{\n  "name": "Updated Category"\n}' },
       { method: 'DELETE', path: '/categories/{id}', label: 'Xóa danh mục', auth: true },
     ],
@@ -174,26 +174,26 @@ export default function ApiDocsPage() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">API Documentation</h1>
+        <h1 className="text-xl font-bold text-slate-800">API Documentation</h1>
         <p className="text-sm text-slate-500 mt-1">
           Test API endpoints trực tiếp &middot; Base URL:{' '}
-          <code className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md text-xs font-semibold">{baseUrl}</code>
+          <code className="bg-red-50 text-red-700 px-2 py-0.5 rounded-md text-xs font-semibold">{baseUrl}</code>
         </p>
       </div>
 
       {/* Token Section */}
-      <div className="mb-6 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100 p-5">
+      <div className="mb-6 rounded-2xl bg-gradient-to-r from-red-50 to-red-50 border border-red-100 p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <LockOutlined className="text-purple-600" />
-            <span className="text-sm font-bold text-purple-800">Bearer Token</span>
+            <LockOutlined className="text-red-600" />
+            <span className="text-sm font-bold text-red-800">Bearer Token</span>
           </div>
           {token && (
             <Button
               size="small"
               icon={<CopyOutlined />}
               onClick={copyToken}
-              className="!text-xs !rounded-lg !border-purple-200 !text-purple-600"
+              className="!text-xs !rounded-lg !border-red-200 !text-red-600"
             >
               Copy từ phiên đăng nhập
             </Button>
@@ -204,7 +204,7 @@ export default function ApiDocsPage() {
           onChange={(e) => setCustomToken(e.target.value)}
           placeholder="Paste JWT token vào đây để xác thực API..."
           rows={2}
-          className="!font-mono !text-xs !rounded-xl !border-purple-200"
+          className="!font-mono !text-xs !rounded-xl !border-red-200"
         />
       </div>
 
@@ -243,7 +243,7 @@ export default function ApiDocsPage() {
                           onClick={() => selectEndpoint(ep)}
                           className={`w-full text-left px-3 py-2.5 rounded-xl text-sm flex items-center gap-2.5 transition-all ${
                             isSelected
-                              ? 'bg-purple-50 border border-purple-200 shadow-sm'
+                              ? 'bg-red-50 border border-red-200 shadow-sm'
                               : 'hover:bg-slate-50 border border-transparent'
                           }`}
                         >

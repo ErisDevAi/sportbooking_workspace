@@ -32,4 +32,10 @@ export const spinHistoryApi = {
     apiClient.get<ApiResponse<SpinStats[]>>(
       `/spin-history/stats/${categoryId}`
     ),
+
+  verifyAndReview: (historyId: string, data: { rating?: number; reviewNote?: string }) =>
+    apiClient.patch<ApiResponse<SpinHistory>>(
+      `/spin-history/${historyId}/verify`,
+      data
+    ),
 };

@@ -60,8 +60,8 @@ export default function DashboardPage() {
       title: 'Tổng người dùng',
       value: data?.totals.users || 0,
       icon: <UserOutlined />,
-      color: '#7C3AED',
-      bgColor: '#F3E8FF',
+      color: '#E53E3E',
+      bgColor: '#FFF5F5',
     },
     {
       title: 'Đang hoạt động',
@@ -89,7 +89,7 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">Tổng quan hệ thống</h1>
+        <h1 className="text-xl font-bold text-slate-800">Tổng quan hệ thống</h1>
         <p className="text-slate-500 text-sm mt-1">Thống kê tổng hợp về hệ thống Decision Maker</p>
       </div>
 

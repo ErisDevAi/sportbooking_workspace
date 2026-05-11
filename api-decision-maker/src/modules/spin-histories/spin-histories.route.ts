@@ -48,6 +48,14 @@ router.get(
   spinHistoryController.getStreak
 );
 
+// PATCH /spin-history/:id/verify — verify and review a spin result
+router.patch(
+  "/:id/verify",
+  authenticate,
+  checkPermission("create_spin"),
+  spinHistoryController.verifyAndReview
+);
+
 // GET /spin-history/stats/:categoryId — selection stats for a category
 router.get(
   "/stats/:categoryId",

@@ -15,6 +15,11 @@ export interface ISpinHistory extends Document {
   currentStreak: number; // consecutive days the user has used this category
   maxStreak: number;     // highest streak ever for this user+category
   lastSpinAt: Date;      // timestamp of this spin
+  // Review / verification
+  isVerified: boolean;   // user confirmed they completed the task
+  verifiedAt?: Date;
+  rating?: number;       // 0-5 stars
+  reviewNote?: string;   // user's text review
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +33,10 @@ const SpinHistorySchema = new Schema<ISpinHistory>(
     currentStreak: { type: Number, default: 1, min: 0 },
     maxStreak: { type: Number, default: 1, min: 0 },
     lastSpinAt: { type: Date, default: Date.now },
+    isVerified: { type: Boolean, default: false },
+    verifiedAt: { type: Date },
+    rating: { type: Number, min: 0, max: 5 },
+    reviewNote: { type: String, maxlength: 500 },
   },
   {
     timestamps: true,

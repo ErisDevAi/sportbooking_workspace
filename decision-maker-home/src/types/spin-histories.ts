@@ -7,6 +7,10 @@ export interface SpinHistory {
   currentStreak: number;
   maxStreak: number;
   lastSpinAt: string;
+  isVerified: boolean;
+  verifiedAt?: string;
+  rating?: number;
+  reviewNote?: string;
   createdAt: string;
 }
 

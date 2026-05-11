@@ -105,7 +105,7 @@ export default function WheelContentsPage() {
     const hexColor =
       typeof values.color === 'string'
         ? values.color
-        : values.color?.toHexString() || '#7C3AED';
+        : values.color?.toHexString() || '#E53E3E';
 
     const formData = new FormData();
     formData.append('label', values.label);
@@ -165,7 +165,7 @@ export default function WheelContentsPage() {
       key: 'weight',
       width: 100,
       render: (weight: number) => (
-        <Tag color="purple" className="!font-bold">x{weight}</Tag>
+        <Tag color="red" className="!font-bold">x{weight}</Tag>
       ),
     },
     {

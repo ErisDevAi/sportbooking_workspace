@@ -69,7 +69,7 @@ export default function CategoriesPage() {
     const hexColor =
       typeof values.color === 'string'
         ? values.color
-        : values.color?.toHexString() || '#7C3AED';
+        : values.color?.toHexString() || '#E53E3E';
 
     const payload = { ...values, color: hexColor };
 
@@ -217,7 +217,7 @@ export default function CategoriesPage() {
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          initialValues={{ isPublic: true, color: '#7C3AED' }}
+          initialValues={{ isPublic: true, color: '#E53E3E' }}
           className="mt-4"
         >
           <Form.Item

@@ -80,7 +80,7 @@ export default function SpinHistoriesPage() {
         if (typeof user === 'object' && user !== null) {
           return (
             <div className="flex items-center gap-2.5">
-              <Avatar size="small" className="!bg-purple-100 !text-purple-600" icon={<UserOutlined />}>
+              <Avatar size="small" className="!bg-red-100 !text-red-600" icon={<UserOutlined />}>
                 {user.name?.charAt(0)?.toUpperCase()}
               </Avatar>
               <div>
@@ -100,7 +100,7 @@ export default function SpinHistoriesPage() {
         const cat = getCategoryInfo(record.categoryId);
         return (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-base">
+            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-base">
               {cat?.icon || '🎯'}
             </div>
             <div>
@@ -172,12 +172,12 @@ export default function SpinHistoriesPage() {
 
       {/* Stats */}
       {stats.length > 0 && (
-        <div className="mb-6 rounded-2xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100 p-5">
-          <h3 className="font-semibold text-purple-800 mb-3 text-sm">Thống kê lựa chọn được quay</h3>
+        <div className="mb-6 rounded-2xl bg-gradient-to-r from-red-50 to-red-50 border border-red-100 p-5">
+          <h3 className="font-semibold text-red-800 mb-3 text-sm">Thống kê lựa chọn được quay</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {stats.map((stat) => (
-              <div key={stat._id} className="bg-white rounded-xl border border-purple-100 p-3 text-center shadow-sm">
-                <p className="text-xl font-black text-purple-600">{stat.count}</p>
+              <div key={stat._id} className="bg-white rounded-xl border border-red-100 p-3 text-center shadow-sm">
+                <p className="text-xl font-black text-red-600">{stat.count}</p>
                 <p className="text-xs text-slate-500 mt-0.5 truncate">{stat.label}</p>
               </div>
             ))}

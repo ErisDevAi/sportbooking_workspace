@@ -73,6 +73,20 @@ export const spinHistoryController = {
   },
 
   /**
+   * PATCH /spin-history/:id/verify — verify and review a spin result
+   */
+  async verifyAndReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { rating, reviewNote } = req.body;
+      const result = await spinHistoryService.verifyAndReview(id, req.user!.userId, { rating, reviewNote });
+      respond.ok(res, result, "Review saved successfully");
+    } catch (e) {
+      next(e);
+    }
+  },
+
+  /**
    * GET /spin-history/stats/:categoryId — get content selection stats for a category
    */
   async getContentStats(req: Request, res: Response, next: NextFunction) {

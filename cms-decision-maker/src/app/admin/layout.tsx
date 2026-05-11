@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!token) {
-      router.push('/login');
+      router.replace('/login');
     }
   }, [token, router]);
 
@@ -65,7 +65,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.replace('/login');
   };
 
   const currentPage = menuItems.find((m) => 'key' in m && m.key === pathname);
@@ -80,24 +80,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         className="fixed left-0 top-0 bottom-0 z-20"
         width={260}
         style={{
-          background: 'linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%)',
+          background: 'linear-gradient(180deg, #1a1a2e 0%, #2a1a2e 50%, #1a1a2e 100%)',
           borderRight: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         {/* Logo */}
         <div className="h-16 flex items-center border-b border-white/10 px-5">
           {sidebarCollapsed ? (
-            <div className="w-9 h-9 mx-auto rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-purple-900/40 flex items-center justify-center">
+            <div className="w-9 h-9 mx-auto rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-900/40 flex items-center justify-center">
               <WheelLogo size={18} />
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-purple-900/40 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-900/40 flex items-center justify-center shrink-0">
                 <WheelLogo size={18} />
               </div>
               <div>
                 <span className="text-white font-black text-sm leading-tight block">Decision Maker</span>
-                <span className="text-purple-300 text-[10px] font-medium">Hệ thống quản trị</span>
+                <span className="text-red-300 text-[10px] font-medium">Hệ thống quản trị</span>
               </div>
             </div>
           )}
@@ -150,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={toggleSidebar}
-              className="text-lg cursor-pointer border-none bg-transparent p-2 rounded-xl hover:bg-purple-50 transition-colors text-slate-500 hover:text-purple-600"
+              className="text-lg cursor-pointer border-none bg-transparent p-2 rounded-xl hover:bg-red-50 transition-colors text-slate-500 hover:text-red-600"
             >
               {sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </button>
@@ -183,10 +183,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             }}
             placement="bottomRight"
           >
-            <div className="flex items-center gap-2.5 cursor-pointer px-3 py-1.5 rounded-full hover:bg-purple-50 transition-colors border border-transparent hover:border-purple-100">
+            <div className="flex items-center gap-2.5 cursor-pointer px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors border border-transparent hover:border-red-100">
               <Avatar
                 size="small"
-                className="!bg-gradient-to-br !from-violet-500 !to-purple-600"
+                className="!bg-gradient-to-br !from-red-500 !to-red-600"
                 style={{ fontSize: 12, fontWeight: 800 }}
               >
                 {user?.name?.charAt(0)?.toUpperCase() || 'A'}

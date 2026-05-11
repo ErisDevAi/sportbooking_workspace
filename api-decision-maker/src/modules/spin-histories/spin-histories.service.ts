@@ -112,7 +112,7 @@ export const spinHistoryService = {
   },
 
   /**
-   * Record a spin result and update streak.
+   * Record a spin result (no streak update — streak only updates on verify).
    */
   async recordSpin(dto: SpinResultDto, userId: string): Promise<{ history: ISpinHistory; streak: IStreakTracker }> {
     // Verify the selected content exists and belongs to the category
@@ -127,43 +127,18 @@ export const spinHistoryService = {
     content.lastSelectedAt = new Date();
     await content.save();
 
-    // Calculate streak
-    const today = todayStr();
-    const yesterday = yesterdayStr();
-
+    // Ensure tracker exists (for totalSpins count) but don't touch streak
     let tracker = await StreakTracker.findOne({ userId, categoryId: dto.categoryId });
-
-    let newStreak = 1;
-    let newMax = 1;
-
     if (tracker) {
-      if (tracker.lastSpinDate === today) {
-        // Already spun today — streak stays the same, just record history
-        newStreak = tracker.currentStreak;
-        newMax = tracker.maxStreak;
-      } else if (tracker.lastSpinDate === yesterday) {
-        // Consecutive day — increment streak
-        newStreak = tracker.currentStreak + 1;
-        newMax = Math.max(newStreak, tracker.maxStreak);
-      } else {
-        // Streak broken — reset to 1
-        newStreak = 1;
-        newMax = tracker.maxStreak; // keep historical max
-      }
-
-      tracker.currentStreak = newStreak;
-      tracker.maxStreak = newMax;
-      tracker.lastSpinDate = today;
       tracker.totalSpins += 1;
       await tracker.save();
     } else {
-      // First spin ever for this user+category
       tracker = await StreakTracker.create({
         userId,
         categoryId: dto.categoryId,
-        currentStreak: 1,
-        maxStreak: 1,
-        lastSpinDate: today,
+        currentStreak: 0,
+        maxStreak: 0,
+        lastSpinDate: "",
         totalSpins: 1,
       });
     }
@@ -228,6 +203,68 @@ export const spinHistoryService = {
     return StreakTracker.find({ userId })
       .populate("categoryId", "name slug icon")
       .sort({ currentStreak: -1 });
+  },
+
+  /**
+   * Verify/review a spin history entry AND update streak.
+   * Streak only increments when user confirms completion (verify).
+   */
+  async verifyAndReview(
+    historyId: string,
+    userId: string,
+    data: { rating?: number; reviewNote?: string }
+  ): Promise<{ history: ISpinHistory; streak: IStreakTracker | null }> {
+    const history = await SpinHistory.findById(historyId);
+    if (!history) throw new AppError("Spin history not found", 404);
+    if (String(history.userId) !== userId) {
+      throw new AppError("You can only review your own spin history", 403);
+    }
+
+    history.isVerified = true;
+    history.verifiedAt = new Date();
+    if (data.rating !== undefined) history.rating = data.rating;
+    if (data.reviewNote !== undefined) history.reviewNote = data.reviewNote;
+    await history.save();
+
+    // Update streak on verify
+    const today = todayStr();
+    const yesterday = yesterdayStr();
+    const categoryId = String(history.categoryId);
+
+    let tracker = await StreakTracker.findOne({ userId, categoryId });
+
+    if (tracker) {
+      if (tracker.lastSpinDate === today) {
+        // Already verified today — streak stays
+      } else if (tracker.lastSpinDate === yesterday || tracker.lastSpinDate === "") {
+        // Consecutive day or first verify — increment streak
+        tracker.currentStreak += 1;
+        tracker.maxStreak = Math.max(tracker.currentStreak, tracker.maxStreak);
+        tracker.lastSpinDate = today;
+      } else {
+        // Streak broken — reset to 1
+        tracker.currentStreak = 1;
+        // keep historical max
+        tracker.lastSpinDate = today;
+      }
+      await tracker.save();
+    } else {
+      tracker = await StreakTracker.create({
+        userId,
+        categoryId,
+        currentStreak: 1,
+        maxStreak: 1,
+        lastSpinDate: today,
+        totalSpins: 0,
+      });
+    }
+
+    // Update history with latest streak values
+    history.currentStreak = tracker.currentStreak;
+    history.maxStreak = tracker.maxStreak;
+    await history.save();
+
+    return { history, streak: tracker };
   },
 
   /**

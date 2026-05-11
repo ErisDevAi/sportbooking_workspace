@@ -110,8 +110,8 @@ export default function RolesPage() {
       key: 'role',
       render: (_: any, record: Role) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
-            <LockOutlined className="text-purple-600" />
+          <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+            <LockOutlined className="text-red-500" />
           </div>
           <div>
             <p className="font-semibold text-slate-800">{record.label}</p>

@@ -28,19 +28,19 @@ export default function LoginPage() {
     try {
       await login(values.email, values.password);
       message.success('Đăng nhập thành công');
-      router.push('/admin/dashboard');
+      router.replace('/admin/dashboard');
     } catch {
       message.error('Sai email hoặc mật khẩu');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-400 to-purple-600 shadow-lg">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-red-400 to-red-600 shadow-lg">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 2v10" />
@@ -51,7 +51,7 @@ export default function LoginPage() {
             </div>
             <div className="text-left">
               <span className="text-xl font-black text-white block leading-tight">Decision Maker</span>
-              <span className="text-xs text-purple-300 font-medium">Hệ thống quản trị</span>
+              <span className="text-xs text-red-300 font-medium">Hệ thống quản trị</span>
             </div>
           </div>
         </div>

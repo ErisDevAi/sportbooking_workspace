@@ -9,6 +9,7 @@ interface AuthUser {
   role: string;
   isActive: boolean;
   permissions: string[];
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -27,7 +28,16 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         const res = await authApi.login({ email, password });
         const { token, user } = res.data.data;
-        set({ token, user });
+        set({
+          token,
+          user: {
+            _id: user._id, name: user.name, email: user.email,
+            role: user.role || 'viewer',
+            isActive: (user as any).isActive ?? true,
+            permissions: (user as any).permissions ?? [],
+            createdAt: (user as any).createdAt,
+          },
+        });
       },
 
       logout: () => {

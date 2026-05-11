@@ -34,7 +34,7 @@ export default function DashboardLayout({
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key === 'logout') {
       logout();
-      router.push('/login');
+      router.replace('/login');
     } else {
       router.push(key);
     }
@@ -86,7 +86,7 @@ export default function DashboardLayout({
             {sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
           <div className="ml-auto flex items-center gap-4">
-            <Link href="/" className="text-sm text-gray-500 hover:text-purple-600 transition-colors">
+            <Link href="/" className="text-sm text-gray-500 hover:text-red-500 transition-colors">
               Về trang chủ
             </Link>
           </div>

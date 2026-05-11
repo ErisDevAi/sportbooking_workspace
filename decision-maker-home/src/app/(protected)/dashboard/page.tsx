@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Row, Col, Spin } from 'antd';
+import { Row, Col } from 'antd';
 import {
   UserOutlined,
   AppstoreOutlined,
@@ -11,6 +11,7 @@ import {
 import StatsCard from '@/components/StatsCard';
 import SimpleChart from '@/components/SimpleChart';
 import { dashboardApi } from '@/api/dashboard';
+import SplashScreen from '@/components/SplashScreen';
 
 interface DashboardStats {
   totals: {
@@ -49,16 +50,12 @@ export default function DashboardPage() {
     fetchStats();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Spin size="large" />
-      </div>
-    );
+  if (!loading && !stats) {
+    return <div className="text-center py-20 text-gray-500">Không thể tải dữ liệu dashboard</div>;
   }
 
-  if (!stats) {
-    return <div className="text-center py-20 text-gray-500">Không thể tải dữ liệu dashboard</div>;
+  if (loading || !stats) {
+    return <SplashScreen />;
   }
 
   const statCards = [
@@ -123,7 +120,7 @@ export default function DashboardPage() {
             title="Hoạt động quay (7 ngày gần nhất)"
             data={activityData.length > 0 ? activityData : [0]}
             labels={activityLabels.length > 0 ? activityLabels : ['Hôm nay']}
-            color="#7C3AED"
+            color="#E53E3E"
           />
         </Col>
         <Col xs={24} lg={8}>

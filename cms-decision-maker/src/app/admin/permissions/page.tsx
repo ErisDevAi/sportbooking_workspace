@@ -77,7 +77,7 @@ export default function PermissionsPage() {
 
   const moduleColors: Record<string, string> = {
     users: 'blue',
-    roles: 'purple',
+    roles: 'red',
     permissions: 'magenta',
     categories: 'green',
     'wheel-contents': 'orange',

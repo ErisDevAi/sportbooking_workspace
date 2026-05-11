@@ -9,7 +9,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-purple-50 font-sans text-slate-900">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-red-50/30 font-sans text-slate-900">
       <Navbar />
       <main className="flex-grow">{children}</main>
       <Footer />
