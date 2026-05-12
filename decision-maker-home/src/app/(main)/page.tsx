@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ThunderboltOutlined,
@@ -19,9 +19,19 @@ import {
   ShareAltOutlined,
   SmileOutlined,
   CalendarOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
+import { Spin } from 'antd';
+import { useAuthStore } from '@/store/auth';
+import { categoriesApi } from '@/api/categories';
+import { wheelContentsApi } from '@/api/wheel-contents';
+import { spinHistoryApi } from '@/api/spin-histories';
+import { getCategoryIcon } from '@/utils/categoryIcons';
+import type { Category } from '@/types/category';
+import type { WheelContent } from '@/types/wheel-contents';
 
-const CATEGORIES = [
+// Fallback data when not logged in
+const FALLBACK_CATEGORIES = [
   {
     key: 'food',
     label: 'Ăn gì?',
@@ -76,21 +86,101 @@ const CATEGORIES = [
   },
 ];
 
+interface WheelCategory {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  items: { label: string; color: string; weight?: number }[];
+  _id?: string;
+}
+
 function DemoWheel() {
+  const token = useAuthStore((s) => s.token);
+  const [categories, setCategories] = useState<WheelCategory[]>(FALLBACK_CATEGORIES);
   const [activeCategory, setActiveCategory] = useState(0);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const currentItems = CATEGORIES[activeCategory].items;
+  // Fetch real data from API if logged in
+  useEffect(() => {
+    if (!token) return;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const catRes = await categoriesApi.getAll();
+        const apiCategories: Category[] = catRes.data.data;
+
+        if (apiCategories.length === 0) return;
+
+        // Fetch items for each category (max 6 categories)
+        const limitedCats = apiCategories.slice(0, 6);
+        const categoriesWithItems: WheelCategory[] = [];
+
+        for (const cat of limitedCats) {
+          try {
+            const itemRes = await wheelContentsApi.getForWheel(cat._id);
+            const apiItems: WheelContent[] = itemRes.data.data;
+            if (apiItems.length >= 2) {
+              categoriesWithItems.push({
+                key: cat._id,
+                label: cat.name,
+                icon: getCategoryIcon(cat.name, cat.slug),
+                items: apiItems.map((item) => ({
+                  label: item.label,
+                  color: item.color,
+                  weight: item.weight,
+                })),
+                _id: cat._id,
+              });
+            }
+          } catch {}
+        }
+
+        if (categoriesWithItems.length > 0) {
+          setCategories(categoriesWithItems);
+          setActiveCategory(0);
+        }
+      } catch {} finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [token]);
+
+  const currentItems = categories[activeCategory]?.items || [];
 
   const spin = () => {
-    if (spinning) return;
+    if (spinning || currentItems.length < 2) return;
     setSpinning(true);
     setResult(null);
-    const idx = Math.floor(Math.random() * currentItems.length);
-    const sliceAngle = 360 / currentItems.length;
-    const target = 360 - (idx * sliceAngle + sliceAngle / 2);
+
+    // Use weighted random if weights are available
+    const hasWeights = currentItems.some((item) => item.weight && item.weight > 0);
+    let idx: number;
+
+    if (hasWeights) {
+      const totalWeight = currentItems.reduce((sum, item) => sum + (item.weight || 1), 0);
+      let rand = Math.random() * totalWeight;
+      idx = 0;
+      for (let i = 0; i < currentItems.length; i++) {
+        rand -= (currentItems[i].weight || 1);
+        if (rand <= 0) { idx = i; break; }
+      }
+    } else {
+      idx = Math.floor(Math.random() * currentItems.length);
+    }
+
+    // Calculate target angle based on weights
+    const totalWeight = currentItems.reduce((sum, item) => sum + (item.weight || 1), 0);
+    let targetAngle = 0;
+    for (let i = 0; i < idx; i++) {
+      targetAngle += ((currentItems[i].weight || 1) / totalWeight) * 360;
+    }
+    targetAngle += (((currentItems[idx].weight || 1) / totalWeight) * 360) / 2;
+
+    const target = 360 - targetAngle;
     const newRotation = rotation + 360 * 5 + target;
     setRotation(newRotation);
     setTimeout(() => {
@@ -106,18 +196,33 @@ function DemoWheel() {
     setRotation(0);
   };
 
-  const gradient = currentItems
-    .map((item, i) => {
-      const angle = 360 / currentItems.length;
-      return `${item.color} ${i * angle}deg ${(i + 1) * angle}deg`;
-    })
-    .join(', ');
+  // Build gradient based on weights
+  const gradient = (() => {
+    if (currentItems.length === 0) return '#E53E3E';
+    const totalWeight = currentItems.reduce((sum, item) => sum + (item.weight || 1), 0);
+    const parts: string[] = [];
+    let current = 0;
+    currentItems.forEach((item) => {
+      const angle = ((item.weight || 1) / totalWeight) * 360;
+      parts.push(`${item.color} ${current}deg ${current + angle}deg`);
+      current += angle;
+    });
+    return parts.join(', ');
+  })();
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[400px]">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center">
       {/* Category tabs */}
       <div className="flex gap-2 mb-8 flex-wrap justify-center">
-        {CATEGORIES.map((cat, i) => (
+        {categories.map((cat, i) => (
           <button
             key={cat.key}
             onClick={() => handleCategoryChange(i)}
@@ -139,7 +244,9 @@ function DemoWheel() {
 
         {/* Tick marks */}
         {currentItems.map((_, i) => {
-          const angle = (360 / currentItems.length) * i;
+          const tw = currentItems.reduce((sum, c) => sum + (c.weight || 1), 0);
+          let angle = 0;
+          for (let j = 0; j < i; j++) angle += ((currentItems[j].weight || 1) / tw) * 360;
           return (
             <div
               key={i}
@@ -178,25 +285,30 @@ function DemoWheel() {
         >
           {/* Segment dividers */}
           {currentItems.map((_, i) => {
-            const angle = (360 / currentItems.length) * i;
+            const tw = currentItems.reduce((sum, c) => sum + (c.weight || 1), 0);
+            let sa = 0;
+            for (let j = 0; j < i; j++) sa += ((currentItems[j].weight || 1) / tw) * 360;
             return (
               <div
                 key={`div-${i}`}
                 className="absolute w-[1px] h-1/2 bg-white/25 left-1/2 top-0 origin-bottom"
-                style={{ transform: `translateX(-50%) rotate(${angle}deg)` }}
+                style={{ transform: `translateX(-50%) rotate(${sa}deg)` }}
               />
             );
           })}
 
           {/* Labels */}
-          {currentItems.map((item, i) => {
-            const angle = 360 / currentItems.length;
-            const mid = i * angle + angle / 2;
+          {currentItems.map((item, index) => {
+            const tw = currentItems.reduce((sum, c) => sum + (c.weight || 1), 0);
+            let sa = 0;
+            for (let i = 0; i < index; i++) sa += ((currentItems[i].weight || 1) / tw) * 360;
+            const sl = ((item.weight || 1) / tw) * 360;
+            const mid = sa + sl / 2;
             const rad = (mid * Math.PI) / 180;
             const radius = 95;
             return (
               <div
-                key={i}
+                key={index}
                 style={{
                   position: 'absolute',
                   left: '50%',
@@ -209,6 +321,9 @@ function DemoWheel() {
                   whiteSpace: 'nowrap',
                   pointerEvents: 'none',
                   letterSpacing: '0.02em',
+                  maxWidth: 85,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
                 {item.label}
@@ -219,7 +334,7 @@ function DemoWheel() {
           {/* Center button */}
           <button
             onClick={spin}
-            disabled={spinning}
+            disabled={spinning || currentItems.length < 2}
             className="absolute left-1/2 top-1/2 z-20 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-red-500 shadow-xl cursor-pointer hover:scale-110 transition-transform disabled:cursor-not-allowed border-0"
             style={{
               boxShadow:
@@ -330,8 +445,8 @@ export default function Home() {
       </section>
 
       {/* QUICK CTA CARDS */}
-      <section className="mx-auto max-w-5xl px-4 pb-20 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+      <section className="mx-auto max-w-6xl px-4 pb-20 relative z-10  ">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mx-auto  ">
           <Link href="/wheels">
             <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.02] cursor-pointer">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -348,6 +463,15 @@ export default function Home() {
               <h2 className="text-xl font-black">Hôm nay làm gì?</h2>
               <p className="text-slate-400 text-sm mt-1">Tìm hoạt động thú vị cho bạn</p>
               <ArrowRightOutlined className="mt-3 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </Link>
+          <Link href="/wheels">
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.02] cursor-pointer">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <StarOutlined className="text-3xl mb-3 opacity-90" />
+              <h2 className="text-xl font-black">Hôm nay chơi gì?</h2>
+              <p className="text-white/80 text-sm mt-1">Quay vòng quay tìm trò chơi ngay</p>
+              <ArrowRightOutlined className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </Link>
         </div>
@@ -504,7 +628,7 @@ export default function Home() {
                       <p className="text-sm font-bold text-slate-800">Anh quay được: <span className="text-red-500">Phở</span></p>
                       <p className="text-xs text-slate-400">2 phút trước</p>
                     </div>
-                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full">🔥 5 ngày</span>
+                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full flex items-center gap-1"><FireOutlined /> 5 ngày</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-500">B</div>
@@ -512,7 +636,7 @@ export default function Home() {
                       <p className="text-sm font-bold text-slate-800">Bình quay được: <span className="text-red-500">Đi gym</span></p>
                       <p className="text-xs text-slate-400">10 phút trước</p>
                     </div>
-                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full">🔥 12 ngày</span>
+                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full flex items-center gap-1"><FireOutlined /> 12 ngày</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100">
                     <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-black text-green-500">C</div>
@@ -520,7 +644,7 @@ export default function Home() {
                       <p className="text-sm font-bold text-slate-800">Chi quay được: <span className="text-red-500">Xem phim</span></p>
                       <p className="text-xs text-slate-400">30 phút trước</p>
                     </div>
-                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full">🔥 3 ngày</span>
+                    <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full flex items-center gap-1"><FireOutlined /> 3 ngày</span>
                   </div>
                 </div>
               </div>
@@ -558,7 +682,7 @@ export default function Home() {
       </section>
 
       {/* PERSONAS */}
-      <section className="py-24 bg-slate-900 relative overflow-hidden">
+      <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/5 rounded-full blur-3xl" />
@@ -567,8 +691,8 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-4 relative">
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-red-400 mb-3">Người dùng</span>
-            <h2 className="text-3xl sm:text-4xl font-black mb-4 text-white">Dành cho tất cả mọi người</h2>
-            <p className="text-slate-400 text-lg">Dù bạn là ai, Decision Maker đều hữu ích</p>
+            <h2 className="text-3xl sm:text-4xl font-black mb-4 text-slate-900">Dành cho tất cả mọi người</h2>
+            <p className="text-slate-600 text-lg">Dù bạn là ai, Decision Maker đều hữu ích</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -580,8 +704,8 @@ export default function Home() {
             ].map((item, i) => (
               <div key={i} className={`rounded-2xl bg-gradient-to-b ${item.gradient} border border-white/10 p-6 text-center hover:border-red-500/30 hover:scale-105 transition-all cursor-default`}>
                 <div className="text-3xl mb-4 text-red-400">{item.icon}</div>
-                <h3 className="font-bold text-white mb-1">{item.title}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>

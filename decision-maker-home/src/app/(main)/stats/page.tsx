@@ -28,6 +28,7 @@ import SplashScreen from '@/components/SplashScreen';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import type { Category } from '@/types/category';
 import type { UserStreak } from '@/types/user-streak';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1);
@@ -177,7 +178,9 @@ export default function StatsPage() {
                   Thành viên từ {new Date(user.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   <span className="text-slate-300 mx-1">|</span>
                   {(() => {
-                    const diff = Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+                    const created = new Date(user.createdAt).getTime();
+                    if (isNaN(created)) return '';
+                    const diff = Math.max(0, Math.floor((Date.now() - created) / (1000 * 60 * 60 * 24)));
                     if (diff === 0) return 'Hôm nay';
                     if (diff === 1) return '1 ngày trước';
                     return `${diff} ngày trước`;
@@ -196,7 +199,7 @@ export default function StatsPage() {
               >
                 {categories.map((cat) => (
                   <Select.Option key={cat._id} value={cat._id}>
-                    {cat.icon} {cat.name}
+                    {getCategoryIcon(cat.name, cat.slug)} {cat.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -229,9 +232,12 @@ export default function StatsPage() {
           <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 shadow-sm p-4 text-center col-span-2 sm:col-span-1">
             <UserOutlined className="text-rose-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-rose-500">
-              {user?.createdAt
-                ? Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24) + 1)
-                : 0}
+              {(() => {
+                if (!user?.createdAt) return 1;
+                const created = new Date(user.createdAt).getTime();
+                if (isNaN(created)) return 1;
+                return Math.max(1, Math.floor((Date.now() - created) / (1000 * 60 * 60 * 24)) + 1);
+              })()}
             </div>
             <div className="text-[11px] text-slate-500 mt-1 font-medium">Ngày tham gia</div>
           </div>
@@ -356,7 +362,7 @@ export default function StatsPage() {
                 <div key={streak.categoryId?._id || 'unknown'} className="flex items-center justify-between rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 hover:shadow-sm transition-shadow">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-lg shadow-sm">
-                      {streak.categoryId?.icon || '📁'}
+                      {getCategoryIcon(streak.categoryId?.name)}
                     </div>
                     <div>
                       <p className="font-bold text-slate-800 text-sm">{streak.categoryId?.name || 'Danh mục'}</p>
@@ -515,7 +521,7 @@ export default function StatsPage() {
                     <div key={h._id} className="flex items-center justify-between rounded-xl bg-green-50/40 border border-green-100 px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-sm">
-                          {cat?.icon || '🎯'}
+                          {getCategoryIcon(cat?.name)}
                         </div>
                         <div>
                           <p className="font-bold text-slate-800 text-sm">{h.selectedLabel}</p>
@@ -579,7 +585,7 @@ export default function StatsPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm ${h.isVerified ? 'bg-green-100' : 'bg-red-50'}`}>
-                          {cat?.icon || '🎯'}
+                          {getCategoryIcon(cat?.name)}
                         </div>
                         <div>
                           <p className="font-bold text-slate-800 text-sm">{h.selectedLabel}</p>

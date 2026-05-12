@@ -28,14 +28,17 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         const res = await authApi.login({ email, password });
         const { token, user } = res.data.data;
+        const u = user as any;
         set({
           token,
           user: {
-            _id: user._id, name: user.name, email: user.email,
-            role: user.role || 'viewer',
-            isActive: (user as any).isActive ?? true,
-            permissions: (user as any).permissions ?? [],
-            createdAt: (user as any).createdAt,
+            _id: u._id || u.id,
+            name: u.name,
+            email: u.email,
+            role: u.role || 'viewer',
+            isActive: u.isActive ?? true,
+            permissions: u.permissions ?? [],
+            createdAt: u.createdAt,
           },
         });
       },

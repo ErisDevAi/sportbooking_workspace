@@ -19,6 +19,7 @@ import type { Category } from '@/types/category';
 import type { WheelContent } from '@/types/wheel-contents';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import SplashScreen from '@/components/SplashScreen';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 const { Title, Text } = Typography;
 
@@ -395,7 +396,7 @@ function SpinPage() {
                 <Button size="small" icon={<PlusOutlined />} onClick={() => { catForm.resetFields(); setShowCatModal(true); }} className="!text-xs">Tạo mới</Button>
               </div>
               <Select placeholder="Chọn danh mục quyết định..." className="w-full" onChange={handleSelectCategory} size="large" value={selectedCategory || undefined}>
-                {categories.map((cat) => (<Select.Option key={cat._id} value={cat._id}>{cat.icon} {cat.name}</Select.Option>))}
+                {categories.map((cat) => (<Select.Option key={cat._id} value={cat._id}>{getCategoryIcon(cat.name, cat.slug)} {cat.name}</Select.Option>))}
               </Select>
             </div>
 
@@ -466,7 +467,7 @@ function SpinPage() {
           {/* RIGHT PANEL - Wheel */}
           <div className="flex flex-col items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm p-6">
             <p className="text-sm text-slate-400 mb-4 font-medium">
-              {selectedCategoryInfo ? `${selectedCategoryInfo.icon} ${selectedCategoryInfo.name}` : 'Bước 2: Nhấn QUAY'}
+              {selectedCategoryInfo ? <><span className="inline-flex mr-1">{getCategoryIcon(selectedCategoryInfo.name, selectedCategoryInfo.slug)}</span> {selectedCategoryInfo.name}</> : 'Bước 2: Nhấn QUAY'}
             </p>
             <div className="relative mb-8 h-[280px] w-[280px] sm:h-[340px] sm:w-[340px]">
               {/* Outer ring glow */}
@@ -665,7 +666,7 @@ function SpinPage() {
                       <div key={history._id} className={`group flex items-center justify-between rounded-xl border px-4 py-3.5 transition-all hover:shadow-sm ${isReviewed ? 'bg-green-50/40 border-green-100' : isVerified ? 'bg-blue-50/40 border-blue-100' : 'bg-white border-slate-100 hover:border-slate-200'}`}>
                         <div className="flex items-center gap-3 min-w-0">
                           <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0 ${isReviewed ? 'bg-green-100' : isVerified ? 'bg-blue-100' : 'bg-red-50'}`}>
-                            {cat?.icon || '🎯'}
+                            {getCategoryIcon(cat?.name, cat?.slug)}
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -743,7 +744,7 @@ function SpinPage() {
               {result.description && <Text type="secondary" className="text-sm">{result.description}</Text>}
               <div className="mt-3">
                 <span className="text-xs text-slate-400 bg-slate-100 rounded-full px-3 py-1">
-                  {selectedCategoryInfo?.icon} {selectedCategoryInfo?.name}
+                  {selectedCategoryInfo && getCategoryIcon(selectedCategoryInfo.name, selectedCategoryInfo.slug)} {selectedCategoryInfo?.name}
                 </span>
               </div>
             </div>
@@ -891,7 +892,6 @@ function SpinPage() {
       <Modal title="Tạo danh mục mới" open={showCatModal} onCancel={() => setShowCatModal(false)} onOk={() => catForm.submit()} confirmLoading={catSubmitting} okText="Tạo mới" cancelText="Hủy" centered width={420}>
         <Form form={catForm} layout="vertical" onFinish={handleCreateCategory} initialValues={{ isPublic: true, color: '#E53E3E' }} className="mt-4">
           <Form.Item name="name" label="Tên danh mục" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}><Input placeholder="Ví dụ: Ăn gì hôm nay" size="large" /></Form.Item>
-          <Form.Item name="icon" label="Biểu tượng (emoji)"><Input placeholder="Ví dụ: 🍔 🎯 📚" size="large" /></Form.Item>
           <Form.Item name="color" label="Màu sắc"><ColorPicker showText /></Form.Item>
           <Form.Item name="description" label="Mô tả"><Input.TextArea rows={2} placeholder="Mô tả ngắn gọn..." /></Form.Item>
         </Form>
