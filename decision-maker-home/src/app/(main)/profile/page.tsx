@@ -14,6 +14,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { spinHistoryApi } from '@/api/spin-histories';
 import SplashScreen from '@/components/SplashScreen';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 
 export default function ProfilePage() {
@@ -65,19 +66,19 @@ export default function ProfilePage() {
 
         {/* Overall Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 text-center">
-            <FireOutlined className="text-orange-500 text-xl mb-2" />
-            <div className="text-3xl font-black text-orange-500">{currentBest}</div>
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 text-center hover-lift animate-scale-in delay-100">
+            <FireOutlined className="text-orange-500 text-xl mb-2 animate-fire-pulse" />
+            <div className="text-3xl font-black text-orange-500 animate-count-up">{currentBest}</div>
             <div className="text-xs text-slate-400 mt-1">Streak hiện tại</div>
           </div>
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 text-center">
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 text-center hover-lift animate-scale-in delay-200">
             <TrophyOutlined className="text-yellow-500 text-xl mb-2" />
-            <div className="text-3xl font-black text-yellow-500">{bestStreak}</div>
+            <div className="text-3xl font-black text-yellow-500 animate-count-up">{bestStreak}</div>
             <div className="text-xs text-slate-400 mt-1">Kỷ lục cao nhất</div>
           </div>
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 text-center">
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 text-center hover-lift animate-scale-in delay-300">
             <ThunderboltOutlined className="text-green-500 text-xl mb-2" />
-            <div className="text-3xl font-black text-green-500">{totalSpins}</div>
+            <div className="text-3xl font-black text-green-500 animate-count-up">{totalSpins}</div>
             <div className="text-xs text-slate-400 mt-1">Tổng lượt quay</div>
           </div>
         </div>
@@ -92,7 +93,7 @@ export default function ProfilePage() {
               {streaks.map((streak) => (
                 <div key={streak.categoryId?._id || 'unknown'} className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center text-lg">{streak.categoryId?.icon || '📁'}</div>
+                    <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center text-lg">{getCategoryIcon(streak.categoryId?.name)}</div>
                     <div>
                       <p className="font-semibold text-slate-800 text-sm">{streak.categoryId?.name || 'Danh mục'}</p>
                       <p className="text-[11px] text-slate-400 flex items-center gap-1">

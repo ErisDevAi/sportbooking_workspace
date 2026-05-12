@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Table, Select, Tag, App, Empty, Avatar } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, PieChartOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { spinHistoryApi } from '@/api/spin-histories';
 import { categoriesApi } from '@/api/categories';
 import type { SpinHistory, SpinStats } from '@/types/spin-histories';
@@ -101,7 +101,7 @@ export default function SpinHistoriesPage() {
         return (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-base">
-              {cat?.icon || '🎯'}
+              <PieChartOutlined />
             </div>
             <div>
               <p className="font-semibold text-slate-800 text-sm">{record.selectedLabel}</p>
@@ -109,6 +109,22 @@ export default function SpinHistoriesPage() {
             </div>
           </div>
         );
+      },
+    },
+    {
+      title: 'Trạng thái',
+      key: 'status',
+      width: 110,
+      render: (_: any, record: any) => {
+        const status = record.status || (record.isVerified ? 'completed' : 'pending');
+        const map: Record<string, { color: string; label: string }> = {
+          pending: { color: 'orange', label: 'Chờ xử lý' },
+          completed: { color: 'green', label: 'Hoàn thành' },
+          skipped: { color: 'default', label: 'Bỏ qua' },
+          expired: { color: 'red', label: 'Hết hạn' },
+        };
+        const info = map[status] || map.pending;
+        return <Tag color={info.color} className="!font-bold !text-xs">{info.label}</Tag>;
       },
     },
     {
@@ -164,7 +180,7 @@ export default function SpinHistoriesPage() {
         >
           {categories.map((cat) => (
             <Select.Option key={cat._id} value={cat._id}>
-              {cat.icon} {cat.name}
+              <AppstoreOutlined /> {cat.name}
             </Select.Option>
           ))}
         </Select>

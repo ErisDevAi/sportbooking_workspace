@@ -3,11 +3,12 @@ import React, { useState, useEffect } from "react";
 import {
   Row, Col, Button, Modal, Form, Input, ColorPicker, Switch, Spin, Empty, App,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined, AppstoreOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
 import { categoriesApi } from "@/api/categories";
+import { getCategoryIcon } from "@/utils/categoryIcons";
 import type { Category } from "@/types/category";
 
 export default function CategoriesPage() {
@@ -35,7 +36,7 @@ export default function CategoriesPage() {
   const showEditModal = (item: Category, e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation();
     setEditingId(item._id);
-    form.setFieldsValue({ name: item.name, icon: item.icon, color: item.color, description: item.description, isPublic: item.isPublic });
+    form.setFieldsValue({ name: item.name, color: item.color, description: item.description, isPublic: item.isPublic });
     setIsModalOpen(true);
   };
 
@@ -87,7 +88,7 @@ export default function CategoriesPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {categories.length === 0 ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-4">📁</div>
+            <div className="text-6xl mb-4"><AppstoreOutlined className="text-slate-300" /></div>
             <h3 className="text-lg font-bold text-slate-700 mb-2">Chưa có danh mục nào</h3>
             <p className="text-slate-500 text-sm mb-6">Tạo danh mục đầu tiên để bắt đầu sử dụng vòng quay</p>
             <Button
@@ -105,11 +106,11 @@ export default function CategoriesPage() {
             {categories.map((item) => (
               <Col xs={24} sm={12} md={8} lg={6} key={item._id}>
                 <Link href={`/categories/${item._id}`} className="block">
-                  <div className="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 cursor-pointer">
+                  <div className="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer animate-scale-in">
                     <div className="h-1.5 rounded-t-2xl" style={{ backgroundColor: item.color }} />
                     <div className="p-5">
                       <div className="flex items-start justify-between mb-3">
-                        <span className="text-3xl">{item.icon || "📁"}</span>
+                        <span className="text-3xl">{getCategoryIcon(item.name, item.slug)}</span>
                         <span className="text-xs font-bold text-slate-400 bg-slate-50 rounded-full px-2.5 py-1">{item.choiceCount || 0} mục</span>
                       </div>
                       <h3 className="font-bold text-slate-800 text-base mb-1">{item.name}</h3>
@@ -155,7 +156,6 @@ export default function CategoriesPage() {
       >
         <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ isPublic: true, color: "#E53E3E" }} className="mt-4">
           <Form.Item name="name" label="Tên danh mục" rules={[{ required: true, message: "Vui lòng nhập tên" }]}><Input placeholder="Ví dụ: Ăn gì hôm nay" size="large" className="!rounded-lg" /></Form.Item>
-          <Form.Item name="icon" label="Biểu tượng (emoji)"><Input placeholder="Ví dụ: 🍔 🎯 📚" size="large" className="!rounded-lg" /></Form.Item>
           <Form.Item name="color" label="Màu sắc"><ColorPicker showText /></Form.Item>
           <Form.Item name="description" label="Mô tả"><Input.TextArea rows={3} placeholder="Mô tả ngắn gọn..." className="!rounded-lg" /></Form.Item>
           <Form.Item name="isPublic" label="Công khai cho mọi người" valuePropName="checked"><Switch /></Form.Item>

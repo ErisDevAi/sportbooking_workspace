@@ -18,6 +18,7 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { categoriesApi } from '@/api/categories';
 import type { Category } from '@/types/category';
@@ -57,7 +58,6 @@ export default function CategoriesPage() {
     setEditingItem(item);
     form.setFieldsValue({
       name: item.name,
-      icon: item.icon,
       color: item.color,
       description: item.description,
       isPublic: item.isPublic,
@@ -111,7 +111,7 @@ export default function CategoriesPage() {
             className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
             style={{ backgroundColor: `${record.color}15` }}
           >
-            {record.icon || '📁'}
+            <AppstoreOutlined />
           </div>
           <div>
             <p className="font-semibold text-slate-800">{record.name}</p>
@@ -226,9 +226,6 @@ export default function CategoriesPage() {
             rules={[{ required: true, message: 'Vui lòng nhập tên danh mục' }]}
           >
             <Input placeholder="Ví dụ: Ăn gì hôm nay" size="large" className="!rounded-lg" />
-          </Form.Item>
-          <Form.Item name="icon" label="Biểu tượng (emoji)">
-            <Input placeholder="Ví dụ: 🍔 🎯 📚" size="large" className="!rounded-lg" />
           </Form.Item>
           <Form.Item name="color" label="Màu đại diện">
             <ColorPicker showText />

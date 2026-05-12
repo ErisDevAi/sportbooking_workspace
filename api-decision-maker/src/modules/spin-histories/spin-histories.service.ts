@@ -322,7 +322,9 @@ export const spinHistoryService = {
     if (history.status !== "pending") {
       throw new AppError("Only pending decisions can be accepted", 400);
     }
-    // Keep status as pending — acceptance is implicit (user saw and accepted the result)
+    // Extend expiry by 24h from now (user acknowledged, give them time to complete)
+    history.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await history.save();
     return history;
   },
 

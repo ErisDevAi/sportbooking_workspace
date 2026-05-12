@@ -21,6 +21,7 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { wheelContentsApi } from '@/api/wheel-contents';
 import { categoriesApi } from '@/api/categories';
@@ -229,7 +230,7 @@ export default function WheelContentsPage() {
           >
             {categories.map((cat) => (
               <Select.Option key={cat._id} value={cat._id}>
-                {cat.icon} {cat.name}
+                <AppstoreOutlined /> {cat.name}
               </Select.Option>
             ))}
           </Select>
@@ -311,7 +312,7 @@ export default function WheelContentsPage() {
             <Select size="large">
               {categories.map((cat) => (
                 <Select.Option key={cat._id} value={cat._id}>
-                  {cat.icon} {cat.name}
+                  <AppstoreOutlined /> {cat.name}
                 </Select.Option>
               ))}
             </Select>

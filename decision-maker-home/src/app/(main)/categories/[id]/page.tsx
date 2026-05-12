@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Spin, Modal, Form, Input, InputNumber, ColorPicker, App } from "antd";
-import { ArrowLeftOutlined, PlusOutlined, PlayCircleOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, PlusOutlined, PlayCircleOutlined, EditOutlined, DeleteOutlined, SearchOutlined, AppstoreOutlined } from "@ant-design/icons";
 import SplashScreen from "@/components/SplashScreen";
 import { categoriesApi } from "@/api/categories";
 import { wheelContentsApi } from "@/api/wheel-contents";
+import { getCategoryIcon } from "@/utils/categoryIcons";
 import type { Category } from "@/types/category";
 import type { WheelContent } from "@/types/wheel-contents";
 
@@ -79,7 +80,7 @@ export default function CategoryDetailPage() {
   if (!loading && !category) {
     return (
       <div className="min-h-[60vh] flex flex-col justify-center items-center gap-4">
-        <div className="text-6xl">🔍</div>
+        <div className="text-6xl text-slate-300"><SearchOutlined /></div>
         <p className="text-slate-500 font-medium">Không tìm thấy danh mục</p>
         <Button onClick={() => router.push('/categories')} className="!rounded-full">Quay lại</Button>
       </div>
@@ -99,7 +100,7 @@ export default function CategoryDetailPage() {
             </button>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style={{ backgroundColor: category.color + '15' }}>
-                {category.icon || "📁"}
+                {getCategoryIcon(category.name, category.slug)}
               </div>
               <div>
                 <h1 className="text-lg font-black text-slate-800">{category.name}</h1>
@@ -136,7 +137,7 @@ export default function CategoryDetailPage() {
 
         {items.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">🎯</div>
+            <div className="text-6xl mb-4 text-slate-300"><AppstoreOutlined /></div>
             <h3 className="text-lg font-bold text-slate-700 mb-2">Chưa có lựa chọn nào</h3>
             <p className="text-slate-500 text-sm mb-6">Thêm ít nhất 2 lựa chọn để bắt đầu quay</p>
             <Button

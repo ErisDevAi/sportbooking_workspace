@@ -66,7 +66,7 @@ const API_GROUPS: EndpointGroup[] = [
     endpoints: [
       { method: 'GET', path: '/categories', label: 'Danh sách danh mục', auth: true },
       { method: 'GET', path: '/categories/{id}', label: 'Chi tiết danh mục', auth: true },
-      { method: 'POST', path: '/categories', label: 'Tạo danh mục', auth: true, body: '{\n  "name": "Test Category",\n  "icon": "🎯",\n  "color": "#E53E3E",\n  "description": "Mô tả",\n  "isPublic": true\n}' },
+      { method: 'POST', path: '/categories', label: 'Tạo danh mục', auth: true, body: '{\n  "name": "Test Category",\n  "color": "#E53E3E",\n  "description": "Mô tả",\n  "isPublic": true\n}' },
       { method: 'PUT', path: '/categories/{id}', label: 'Cập nhật danh mục', auth: true, body: '{\n  "name": "Updated Category"\n}' },
       { method: 'DELETE', path: '/categories/{id}', label: 'Xóa danh mục', auth: true },
     ],

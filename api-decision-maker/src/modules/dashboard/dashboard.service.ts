@@ -1,25 +1,36 @@
 /**
  * modules/dashboard/dashboard.service.ts
  *
- * Aggregates real counts from the DB + generates mock analytics data.
- * Replace the mock section with real aggregation pipelines as the app grows.
+ * Aggregates real counts from the DB for admin dashboard.
  */
 
 import { User } from "../users/user.model";
 import { Role } from "../roles/role.model";
 import { Permission } from "../permissions/permission.model";
 import { Category } from "../categories/category.model";
+import { WheelContent } from "../wheel-contents/wheel-content.model";
 import { SpinHistory } from "../spin-histories/spin-histories.model";
+import { UserStreak } from "../user-streaks/user-streak.model";
+import { Backup } from "../backup/backup.model";
 
 export const dashboardService = {
   async getStats() {
-    const [totalUsers, activeUsers, totalRoles, totalPermissions, totalCategories, totalSpins] = await Promise.all([
+    const [
+      totalUsers, activeUsers, totalRoles, totalPermissions,
+      totalCategories, totalSpins, totalWheelContents, totalBackups,
+      totalStreaks, completedDecisions, pendingDecisions,
+    ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ isActive: true }),
       Role.countDocuments(),
       Permission.countDocuments(),
       Category.countDocuments(),
       SpinHistory.countDocuments(),
+      WheelContent.countDocuments(),
+      Backup.countDocuments(),
+      UserStreak.countDocuments(),
+      SpinHistory.countDocuments({ status: "completed" }),
+      SpinHistory.countDocuments({ status: "pending" }),
     ]);
 
     // Users by role
@@ -52,10 +63,35 @@ export const dashboardService = {
       return { date: dateStr, spins: found ? found.count : 0 };
     });
 
+    // Top streaks
+    const topStreaks = await UserStreak.find()
+      .populate("userId", "name email")
+      .sort({ longestStreak: -1 })
+      .limit(5);
+
     return {
-      totals: { users: totalUsers, activeUsers, roles: totalRoles, permissions: totalPermissions, categories: totalCategories, spins: totalSpins },
+      totals: {
+        users: totalUsers,
+        activeUsers,
+        roles: totalRoles,
+        permissions: totalPermissions,
+        categories: totalCategories,
+        spins: totalSpins,
+        wheelContents: totalWheelContents,
+        backups: totalBackups,
+        streaks: totalStreaks,
+        completedDecisions,
+        pendingDecisions,
+      },
       usersByRole: byRole.map((r) => ({ role: r._id as string, count: r.count as number })),
       activity,
+      topStreaks: topStreaks.map((s) => ({
+        user: s.userId,
+        currentStreak: s.currentStreak,
+        longestStreak: s.longestStreak,
+        level: s.level,
+        totalCheckins: s.totalCheckins,
+      })),
       system: {
         status: "healthy",
         version: "1.0.0",
