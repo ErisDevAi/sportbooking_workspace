@@ -151,11 +151,11 @@ export default function CategoryDetailPage() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 list-stagger">
             {items.map((item) => (
               <div
                 key={item._id}
-                className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all"
+                className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-5 h-5 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: item.color }} />

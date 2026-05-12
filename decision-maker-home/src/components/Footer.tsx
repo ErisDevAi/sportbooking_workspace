@@ -30,7 +30,7 @@ export default function Footer() {
             <div className="flex gap-3">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 rounded-full bg-red-500 hover:bg-red-600 px-5 py-2 text-sm font-bold text-white transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-red-500 hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-0.5 px-5 py-2 text-sm font-bold text-white transition-all duration-300"
               >
                 Bắt đầu miễn phí
               </Link>
@@ -71,7 +71,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Decision Maker. HUMG — Trường Đại học Mỏ - Địa chất Hà Nội.
           </p>
           <p className="text-xs text-slate-600">
-            Made with <span className="text-red-400">&#9829;</span> by HUMG Students
+            Made with <span className="text-red-400 animate-heartbeat">&#9829;</span> by HUMG Students
           </p>
         </div>
       </div>

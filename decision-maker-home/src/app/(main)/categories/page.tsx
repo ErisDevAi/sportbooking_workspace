@@ -102,7 +102,7 @@ export default function CategoriesPage() {
             </Button>
           </div>
         ) : (
-          <Row gutter={[20, 20]}>
+          <Row gutter={[20, 20]} className="grid-stagger">
             {categories.map((item) => (
               <Col xs={24} sm={12} md={8} lg={6} key={item._id}>
                 <Link href={`/categories/${item._id}`} className="block">

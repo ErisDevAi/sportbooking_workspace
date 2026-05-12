@@ -46,12 +46,12 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-red-50/30 px-4 relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute top-20 left-20 w-72 h-72 bg-red-100 rounded-full blur-3xl opacity-30" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-orange-100 rounded-full blur-3xl opacity-20" />
+      <div className="absolute top-20 left-20 w-72 h-72 bg-red-100 rounded-full blur-3xl opacity-30 blob-animate-2" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-orange-100 rounded-full blur-3xl opacity-20 blob-animate-1" />
 
-      <div className="w-full max-w-md relative">
+      <div className="w-full max-w-md relative animate-slide-up">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 animate-fade-in">
           <Link href="/" className="inline-flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-200/50">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -71,7 +71,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 animate-scale-in delay-200">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-slate-800">Tạo tài khoản mới</h1>
             <p className="text-slate-500 mt-1 text-sm">Miễn phí, không giới hạn lượt quay</p>

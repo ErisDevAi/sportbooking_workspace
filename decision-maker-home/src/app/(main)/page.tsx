@@ -373,9 +373,9 @@ export default function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-red-100 rounded-full blur-3xl opacity-40" />
-          <div className="absolute top-40 right-10 w-96 h-96 bg-orange-100 rounded-full blur-3xl opacity-30" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-red-50 rounded-full blur-3xl opacity-50" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-red-100 rounded-full blur-3xl opacity-40 blob-animate-1" />
+          <div className="absolute top-40 right-10 w-96 h-96 bg-orange-100 rounded-full blur-3xl opacity-30 blob-animate-2" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-red-50 rounded-full blur-3xl opacity-50 blob-animate-1" />
         </div>
 
         <div className="mx-auto max-w-6xl px-4 pt-20 pb-24">

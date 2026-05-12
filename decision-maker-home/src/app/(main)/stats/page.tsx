@@ -244,7 +244,7 @@ export default function StatsPage() {
         </div>
 
         {/* Calendar */}
-        <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8">
+        <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8 animate-slide-up delay-300">
           {/* Calendar header */}
           <div className="flex items-center justify-between mb-5">
             <button type="button" onClick={prevMonth} className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors text-lg font-bold">
@@ -353,13 +353,13 @@ export default function StatsPage() {
 
         {/* Streak by category */}
         {filteredStreaks.length > 0 ? (
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8">
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8 animate-slide-up delay-400">
             <h2 className="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
-              <FireOutlined className="text-orange-500" /> Streak theo danh mục
+              <FireOutlined className="text-orange-500 animate-fire-pulse" /> Streak theo danh mục
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-3 list-stagger">
               {filteredStreaks.map((streak) => (
-                <div key={streak.categoryId?._id || 'unknown'} className="flex items-center justify-between rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 hover:shadow-sm transition-shadow">
+                <div key={streak.categoryId?._id || 'unknown'} className="flex items-center justify-between rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-lg shadow-sm">
                       {getCategoryIcon(streak.categoryId?.name)}
@@ -426,7 +426,7 @@ export default function StatsPage() {
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2.5">
                   <div
-                    className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full transition-all"
+                    className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full progress-fill"
                     style={{ width: `${Math.min(100, (myStreak.currentStreak / Math.max(1, [3, 7, 14, 30, 60, 100, 200][myStreak.level - 1])) * 100)}%` }}
                   />
                 </div>
@@ -454,11 +454,11 @@ export default function StatsPage() {
 
         {/* Leaderboard */}
         {leaderboard.length > 0 && (
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8">
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8 animate-slide-up delay-500">
             <h2 className="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
               <TrophyOutlined className="text-yellow-500" /> Bảng xếp hạng
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-2 list-stagger">
               {leaderboard.map((entry, index) => {
                 const entryUser = typeof entry.userId === 'object' ? entry.userId : null;
                 const isMe = entryUser && user && entryUser._id === user._id;

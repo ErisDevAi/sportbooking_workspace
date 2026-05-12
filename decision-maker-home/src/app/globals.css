@@ -47,7 +47,9 @@ html {
   color: #9B2C2C;
 }
 
-/* Splash screen animations */
+/* ═══════════════════════════════════════════
+   SPLASH SCREEN ANIMATIONS
+   ═══════════════════════════════════════════ */
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -71,7 +73,9 @@ html {
   animation: loading-bar 2s ease-in-out infinite;
 }
 
-/* Staggered animation delays */
+/* ═══════════════════════════════════════════
+   STAGGERED ANIMATION DELAYS
+   ═══════════════════════════════════════════ */
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
@@ -81,11 +85,9 @@ html {
 .delay-700 { animation-delay: 700ms; }
 .delay-800 { animation-delay: 800ms; }
 
-/* Confetti burst animation */
-@keyframes confetti-fall {
-  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
+/* ═══════════════════════════════════════════
+   SPECIAL EFFECTS
+   ═══════════════════════════════════════════ */
 
 /* Streak fire pulse */
 @keyframes fire-pulse {
@@ -108,20 +110,281 @@ html {
 
 /* Card hover lift */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0,0,0,0.08);
 }
 
-/* Smooth page transitions */
-.page-enter {
-  opacity: 0;
-  transform: translateY(12px);
+/* ═══════════════════════════════════════════
+   FORM INPUT ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Ant Design Input focus glow */
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused,
+.ant-input-number-focused,
+.ant-select-focused .ant-select-selector {
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.12) !important;
+  border-color: #E53E3E !important;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
-.page-enter-active {
+
+.ant-input,
+.ant-input-number,
+.ant-input-affix-wrapper,
+.ant-select-selector {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease !important;
+}
+
+/* Input error shake */
+@keyframes input-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-input-affix-wrapper {
+  animation: input-shake 0.4s ease;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTON ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Button press feedback */
+.ant-btn:active:not(:disabled) {
+  transform: scale(0.97) !important;
+  transition: transform 0.1s ease !important;
+}
+
+/* Primary button hover glow */
+.ant-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(229, 62, 62, 0.35) !important;
+  transform: translateY(-1px);
+  transition: all 0.25s ease !important;
+}
+
+/* ═══════════════════════════════════════════
+   MODAL ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Override Ant Design modal to add entrance */
+.ant-modal {
+  animation: modal-entrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+@keyframes modal-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ant-modal-mask {
+  animation: fade-in-mask 0.25s ease !important;
+}
+
+@keyframes fade-in-mask {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════
+   NAVBAR ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Navbar blur on scroll (applied via JS class) */
+.navbar-scrolled {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+/* Nav link underline animation */
+.nav-link-animated {
+  position: relative;
+}
+.nav-link-animated::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #E53E3E;
+  border-radius: 1px;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.nav-link-animated:hover::after,
+.nav-link-animated.active::after {
+  width: 100%;
+  left: 0;
+}
+
+/* ═══════════════════════════════════════════
+   LIST & GRID ITEM ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+/* Staggered list entrance */
+.list-stagger > * {
+  opacity: 0;
+  animation: slide-up 0.4s ease-out forwards;
+}
+.list-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.list-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.list-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.list-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.list-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.list-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.list-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.list-stagger > *:nth-child(8) { animation-delay: 350ms; }
+.list-stagger > *:nth-child(9) { animation-delay: 400ms; }
+.list-stagger > *:nth-child(10) { animation-delay: 450ms; }
+.list-stagger > *:nth-child(n+11) { animation-delay: 500ms; }
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid stagger - for card grids */
+.grid-stagger > * {
+  opacity: 0;
+  animation: scale-in-grid 0.4s ease-out forwards;
+}
+.grid-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.grid-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.grid-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.grid-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.grid-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.grid-stagger > *:nth-child(6) { animation-delay: 400ms; }
+.grid-stagger > *:nth-child(n+7) { animation-delay: 480ms; }
+
+@keyframes scale-in-grid {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ═══════════════════════════════════════════
+   PROGRESS BAR FILL ANIMATION
+   ═══════════════════════════════════════════ */
+.progress-fill {
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ═══════════════════════════════════════════
+   FLOATING BACKGROUND BLOBS
+   ═══════════════════════════════════════════ */
+@keyframes blob-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -30px) scale(1.05); }
+  50% { transform: translate(-10px, 15px) scale(0.95); }
+  75% { transform: translate(15px, 10px) scale(1.02); }
+}
+@keyframes blob-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-15px, 20px) scale(1.03); }
+  50% { transform: translate(25px, -10px) scale(0.97); }
+  75% { transform: translate(-20px, -15px) scale(1.05); }
+}
+.blob-animate-1 {
+  animation: blob-float-1 8s ease-in-out infinite;
+}
+.blob-animate-2 {
+  animation: blob-float-2 10s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════
+   PAGE TRANSITION
+   ═══════════════════════════════════════════ */
+.page-transition {
+  animation: page-fade-in 0.4s ease-out;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   HEART BEAT (for footer)
+   ═══════════════════════════════════════════ */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); }
+  60% { transform: scale(1); }
+}
+.animate-heartbeat {
+  animation: heartbeat 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ═══════════════════════════════════════════
+   RATING STARS ANIMATION
+   ═══════════════════════════════════════════ */
+.ant-rate-star {
+  transition: transform 0.2s ease !important;
+}
+.ant-rate-star:hover {
+  transform: scale(1.3) !important;
+}
+
+/* ═══════════════════════════════════════════
+   TOOLTIP / TAG ANIMATIONS
+   ═══════════════════════════════════════════ */
+.ant-tag {
+  transition: all 0.2s ease !important;
+}
+.ant-tag:hover {
+  transform: scale(1.05);
+}
+
+/* ═══════════════════════════════════════════
+   TABLE ROW ANIMATIONS
+   ═══════════════════════════════════════════ */
+.ant-table-tbody > tr {
+  transition: background-color 0.2s ease, transform 0.2s ease !important;
+}
+.ant-table-tbody > tr:hover {
+  transform: scale(1.005);
+}
+
+/* ═══════════════════════════════════════════
+   CONFETTI BURST
+   ═══════════════════════════════════════════ */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════
+   SMOOTH SECTION REVEAL (for about/marketing)
+   ═══════════════════════════════════════════ */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-section.visible {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.4s ease, transform 0.4s ease;
 }

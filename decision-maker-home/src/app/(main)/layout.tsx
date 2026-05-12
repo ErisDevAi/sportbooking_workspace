@@ -11,7 +11,7 @@ export default function MainLayout({
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-red-50/30 font-sans text-slate-900">
       <Navbar />
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow page-transition">{children}</main>
       <Footer />
     </div>
   );

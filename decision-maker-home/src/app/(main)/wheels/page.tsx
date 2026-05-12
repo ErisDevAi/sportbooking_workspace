@@ -411,7 +411,7 @@ function SpinPage() {
               </div>
               {loadingItems ? (<div className="flex justify-center py-8"><Spin /></div>)
                 : items.length === 0 ? (<div className="text-center py-8 text-slate-400"><p className="text-sm">{selectedCategory ? 'Danh mục này chưa có lựa chọn' : 'Vui lòng chọn danh mục'}</p></div>)
-                : (<div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                : (<div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 list-stagger">
                   {items.map((item) => (
                     <div key={item._id} className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-4 py-3 hover:bg-red-50/30 transition-colors">
                       <div className="flex items-center gap-3">
@@ -656,7 +656,7 @@ function SpinPage() {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 list-stagger">
                   {filteredHistories.map((history) => {
                     const cat = categories.find((c) => c._id === history.categoryId);
                     const isReviewed = isItemReviewed(history);

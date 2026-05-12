@@ -56,8 +56,8 @@ export default function ProfilePage() {
     <div className="px-4 py-6 text-slate-900">
       <div className="max-w-3xl mx-auto">
         {/* Profile Header */}
-        <div className="text-center mb-10">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-3xl font-black text-white mx-auto mb-4 shadow-lg shadow-red-200/50">
+        <div className="text-center mb-10 animate-slide-up">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-3xl font-black text-white mx-auto mb-4 shadow-lg shadow-red-200/50 animate-bounce-in">
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <h1 className="text-2xl font-black text-slate-800">{user?.name || 'Người dùng'}</h1>
@@ -85,11 +85,11 @@ export default function ProfilePage() {
 
         {/* Streaks by Category */}
         {streaks.length > 0 && (
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8">
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8 animate-slide-up delay-300">
             <h2 className="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
-              <FireOutlined className="text-orange-500" /> Streak theo danh mục
+              <FireOutlined className="text-orange-500 animate-fire-pulse" /> Streak theo danh mục
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-3 list-stagger">
               {streaks.map((streak) => (
                 <div key={streak.categoryId?._id || 'unknown'} className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
                   <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export default function ProfilePage() {
         )}
 
         {/* Recent History */}
-        <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5">
+        <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 animate-slide-up delay-400">
           <h2 className="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
             <ClockCircleOutlined className="text-red-400" /> Lịch sử quay gần đây
           </h2>
@@ -124,7 +124,7 @@ export default function ProfilePage() {
               <Link href="/wheels" className="text-red-500 text-sm hover:text-red-600 mt-2 inline-flex items-center gap-1">Quay ngay <RightOutlined className="text-[10px]" /></Link>
             </div>
           ) : (
-            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 list-stagger">
               {histories.map((h) => (
                 <div key={h._id} className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 px-4 py-3">
                   <div className="flex items-center gap-3">
