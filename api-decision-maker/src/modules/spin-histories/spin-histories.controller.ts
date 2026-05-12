@@ -13,11 +13,11 @@ export const spinHistoryController = {
    */
   async smartSpin(req: Request, res: Response, next: NextFunction) {
     try {
-      const { categoryId } = req.body;
+      const { categoryId, question } = req.body;
       if (!categoryId) {
         return respond.fail(res, "categoryId is required", 400);
       }
-      const result = await spinHistoryService.smartSpin(categoryId, req.user!.userId);
+      const result = await spinHistoryService.smartSpin(categoryId, req.user!.userId, question);
       respond.created(res, result, "Smart spin completed");
     } catch (e) {
       next(e);
@@ -44,6 +44,7 @@ export const spinHistoryController = {
     try {
       const { skip, limit, page, buildMeta } = parsePagination(req.query);
       const categoryId = req.query.categoryId as string | undefined;
+      const status = req.query.status as string | undefined;
       const isAdmin = req.user!.role === "admin";
       const showAll = req.query.all === "true" && isAdmin;
       const { items, meta } = await spinHistoryService.getHistory(
@@ -51,7 +52,8 @@ export const spinHistoryController = {
         skip,
         limit,
         page,
-        categoryId
+        categoryId,
+        status
       );
       respond.ok(res, items, "Spin history fetched", buildMeta(meta.total));
     } catch (e) {
@@ -73,13 +75,53 @@ export const spinHistoryController = {
   },
 
   /**
+   * GET /spin-history/today — get today's pending decisions
+   */
+  async getTodayDecisions(req: Request, res: Response, next: NextFunction) {
+    try {
+      const decisions = await spinHistoryService.getTodayDecisions(req.user!.userId);
+      respond.ok(res, decisions, "Today's decisions fetched");
+    } catch (e) {
+      next(e);
+    }
+  },
+
+  /**
+   * PUT /spin-history/:id/accept — accept a decision result
+   */
+  async acceptDecision(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await spinHistoryService.acceptDecision(req.params.id, req.user!.userId);
+      respond.ok(res, result, "Decision accepted");
+    } catch (e) {
+      next(e);
+    }
+  },
+
+  /**
+   * PUT /spin-history/:id/skip — skip a decision result
+   */
+  async skipDecision(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await spinHistoryService.skipDecision(req.params.id, req.user!.userId);
+      respond.ok(res, result, "Decision skipped");
+    } catch (e) {
+      next(e);
+    }
+  },
+
+  /**
    * PATCH /spin-history/:id/verify — verify and review a spin result
    */
   async verifyAndReview(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const { rating, reviewNote } = req.body;
-      const result = await spinHistoryService.verifyAndReview(id, req.user!.userId, { rating, reviewNote });
+      const { rating, reviewNote, checkinImageUrl } = req.body;
+      const result = await spinHistoryService.verifyAndReview(id, req.user!.userId, {
+        rating,
+        reviewNote,
+        checkinImageUrl,
+      });
       respond.ok(res, result, "Review saved successfully");
     } catch (e) {
       next(e);

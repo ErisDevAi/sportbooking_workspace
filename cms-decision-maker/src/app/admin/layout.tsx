@@ -11,6 +11,7 @@ import {
   SafetyCertificateOutlined,
   KeyOutlined,
   ApiOutlined,
+  CloudServerOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
@@ -31,6 +32,7 @@ const menuItems = [
   { key: '/admin/categories', icon: <AppstoreOutlined />, label: 'Danh mục' },
   { key: '/admin/wheel-contents', icon: <PieChartOutlined />, label: 'Nội dung vòng quay' },
   { key: '/admin/spin-histories', icon: <HistoryOutlined />, label: 'Lịch sử quay' },
+  { key: '/admin/backup', icon: <CloudServerOutlined />, label: 'Sao lưu' },
   { type: 'divider' as const },
   { key: '/admin/api-docs', icon: <ApiOutlined />, label: 'API Docs' },
 ];

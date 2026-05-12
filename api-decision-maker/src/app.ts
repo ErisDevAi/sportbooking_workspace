@@ -34,6 +34,8 @@ import dashboardRoutes      from "./modules/dashboard/dashboard.route";
 import categoryRoutes       from "./modules/categories/category.route";
 import wheelContentRoutes   from "./modules/wheel-contents/wheel-content.route";
 import spinHistoryRoutes    from "./modules/spin-histories/spin-histories.route";
+import userStreakRoutes     from "./modules/user-streaks/user-streak.route";
+import backupRoutes        from "./modules/backup/backup.route";
 
 const app = express();
 
@@ -79,6 +81,8 @@ app.use("/dashboard",   dashboardRoutes);
 app.use("/categories",      categoryRoutes);
 app.use("/wheel-contents",  wheelContentRoutes);
 app.use("/spin-history",    spinHistoryRoutes);
+app.use("/streaks",         userStreakRoutes);
+app.use("/backup",          backupRoutes);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {
@@ -106,6 +110,9 @@ async function start() {
     logger.info("  GET    /categories      POST /categories   PUT /categories/:id   DELETE /categories/:id");
     logger.info("  GET    /wheel-contents  POST /wheel-contents PUT /wheel-contents/:id DELETE /wheel-contents/:id");
     logger.info("  POST   /spin-history    GET /spin-history   GET /spin-history/streak  GET /spin-history/stats/:categoryId");
+    logger.info("  GET    /spin-history/today  PUT /spin-history/:id/accept  PUT /spin-history/:id/skip");
+    logger.info("  GET    /streaks/me     GET /streaks/leaderboard");
+    logger.info("  POST   /backup/create  GET /backup/list   POST /backup/restore/:id  DELETE /backup/:id");
   });
 }
 

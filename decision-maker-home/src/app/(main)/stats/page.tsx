@@ -22,10 +22,12 @@ import {
 import { useAuthStore } from '@/store/auth';
 import { spinHistoryApi } from '@/api/spin-histories';
 import { categoriesApi } from '@/api/categories';
-import { UserOutlined } from '@ant-design/icons';
+import { userStreakApi } from '@/api/user-streaks';
+import { UserOutlined, CrownOutlined } from '@ant-design/icons';
 import SplashScreen from '@/components/SplashScreen';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import type { Category } from '@/types/category';
+import type { UserStreak } from '@/types/user-streak';
 
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1);
@@ -54,6 +56,8 @@ export default function StatsPage() {
   const [streaks, setStreaks] = useState<Streak[]>([]);
   const [histories, setHistories] = useState<SpinHistory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [myStreak, setMyStreak] = useState<UserStreak | null>(null);
+  const [leaderboard, setLeaderboard] = useState<UserStreak[]>([]);
 
   // Calendar
   const now = new Date();
@@ -73,14 +77,18 @@ export default function StatsPage() {
     if (!token) return;
     const fetchInitial = async () => {
       try {
-        const [catRes, streakRes, historyRes] = await Promise.all([
+        const [catRes, streakRes, historyRes, myStreakRes, leaderboardRes] = await Promise.all([
           categoriesApi.getAll(),
           spinHistoryApi.getStreak().catch(() => ({ data: { data: [] } })),
           spinHistoryApi.getAll({ limit: 200 }).catch(() => ({ data: { data: [] } })),
+          userStreakApi.getMyStreak().catch(() => ({ data: { data: null } })),
+          userStreakApi.getLeaderboard({ limit: 10 }).catch(() => ({ data: { data: [] } })),
         ]);
         setCategories(catRes.data.data);
         setStreaks(streakRes.data.data);
         setHistories(historyRes.data.data);
+        if (myStreakRes.data.data) setMyStreak(myStreakRes.data.data);
+        setLeaderboard(leaderboardRes.data.data);
       } catch {
         message.error('Không thể tải dữ liệu');
       } finally {
@@ -386,6 +394,108 @@ export default function StatsPage() {
             <SmileOutlined className="text-4xl text-slate-200 mb-3" />
             <p className="font-bold text-slate-700">Chưa có dữ liệu streak</p>
             <p className="text-sm text-slate-400 mt-1">Quay vòng quay và xác nhận hoàn thành để bắt đầu xây dựng streak!</p>
+          </div>
+        )}
+
+        {/* Level & Badges */}
+        {myStreak && (
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8">
+            <h2 className="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
+              <CrownOutlined className="text-purple-500" /> Level & Huy hiệu
+            </h2>
+            <div className="flex items-center gap-6 mb-4">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-2xl font-black text-white shadow-lg shadow-purple-200/50">
+                  {myStreak.level}
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5 font-medium">Level</p>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 text-sm text-slate-600 mb-2">
+                  <span><strong>{myStreak.totalDecisions}</strong> quyết định</span>
+                  <span className="text-slate-300">|</span>
+                  <span><strong>{myStreak.totalCheckins}</strong> check-in</span>
+                  <span className="text-slate-300">|</span>
+                  <span>Streak: <strong className="text-orange-500">{myStreak.currentStreak}</strong> / <strong className="text-yellow-500">{myStreak.longestStreak}</strong></span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2.5">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full transition-all"
+                    style={{ width: `${Math.min(100, (myStreak.currentStreak / Math.max(1, [3, 7, 14, 30, 60, 100, 200][myStreak.level - 1])) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+            {myStreak.badges.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {myStreak.badges.map((badge) => (
+                  <div
+                    key={badge.slug}
+                    className="flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-100 rounded-full px-3 py-1.5"
+                    title={`Đạt được: ${new Date(badge.earnedAt).toLocaleDateString('vi-VN')}`}
+                  >
+                    <span className="text-sm">{badge.icon}</span>
+                    <span className="text-xs font-bold text-amber-700">{badge.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {myStreak.badges.length === 0 && (
+              <p className="text-sm text-slate-400">Chưa có huy hiệu nào. Hãy tiếp tục quay và check-in!</p>
+            )}
+          </div>
+        )}
+
+        {/* Leaderboard */}
+        {leaderboard.length > 0 && (
+          <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8">
+            <h2 className="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
+              <TrophyOutlined className="text-yellow-500" /> Bảng xếp hạng
+            </h2>
+            <div className="space-y-2">
+              {leaderboard.map((entry, index) => {
+                const entryUser = typeof entry.userId === 'object' ? entry.userId : null;
+                const isMe = entryUser && user && entryUser._id === user._id;
+                const rankColors = ['from-yellow-400 to-amber-500', 'from-slate-300 to-slate-400', 'from-amber-600 to-amber-700'];
+                return (
+                  <div
+                    key={entry._id}
+                    className={`flex items-center justify-between rounded-xl px-4 py-3 transition-shadow ${
+                      isMe
+                        ? 'bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 shadow-sm'
+                        : 'bg-slate-50 border border-slate-100 hover:shadow-sm'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-white ${
+                        index < 3
+                          ? `bg-gradient-to-br ${rankColors[index]}`
+                          : 'bg-slate-300'
+                      }`}>
+                        {index + 1}
+                      </div>
+                      <div>
+                        <p className={`font-bold text-sm ${isMe ? 'text-red-600' : 'text-slate-800'}`}>
+                          {entryUser?.name || 'User'}
+                          {isMe && <span className="text-xs text-red-400 ml-1.5">(bạn)</span>}
+                        </p>
+                        <p className="text-[11px] text-slate-400">Level {entry.level}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-center">
+                      <div>
+                        <div className="text-sm font-black text-yellow-500">{entry.longestStreak}</div>
+                        <div className="text-[10px] text-slate-400">Kỷ lục</div>
+                      </div>
+                      <div>
+                        <div className="text-sm font-black text-emerald-500">{entry.totalCheckins}</div>
+                        <div className="text-[10px] text-slate-400">Check-in</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

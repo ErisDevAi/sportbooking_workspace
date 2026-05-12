@@ -1,12 +1,17 @@
 /**
  * modules/spin-histories/spin-histories.service.ts
  *
- * Business logic for spin results and streak tracking.
+ * Business logic for spin results, decision flow, and streak tracking.
  *
  * Streak logic:
- *   - A streak increments when a user spins on consecutive days (for same category).
+ *   - A streak increments when a user verifies on consecutive days (for same category).
  *   - If a day is missed, the streak resets to 1.
  *   - maxStreak records the highest streak achieved.
+ *
+ * Decision flow:
+ *   - Spin creates a decision with status "pending" and 24h expiry.
+ *   - User can accept (keep pending), skip (status "skipped"), or verify/check-in (status "completed").
+ *   - Expired decisions are batch-updated via expireOldDecisions().
  */
 
 import mongoose from "mongoose";
@@ -14,6 +19,7 @@ import { SpinHistory, ISpinHistory, StreakTracker, IStreakTracker } from "./spin
 import { WheelContent } from "../wheel-contents/wheel-content.model";
 import { AppError } from "../../middlewares/error.middleware";
 import { PaginationMeta } from "../../common/pagination";
+import { userStreakService } from "../user-streaks/user-streak.service";
 
 export interface SpinHistoryPage {
   items: ISpinHistory[];
@@ -23,6 +29,7 @@ export interface SpinHistoryPage {
 export interface SpinResultDto {
   categoryId: string;
   selectedContentId: string;
+  question?: string;
 }
 
 /**
@@ -102,19 +109,29 @@ export const spinHistoryService = {
    * Smart spin: use smartRandom algorithm to pick a choice,
    * then record the result and update streak.
    */
-  async smartSpin(categoryId: string, userId: string): Promise<{ history: ISpinHistory; streak: IStreakTracker; selected: any }> {
+  async smartSpin(
+    categoryId: string,
+    userId: string,
+    question?: string
+  ): Promise<{ history: ISpinHistory; streak: IStreakTracker; selected: any }> {
     const selected = await smartRandom(categoryId);
     const result = await this.recordSpin(
-      { categoryId, selectedContentId: String(selected._id) },
-      userId
+      { categoryId, selectedContentId: String(selected._id), question },
+      userId,
+      true // skipContentUpdate — smartRandom already updated stats
     );
     return { ...result, selected };
   },
 
   /**
-   * Record a spin result (no streak update — streak only updates on verify).
+   * Record a spin result.
+   * Sets status to "pending" with 24h expiry.
    */
-  async recordSpin(dto: SpinResultDto, userId: string): Promise<{ history: ISpinHistory; streak: IStreakTracker }> {
+  async recordSpin(
+    dto: SpinResultDto,
+    userId: string,
+    skipContentUpdate = false
+  ): Promise<{ history: ISpinHistory; streak: IStreakTracker }> {
     // Verify the selected content exists and belongs to the category
     const content = await WheelContent.findById(dto.selectedContentId);
     if (!content) throw new AppError("Selected wheel content not found", 404);
@@ -122,10 +139,12 @@ export const spinHistoryService = {
       throw new AppError("Selected content does not belong to this category", 400);
     }
 
-    // Update selection stats on the content
-    content.timesSelected = (content.timesSelected || 0) + 1;
-    content.lastSelectedAt = new Date();
-    await content.save();
+    // Update selection stats on the content (skip if smartRandom already did it)
+    if (!skipContentUpdate) {
+      content.timesSelected = (content.timesSelected || 0) + 1;
+      content.lastSelectedAt = new Date();
+      await content.save();
+    }
 
     // Ensure tracker exists (for totalSpins count) but don't touch streak
     let tracker = await StreakTracker.findOne({ userId, categoryId: dto.categoryId });
@@ -143,12 +162,22 @@ export const spinHistoryService = {
       });
     }
 
-    // Record the spin history
+    // Calculate expiry (24 hours from now)
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    // Update global user streak (total decisions)
+    await userStreakService.updateOnSpin(userId);
+
+    // Record the spin history with decision flow fields
     const history = await SpinHistory.create({
       userId,
       categoryId: dto.categoryId,
       selectedContentId: dto.selectedContentId,
       selectedLabel: content.label,
+      status: "pending",
+      question: dto.question || "",
+      spinCount: 1,
+      expiresAt,
       currentStreak: tracker.currentStreak,
       maxStreak: tracker.maxStreak,
       lastSpinAt: new Date(),
@@ -158,7 +187,7 @@ export const spinHistoryService = {
   },
 
   /**
-   * Get spin history for a user, optionally filtered by category.
+   * Get spin history for a user, optionally filtered by category and status.
    * If userId is undefined, returns all users' history (admin).
    */
   async getHistory(
@@ -166,11 +195,13 @@ export const spinHistoryService = {
     skip: number,
     limit: number,
     page: number,
-    categoryId?: string
+    categoryId?: string,
+    status?: string
   ): Promise<SpinHistoryPage> {
     const filter: Record<string, unknown> = {};
     if (userId) filter.userId = userId;
     if (categoryId) filter.categoryId = categoryId;
+    if (status) filter.status = status;
 
     const [items, total] = await Promise.all([
       SpinHistory.find(filter)
@@ -207,12 +238,13 @@ export const spinHistoryService = {
 
   /**
    * Verify/review a spin history entry AND update streak.
+   * Sets decision status to "completed".
    * Streak only increments when user confirms completion (verify).
    */
   async verifyAndReview(
     historyId: string,
     userId: string,
-    data: { rating?: number; reviewNote?: string }
+    data: { rating?: number; reviewNote?: string; checkinImageUrl?: string }
   ): Promise<{ history: ISpinHistory; streak: IStreakTracker | null }> {
     const history = await SpinHistory.findById(historyId);
     if (!history) throw new AppError("Spin history not found", 404);
@@ -220,11 +252,19 @@ export const spinHistoryService = {
       throw new AppError("You can only review your own spin history", 403);
     }
 
+    // Update verification + decision status
     history.isVerified = true;
     history.verifiedAt = new Date();
+    history.status = "completed";
     if (data.rating !== undefined) history.rating = data.rating;
     if (data.reviewNote !== undefined) history.reviewNote = data.reviewNote;
+    if (data.checkinImageUrl) history.checkinImageUrl = data.checkinImageUrl;
     await history.save();
+
+    // Increment timesCompleted on the wheel content
+    await WheelContent.findByIdAndUpdate(history.selectedContentId, {
+      $inc: { timesCompleted: 1 },
+    });
 
     // Update streak on verify
     const today = todayStr();
@@ -264,7 +304,73 @@ export const spinHistoryService = {
     history.maxStreak = tracker.maxStreak;
     await history.save();
 
+    // Update global user streak (check-in)
+    await userStreakService.updateOnCheckin(userId);
+
     return { history, streak: tracker };
+  },
+
+  /**
+   * Accept a decision — marks it as acknowledged but keeps status pending.
+   */
+  async acceptDecision(historyId: string, userId: string): Promise<ISpinHistory> {
+    const history = await SpinHistory.findById(historyId);
+    if (!history) throw new AppError("Spin history not found", 404);
+    if (String(history.userId) !== userId) {
+      throw new AppError("You can only accept your own decisions", 403);
+    }
+    if (history.status !== "pending") {
+      throw new AppError("Only pending decisions can be accepted", 400);
+    }
+    // Keep status as pending — acceptance is implicit (user saw and accepted the result)
+    return history;
+  },
+
+  /**
+   * Skip a decision — sets status to "skipped".
+   */
+  async skipDecision(historyId: string, userId: string): Promise<ISpinHistory> {
+    const history = await SpinHistory.findById(historyId);
+    if (!history) throw new AppError("Spin history not found", 404);
+    if (String(history.userId) !== userId) {
+      throw new AppError("You can only skip your own decisions", 403);
+    }
+    if (history.status !== "pending") {
+      throw new AppError("Only pending decisions can be skipped", 400);
+    }
+
+    history.status = "skipped";
+    await history.save();
+    return history;
+  },
+
+  /**
+   * Get today's pending decisions for a user.
+   */
+  async getTodayDecisions(userId: string): Promise<ISpinHistory[]> {
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    return SpinHistory.find({
+      userId,
+      status: "pending",
+      createdAt: { $gte: startOfDay },
+    })
+      .populate("categoryId", "name slug icon")
+      .populate("selectedContentId", "label image color")
+      .sort({ createdAt: -1 });
+  },
+
+  /**
+   * Expire old pending decisions that have passed their expiresAt time.
+   * Can be called periodically or on-demand.
+   */
+  async expireOldDecisions(): Promise<number> {
+    const result = await SpinHistory.updateMany(
+      { status: "pending", expiresAt: { $lte: new Date() } },
+      { $set: { status: "expired" } }
+    );
+    return result.modifiedCount;
   },
 
   /**
