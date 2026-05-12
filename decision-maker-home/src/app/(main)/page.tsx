@@ -385,10 +385,10 @@ export default function Home() {
                 <FireOutlined /> Quyết định thông minh, hành động ngay
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-black tracking-tight mb-6 leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-black tracking-tight mb-6 leading-[1.1] animate-slide-up delay-100">
                 Không biết{' '}
                 <span className="relative">
-                  <span className="bg-gradient-to-r from-red-500 via-red-600 to-orange-500 bg-clip-text text-transparent">
+                  <span className="text-shimmer">
                     chọn gì?
                   </span>
                   <svg className="absolute -bottom-2 left-0 w-full" height="8" viewBox="0 0 200 8" fill="none">
@@ -445,33 +445,33 @@ export default function Home() {
       </section>
 
       {/* QUICK CTA CARDS */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 relative z-10  ">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mx-auto  ">
-          <Link href="/wheels">
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.02] cursor-pointer">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <StarOutlined className="text-3xl mb-3 opacity-90" />
+      <section className="mx-auto max-w-6xl px-4 pb-20 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mx-auto">
+          <Link href="/wheels" className="animate-slide-up delay-100">
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.03] cursor-pointer">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+              <StarOutlined className="text-3xl mb-3 opacity-90 group-hover:animate-wiggle" />
               <h2 className="text-xl font-black">Hôm nay ăn gì?</h2>
               <p className="text-white/80 text-sm mt-1">Quay vòng quay tìm món ăn ngay</p>
-              <ArrowRightOutlined className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ArrowRightOutlined className="mt-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
             </div>
           </Link>
-          <Link href="/wheels">
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-7 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] cursor-pointer border border-slate-700/50">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <RocketOutlined className="text-3xl mb-3 text-red-400" />
+          <Link href="/wheels" className="animate-slide-up delay-200">
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-7 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-[1.03] cursor-pointer border border-slate-700/50">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+              <RocketOutlined className="text-3xl mb-3 text-red-400 group-hover:animate-bounce" />
               <h2 className="text-xl font-black">Hôm nay làm gì?</h2>
               <p className="text-slate-400 text-sm mt-1">Tìm hoạt động thú vị cho bạn</p>
-              <ArrowRightOutlined className="mt-3 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ArrowRightOutlined className="mt-3 text-red-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
             </div>
           </Link>
-          <Link href="/wheels">
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.02] cursor-pointer">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <StarOutlined className="text-3xl mb-3 opacity-90" />
+          <Link href="/wheels" className="animate-slide-up delay-300">
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.03] cursor-pointer">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+              <SmileOutlined className="text-3xl mb-3 opacity-90 group-hover:animate-wiggle" />
               <h2 className="text-xl font-black">Hôm nay chơi gì?</h2>
               <p className="text-white/80 text-sm mt-1">Quay vòng quay tìm trò chơi ngay</p>
-              <ArrowRightOutlined className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ArrowRightOutlined className="mt-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
             </div>
           </Link>
         </div>
@@ -488,33 +488,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="group rounded-2xl bg-white border border-slate-100 p-8 hover:shadow-xl hover:-translate-y-1 transition-all">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-5 group-hover:bg-red-100 transition-colors">
-                <ThunderboltOutlined className="text-red-500 text-2xl" />
+            {[
+              { icon: <ThunderboltOutlined className="text-red-500 text-2xl group-hover:scale-125 transition-transform" />, bg: 'bg-red-50', hoverBg: 'group-hover:bg-red-100', title: 'Nhanh chóng & đơn giản', desc: 'Chỉ cần 3 bước: chọn chủ đề, quay vòng quay, nhận kết quả. Không còn mất hàng giờ suy nghĩ "ăn gì hôm nay".' },
+              { icon: <SmileOutlined className="text-orange-500 text-2xl group-hover:scale-125 transition-transform" />, bg: 'bg-orange-50', hoverBg: 'group-hover:bg-orange-100', title: 'Gợi ý thông minh', desc: 'Hệ thống nhớ những gì bạn đã chọn gần đây và ưu tiên gợi ý những món mới, giúp bạn khám phá nhiều hơn.' },
+              { icon: <UserOutlined className="text-emerald-500 text-2xl group-hover:scale-125 transition-transform" />, bg: 'bg-emerald-50', hoverBg: 'group-hover:bg-emerald-100', title: 'Hoàn toàn cá nhân hóa', desc: 'Tự tạo danh mục và lựa chọn riêng theo sở thích. Điều chỉnh trọng số để món yêu thích xuất hiện nhiều hơn.' },
+            ].map((item, i) => (
+              <div key={i} className={`group rounded-2xl bg-white border border-slate-100 p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate-slide-up delay-${(i + 1) * 100}`}>
+                <div className={`w-14 h-14 rounded-2xl ${item.bg} flex items-center justify-center mb-5 ${item.hoverBg} transition-colors duration-300`}>
+                  {item.icon}
+                </div>
+                <h3 className="font-bold text-xl mb-3 text-slate-800">{item.title}</h3>
+                <p className="text-slate-500 leading-relaxed">{item.desc}</p>
               </div>
-              <h3 className="font-bold text-xl mb-3 text-slate-800">Nhanh chóng & đơn giản</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Chỉ cần 3 bước: chọn chủ đề, quay vòng quay, nhận kết quả. Không còn mất hàng giờ suy nghĩ &ldquo;ăn gì hôm nay&rdquo;.
-              </p>
-            </div>
-            <div className="group rounded-2xl bg-white border border-slate-100 p-8 hover:shadow-xl hover:-translate-y-1 transition-all">
-              <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-5 group-hover:bg-orange-100 transition-colors">
-                <SmileOutlined className="text-orange-500 text-2xl" />
-              </div>
-              <h3 className="font-bold text-xl mb-3 text-slate-800">Gợi ý thông minh</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Hệ thống nhớ những gì bạn đã chọn gần đây và ưu tiên gợi ý những món mới, giúp bạn khám phá nhiều hơn.
-              </p>
-            </div>
-            <div className="group rounded-2xl bg-white border border-slate-100 p-8 hover:shadow-xl hover:-translate-y-1 transition-all">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-5 group-hover:bg-emerald-100 transition-colors">
-                <UserOutlined className="text-emerald-500 text-2xl" />
-              </div>
-              <h3 className="font-bold text-xl mb-3 text-slate-800">Hoàn toàn cá nhân hóa</h3>
-              <p className="text-slate-500 leading-relaxed">
-                Tự tạo danh mục và lựa chọn riêng theo sở thích. Điều chỉnh trọng số để món yêu thích xuất hiện nhiều hơn.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -534,11 +520,11 @@ export default function Home() {
               { step: '02', title: 'Quay vòng quay', desc: 'Nhấn nút QUAY và hệ thống sẽ chọn ra kết quả phù hợp nhất cho bạn.' },
               { step: '03', title: 'Hành động ngay!', desc: 'Nhận kết quả, thực hiện và check-in để giữ chuỗi ngày liên tiếp.' },
             ].map((item, i) => (
-              <div key={i} className="relative text-center group">
+              <div key={i} className={`relative text-center group animate-slide-up delay-${(i + 1) * 200}`}>
                 {i < 2 && (
                   <div className="hidden md:block absolute top-10 left-[60%] w-[80%] border-t-2 border-dashed border-red-200 z-0" />
                 )}
-                <div className="relative z-10 w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center mx-auto mb-5 shadow-lg shadow-red-200/50 group-hover:shadow-xl group-hover:shadow-red-300/50 transition-shadow">
+                <div className="relative z-10 w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center mx-auto mb-5 shadow-lg shadow-red-200/50 group-hover:shadow-xl group-hover:shadow-red-300/50 group-hover:scale-110 transition-all duration-300">
                   <span className="text-2xl font-black">{item.step}</span>
                 </div>
                 <h3 className="font-bold text-lg mb-2 text-slate-800">{item.title}</h3>
@@ -582,7 +568,7 @@ export default function Home() {
             </div>
 
             {/* Streak visual */}
-            <div className="relative">
+            <div className="relative animate-slide-left">
               <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl" />
               <div className="relative rounded-3xl border border-orange-100 p-8 bg-white/80 backdrop-blur-sm">
                 <div className="text-center mb-6">
@@ -702,8 +688,8 @@ export default function Home() {
               { icon: <HeartOutlined />, title: 'Cặp đôi', desc: 'Hẹn hò đi đâu, ăn gì', gradient: 'from-pink-500/20 to-pink-600/10' },
               { icon: <RocketOutlined />, title: 'Team lead', desc: 'Ra quyết định nhanh cho nhóm', gradient: 'from-amber-500/20 to-amber-600/10' },
             ].map((item, i) => (
-              <div key={i} className={`rounded-2xl bg-gradient-to-b ${item.gradient} border border-white/10 p-6 text-center hover:border-red-500/30 hover:scale-105 transition-all cursor-default`}>
-                <div className="text-3xl mb-4 text-red-400">{item.icon}</div>
+              <div key={i} className={`rounded-2xl bg-gradient-to-b ${item.gradient} border border-white/10 p-6 text-center hover:border-red-500/30 hover:scale-110 hover:-translate-y-1 transition-all duration-300 cursor-default animate-scale-in delay-${(i + 1) * 100}`}>
+                <div className="text-3xl mb-4 text-red-400 group-hover:animate-bounce">{item.icon}</div>
                 <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
                 <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
               </div>

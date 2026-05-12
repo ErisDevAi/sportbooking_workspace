@@ -209,27 +209,27 @@ export default function StatsPage() {
 
         {/* Stats cards */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
-          <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-red-50 border border-orange-100 shadow-sm p-4 text-center">
+          <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-red-50 border border-orange-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-100">
             <FireFilled className="text-orange-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-orange-500">{currentBest}</div>
             <div className="text-[11px] text-slate-500 mt-1 font-medium">Streak hiện tại</div>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-100 shadow-sm p-4 text-center">
+          <div className="rounded-2xl bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-200">
             <TrophyFilled className="text-yellow-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-yellow-500">{bestStreak}</div>
             <div className="text-[11px] text-slate-500 mt-1 font-medium">Kỷ lục</div>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-100 shadow-sm p-4 text-center">
+          <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-300">
             <ThunderboltFilled className="text-emerald-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-emerald-500">{totalSpins}</div>
             <div className="text-[11px] text-slate-500 mt-1 font-medium">Tổng lượt quay</div>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 shadow-sm p-4 text-center">
+          <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-400">
             <CalendarOutlined className="text-blue-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-blue-500">{activeDays}</div>
             <div className="text-[11px] text-slate-500 mt-1 font-medium">Ngày hoạt động</div>
           </div>
-          <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 shadow-sm p-4 text-center col-span-2 sm:col-span-1">
+          <div className="rounded-2xl bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 shadow-sm p-4 text-center col-span-2 sm:col-span-1 hover-lift animate-scale-in delay-500">
             <UserOutlined className="text-rose-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-rose-500">
               {(() => {

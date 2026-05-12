@@ -368,19 +368,19 @@ function SpinPage() {
         {/* Streak cards */}
         {currentStreak && (
           <div className="grid grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
-            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4 text-center">
-              <FireOutlined className="text-orange-400 text-lg mb-1" />
-              <div className="text-2xl font-black text-orange-500">{currentStreak.currentStreak}</div>
+            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-100">
+              <FireOutlined className="text-orange-400 text-lg mb-1 animate-fire-pulse" />
+              <div className="text-2xl font-black text-orange-500 animate-count-up">{currentStreak.currentStreak}</div>
               <div className="text-xs text-slate-400 mt-1">Streak hiện tại</div>
             </div>
-            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4 text-center">
+            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-200">
               <TrophyOutlined className="text-yellow-500 text-lg mb-1" />
-              <div className="text-2xl font-black text-yellow-500">{currentStreak.maxStreak}</div>
+              <div className="text-2xl font-black text-yellow-500 animate-count-up">{currentStreak.maxStreak}</div>
               <div className="text-xs text-slate-400 mt-1">Kỷ lục</div>
             </div>
-            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4 text-center">
+            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-300">
               <ThunderboltOutlined className="text-green-500 text-lg mb-1" />
-              <div className="text-2xl font-black text-green-500">{currentStreak.totalSpins}</div>
+              <div className="text-2xl font-black text-green-500 animate-count-up">{currentStreak.totalSpins}</div>
               <div className="text-xs text-slate-400 mt-1">Tổng quay</div>
             </div>
           </div>
