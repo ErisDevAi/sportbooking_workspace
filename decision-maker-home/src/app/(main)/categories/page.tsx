@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Row, Col, Button, Modal, Form, Input, ColorPicker, Switch, Spin, Empty, App,
 } from "antd";
@@ -7,7 +7,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined, Appstor
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
-import TourGuide from "@/components/TourGuide";
+import TourGuide, { type TourGuideHandle } from "@/components/TourGuide";
 import { categoriesApi } from "@/api/categories";
 import { getCategoryIcon } from "@/utils/categoryIcons";
 import type { Category } from "@/types/category";
@@ -21,6 +21,7 @@ export default function CategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const tourRef = useRef<TourGuideHandle>(null);
 
   const fetchCategories = async () => {
     try {
@@ -69,12 +70,15 @@ export default function CategoriesPage() {
   return (
     <>
     <SplashScreen ready={!loading} />
-    <TourGuide page="categories" />
+    <TourGuide ref={tourRef} page="categories" />
     <div>
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-slate-800">Danh mục quyết định</h1>
-          <p className="text-sm text-slate-500 mt-1">Quản lý các chủ đề quyết định của bạn</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-sm text-slate-500">Quản lý các chủ đề quyết định của bạn</p>
+            <button type="button" onClick={() => tourRef.current?.start()} className="text-xs font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-colors cursor-pointer border-0">Hướng dẫn</button>
+          </div>
         </div>
         <Button
           type="primary"

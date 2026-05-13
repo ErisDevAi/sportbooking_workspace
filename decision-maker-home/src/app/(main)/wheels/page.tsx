@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   Select, Button, Modal, Typography, Rate, Input, InputNumber, Upload,
@@ -19,7 +19,7 @@ import type { Category } from '@/types/category';
 import type { WheelContent } from '@/types/wheel-contents';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import SplashScreen from '@/components/SplashScreen';
-import TourGuide from '@/components/TourGuide';
+import TourGuide, { type TourGuideHandle } from '@/components/TourGuide';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 
 const { Title, Text } = Typography;
@@ -97,6 +97,9 @@ function SpinPage() {
   // Re-spin count (max 2 per session)
   const [respinCount, setRespinCount] = useState(0);
   const MAX_RESPIN = 2;
+
+  // Tour guide ref
+  const tourRef = useRef<TourGuideHandle>(null);
 
   useEffect(() => {
     const fetchInitial = async () => {
@@ -359,12 +362,21 @@ function SpinPage() {
   return (
     <>
     <SplashScreen ready={!loadingCategories} />
-    <TourGuide page="wheels" />
+    <TourGuide ref={tourRef} page="wheels" />
     <div className="px-4 py-6 text-slate-900">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-black mb-2 text-slate-800">Vòng quay quyết định</h1>
-          <p className="text-slate-400 text-sm">Chọn danh mục, quay và hành động!</p>
+          <div className="flex items-center justify-center gap-3">
+            <p className="text-slate-400 text-sm">Chọn danh mục, quay và hành động!</p>
+            <button
+              type="button"
+              onClick={() => tourRef.current?.start()}
+              className="text-xs font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-colors cursor-pointer border-0"
+            >
+              Hướng dẫn
+            </button>
+          </div>
         </div>
 
         {/* Streak cards */}

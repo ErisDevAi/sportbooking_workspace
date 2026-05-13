@@ -22,7 +22,6 @@ import {
   AppstoreOutlined,
 } from '@ant-design/icons';
 import { Spin } from 'antd';
-import TourGuide from '@/components/TourGuide';
 import { useAuthStore } from '@/store/auth';
 import { categoriesApi } from '@/api/categories';
 import { wheelContentsApi } from '@/api/wheel-contents';
@@ -371,7 +370,6 @@ function DemoWheel() {
 export default function Home() {
   return (
     <>
-      <TourGuide page="home" />
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">

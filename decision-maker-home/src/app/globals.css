@@ -651,35 +651,3 @@ html {
   animation: count-up-pulse 0.6s ease-out;
 }
 
-/* ═══════════════════════════════════════════
-   TOUR GUIDE STYLES
-   ═══════════════════════════════════════════ */
-.react-joyride__tooltip {
-  border-radius: 16px !important;
-  font-family: 'Inter', sans-serif !important;
-}
-
-.react-joyride__spotlight {
-  border-radius: 16px !important;
-}
-
-.tour-highlight {
-  position: relative;
-  z-index: 1;
-}
-
-.tour-highlight::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 16px;
-  border: 2px dashed #E53E3E;
-  opacity: 0;
-  animation: tour-pulse 1.5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes tour-pulse {
-  0%, 100% { opacity: 0; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.02); }
-}

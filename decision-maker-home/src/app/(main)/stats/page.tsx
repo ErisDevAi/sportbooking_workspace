@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Select, Spin, App, Empty, Modal } from 'antd';
 import {
@@ -25,7 +25,7 @@ import { categoriesApi } from '@/api/categories';
 import { userStreakApi } from '@/api/user-streaks';
 import { UserOutlined, CrownOutlined } from '@ant-design/icons';
 import SplashScreen from '@/components/SplashScreen';
-import TourGuide from '@/components/TourGuide';
+import TourGuide, { type TourGuideHandle } from '@/components/TourGuide';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import type { Category } from '@/types/category';
 import type { UserStreak } from '@/types/user-streak';
@@ -60,6 +60,7 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true);
   const [myStreak, setMyStreak] = useState<UserStreak | null>(null);
   const [leaderboard, setLeaderboard] = useState<UserStreak[]>([]);
+  const tourRef = useRef<TourGuideHandle>(null);
 
   // Calendar
   const now = new Date();
@@ -159,7 +160,7 @@ export default function StatsPage() {
   return (
     <>
     <SplashScreen ready={!loading} />
-    <TourGuide page="stats" />
+    <TourGuide ref={tourRef} page="stats" />
     <div className="px-4 py-6 text-slate-900">
       <div className="max-w-4xl mx-auto">
         {/* Header with user info */}
@@ -172,6 +173,7 @@ export default function StatsPage() {
               <h1 className="text-xl sm:text-2xl font-black text-slate-800 flex items-center justify-center sm:justify-start gap-2">
                 <FireFilled className="text-orange-500" />
                 Streak & Thống kê
+                <button type="button" onClick={() => tourRef.current?.start()} className="text-xs font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg transition-colors cursor-pointer border-0 ml-1">Hướng dẫn</button>
               </h1>
               <p className="text-slate-400 text-sm mt-0.5">{user?.name} &middot; {user?.email}</p>
               {user?.createdAt && (
