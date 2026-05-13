@@ -457,12 +457,12 @@ export default function Home() {
             </div>
           </Link>
           <Link href="/wheels" className="animate-slide-up delay-200">
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-7 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-[1.03] cursor-pointer border border-slate-700/50">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
-              <RocketOutlined className="text-3xl mb-3 text-red-400 group-hover:animate-bounce" />
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 p-7 text-white shadow-xl shadow-orange-200/30 hover:shadow-2xl hover:shadow-orange-300/40 transition-all hover:scale-[1.03] cursor-pointer">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
+              <RocketOutlined className="text-3xl mb-3 opacity-90 group-hover:animate-bounce" />
               <h2 className="text-xl font-black">Hôm nay làm gì?</h2>
-              <p className="text-slate-400 text-sm mt-1">Tìm hoạt động thú vị cho bạn</p>
-              <ArrowRightOutlined className="mt-3 text-red-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+              <p className="text-white/80 text-sm mt-1">Tìm hoạt động thú vị cho bạn</p>
+              <ArrowRightOutlined className="mt-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
             </div>
           </Link>
           <Link href="/wheels" className="animate-slide-up delay-300">

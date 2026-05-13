@@ -118,17 +118,17 @@ export default function AboutPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-20 bg-slate-900 relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/5 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-100/40 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-100/30 rounded-full blur-3xl" />
         </div>
 
         <div className="mx-auto max-w-4xl px-4 relative">
           <div className="text-center mb-14">
-            <span className="inline-block text-xs font-bold uppercase tracking-widest text-red-400 mb-3">Cách hoạt động</span>
-            <h2 className="text-3xl font-black mb-3 text-white">Từ câu hỏi đến hành động</h2>
-            <p className="text-slate-400 text-lg">Quy trình đơn giản, kết quả tuyệt vời</p>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-red-500 mb-3">Cách hoạt động</span>
+            <h2 className="text-3xl font-black mb-3 text-slate-800">Từ câu hỏi đến hành động</h2>
+            <p className="text-slate-500 text-lg">Quy trình đơn giản, kết quả tuyệt vời</p>
           </div>
 
           <div className="space-y-4">
@@ -138,15 +138,15 @@ export default function AboutPage() {
               { step: '3', title: 'Nhận kết quả', desc: 'Xem kết quả. Chấp nhận để tiếp tục hoặc quay lại (tối đa 2 lần re-spin mỗi ngày).', icon: <CheckCircleOutlined /> },
               { step: '4', title: 'Check-in & Streak', desc: 'Thực hiện quyết định, check-in và duy trì chuỗi streak để tạo thói quen tích cực.', icon: <FireOutlined /> },
             ].map((item, i) => (
-              <div key={i} className="flex items-start gap-5 rounded-2xl bg-white/5 border border-white/10 p-6 hover:bg-white/10 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-lg font-black text-white shrink-0 shadow-lg shadow-red-500/20">
+              <div key={i} className="flex items-start gap-5 rounded-2xl bg-white border border-slate-100 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-lg font-black text-white shrink-0 shadow-lg shadow-red-200/50">
                   {item.step}
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg mb-1 text-white flex items-center gap-2">
-                    <span className="text-red-400">{item.icon}</span> {item.title}
+                  <h3 className="font-bold text-lg mb-1 text-slate-800 flex items-center gap-2">
+                    <span className="text-red-500">{item.icon}</span> {item.title}
                   </h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                  <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -191,7 +191,7 @@ export default function AboutPage() {
 
           {/* Example table */}
           <div className="rounded-2xl border border-slate-100 overflow-hidden">
-            <div className="bg-slate-900 text-white px-6 py-3">
+            <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-t-2xl">
               <p className="text-sm font-bold flex items-center gap-2">
                 <ExperimentOutlined /> Ví dụ thực tế
               </p>

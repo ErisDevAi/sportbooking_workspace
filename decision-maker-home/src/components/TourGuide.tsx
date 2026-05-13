@@ -217,23 +217,17 @@ const TourGuide = forwardRef<TourGuideHandle, Props>(function TourGuide({ page }
     return () => { window.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
   }, [active, step, steps]);
 
+  const close = useCallback(() => { setActive(false); setTargetRect(null); }, []);
+  const next = useCallback(() => { step < steps.length - 1 ? setStep(s => s + 1) : close(); }, [step, steps.length, close]);
+  const prev = useCallback(() => { if (step > 0) setStep(s => s - 1); }, [step]);
+
   // Keyboard
   useEffect(() => {
     if (!active) return;
     const h = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  });
-
-  // Disable body scroll when active
-  useEffect(() => {
-    if (active) { document.body.style.overflow = 'hidden'; }
-    return () => { document.body.style.overflow = ''; };
-  }, [active]);
-
-  const close = useCallback(() => { setActive(false); setTargetRect(null); }, []);
-  const next = useCallback(() => { step < steps.length - 1 ? setStep(s => s + 1) : close(); }, [step, steps.length, close]);
-  const prev = useCallback(() => { if (step > 0) setStep(s => s - 1); }, [step]);
+  }, [active, close, next, prev]);
 
   if (!mounted || steps.length === 0) return null;
   if (!active || !targetRect) return null;
