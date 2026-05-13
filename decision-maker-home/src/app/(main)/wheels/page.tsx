@@ -19,6 +19,7 @@ import type { Category } from '@/types/category';
 import type { WheelContent } from '@/types/wheel-contents';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import SplashScreen from '@/components/SplashScreen';
+import TourGuide from '@/components/TourGuide';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 
 const { Title, Text } = Typography;
@@ -358,6 +359,7 @@ function SpinPage() {
   return (
     <>
     <SplashScreen ready={!loadingCategories} />
+    <TourGuide page="wheels" />
     <div className="px-4 py-6 text-slate-900">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
@@ -390,10 +392,10 @@ function SpinPage() {
           {/* LEFT PANEL */}
           <div className="space-y-4">
             {/* Category selector */}
-            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5">
+            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5" data-tour="category-select">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-bold text-slate-700">Bước 1: Chọn danh mục</h2>
-                <Button size="small" icon={<PlusOutlined />} onClick={() => { catForm.resetFields(); setShowCatModal(true); }} className="!text-xs">Tạo mới</Button>
+                <Button size="small" icon={<PlusOutlined />} onClick={() => { catForm.resetFields(); setShowCatModal(true); }} className="!text-xs !rounded-lg" data-tour="create-category">Tạo mới</Button>
               </div>
               <Select placeholder="Chọn danh mục quyết định..." className="w-full" onChange={handleSelectCategory} size="large" value={selectedCategory || undefined}>
                 {categories.map((cat) => (<Select.Option key={cat._id} value={cat._id}>{getCategoryIcon(cat.name, cat.slug)} {cat.name}</Select.Option>))}
@@ -401,7 +403,7 @@ function SpinPage() {
             </div>
 
             {/* Item list */}
-            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5">
+            <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5" data-tour="item-list">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-bold text-slate-700">Danh sách lựa chọn</h2>
                 <div className="flex items-center gap-2">
@@ -465,7 +467,7 @@ function SpinPage() {
           </div>
 
           {/* RIGHT PANEL - Wheel */}
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm p-6">
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm p-6" data-tour="wheel">
             <p className="text-sm text-slate-400 mb-4 font-medium">
               {selectedCategoryInfo ? <><span className="inline-flex mr-1">{getCategoryIcon(selectedCategoryInfo.name, selectedCategoryInfo.slug)}</span> {selectedCategoryInfo.name}</> : 'Bước 2: Nhấn QUAY'}
             </p>
@@ -573,7 +575,7 @@ function SpinPage() {
                 </button>
               </div>
             </div>
-            <Button type="primary" size="large" onClick={handleSpin} disabled={isSpinning || items.length < 2} className="!h-14 !min-w-[220px] !rounded-full !text-base !font-black !shadow-lg !bg-red-500 !border-red-500 hover:!bg-red-600">
+            <Button type="primary" size="large" onClick={handleSpin} disabled={isSpinning || items.length < 2} data-tour="spin-button" className="!h-14 !min-w-[220px] !rounded-full !text-base !font-black !shadow-lg !bg-red-500 !border-red-500 hover:!bg-red-600">
               {isSpinning ? 'Đang quay...' : 'QUAY NGAY!'}
             </Button>
             {items.length < 2 && selectedCategory && (<p className="mt-4 text-xs text-amber-600 font-medium text-center">Cần ít nhất 2 lựa chọn để quay</p>)}
@@ -594,7 +596,7 @@ function SpinPage() {
         });
 
         return (
-          <div className="max-w-6xl mx-auto mt-8">
+          <div className="max-w-6xl mx-auto mt-8" data-tour="history">
             <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
                 <h2 className="text-base font-bold text-slate-700 flex items-center gap-2">
@@ -606,22 +608,14 @@ function SpinPage() {
                   <button
                     type="button"
                     onClick={() => setHistoryFilter('all')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${
-                      historyFilter === 'all'
-                        ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
-                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
-                    }`}
+                    className={`btn-filter ${historyFilter === 'all' ? 'active' : ''}`}
                   >
                     Tất cả
                   </button>
                   <button
                     type="button"
                     onClick={() => setHistoryFilter('pending')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                      historyFilter === 'pending'
-                        ? 'bg-orange-500 text-white border-orange-500 shadow-sm shadow-orange-200/50'
-                        : 'bg-white text-slate-500 border-slate-200 hover:border-orange-200 hover:text-orange-500'
-                    }`}
+                    className={`btn-filter ${historyFilter === 'pending' ? 'active-orange' : ''}`}
                   >
                     Chờ đánh giá
                     {pendingCount > 0 && (
@@ -633,11 +627,7 @@ function SpinPage() {
                   <button
                     type="button"
                     onClick={() => setHistoryFilter('reviewed')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                      historyFilter === 'reviewed'
-                        ? 'bg-green-500 text-white border-green-500 shadow-sm shadow-green-200/50'
-                        : 'bg-white text-slate-500 border-slate-200 hover:border-green-200 hover:text-green-500'
-                    }`}
+                    className={`btn-filter ${historyFilter === 'reviewed' ? 'active-green' : ''}`}
                   >
                     Đã đánh giá
                     {reviewedCount > 0 && (
@@ -699,7 +689,7 @@ function SpinPage() {
                             <button
                               type="button"
                               onClick={() => handleOpenReview(history)}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-green-600 bg-green-100 hover:bg-green-200 transition-colors"
+                              className="btn-action btn-action-success"
                             >
                               <EditOutlined className="text-[10px]" /> Sửa
                             </button>
@@ -707,7 +697,7 @@ function SpinPage() {
                             <button
                               type="button"
                               onClick={() => handleOpenReview(history)}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200/50 transition-all"
+                              className="btn-action text-white !bg-orange-500 hover:!bg-orange-600 shadow-sm shadow-orange-200/50"
                             >
                               <StarOutlined className="text-[10px]" /> Đánh giá
                             </button>

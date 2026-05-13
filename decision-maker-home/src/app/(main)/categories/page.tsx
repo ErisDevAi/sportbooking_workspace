@@ -7,6 +7,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, PlayCircleOutlined, Appstor
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
+import TourGuide from "@/components/TourGuide";
 import { categoriesApi } from "@/api/categories";
 import { getCategoryIcon } from "@/utils/categoryIcons";
 import type { Category } from "@/types/category";
@@ -68,6 +69,7 @@ export default function CategoriesPage() {
   return (
     <>
     <SplashScreen ready={!loading} />
+    <TourGuide page="categories" />
     <div>
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-4 flex items-center justify-between">
         <div>
@@ -79,6 +81,7 @@ export default function CategoriesPage() {
           icon={<PlusOutlined />}
           onClick={showAddModal}
           size="large"
+          data-tour="create-cat-btn"
           className="!rounded-full !font-bold !px-6 !bg-red-500 !border-red-500 hover:!bg-red-600 !shadow-lg !shadow-red-200/50"
         >
           Tạo danh mục
@@ -122,13 +125,13 @@ export default function CategoriesPage() {
                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={(e) => showEditModal(item, e)}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+                            className="btn-action btn-action-edit"
                           >
                             <EditOutlined className="text-[10px]" /> Sửa
                           </button>
                           <button
                             onClick={(e) => handleDelete(item._id, e)}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                            className="btn-action btn-action-delete"
                           >
                             <DeleteOutlined className="text-[10px]" /> Xóa
                           </button>

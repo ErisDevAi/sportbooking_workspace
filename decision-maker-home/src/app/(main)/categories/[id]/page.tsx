@@ -95,7 +95,7 @@ export default function CategoryDetailPage() {
       <div className="max-w-4xl mx-auto px-4 pt-8 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
+            <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors cursor-pointer">
               <ArrowLeftOutlined />
             </button>
             <div className="flex items-center gap-3">
@@ -170,13 +170,13 @@ export default function CategoryDetailPage() {
                   </span>
                   <button
                     onClick={() => showEditModal(item)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+                    className="btn-action btn-action-edit"
                   >
                     <EditOutlined className="text-[10px]" /> Sửa
                   </button>
                   <button
                     onClick={() => handleDelete(item._id)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                    className="btn-action btn-action-delete"
                   >
                     <DeleteOutlined className="text-[10px]" /> Xóa
                   </button>

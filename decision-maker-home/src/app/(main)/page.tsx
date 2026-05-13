@@ -22,6 +22,7 @@ import {
   AppstoreOutlined,
 } from '@ant-design/icons';
 import { Spin } from 'antd';
+import TourGuide from '@/components/TourGuide';
 import { useAuthStore } from '@/store/auth';
 import { categoriesApi } from '@/api/categories';
 import { wheelContentsApi } from '@/api/wheel-contents';
@@ -370,6 +371,7 @@ function DemoWheel() {
 export default function Home() {
   return (
     <>
+      <TourGuide page="home" />
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
@@ -437,7 +439,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex justify-center" data-tour="demo-wheel">
               <DemoWheel />
             </div>
           </div>
@@ -445,7 +447,7 @@ export default function Home() {
       </section>
 
       {/* QUICK CTA CARDS */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 relative z-10">
+      <section className="mx-auto max-w-6xl px-4 pb-20 relative z-10" data-tour="quick-cards">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mx-auto">
           <Link href="/wheels" className="animate-slide-up delay-100">
             <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 p-7 text-white shadow-xl shadow-red-200/30 hover:shadow-2xl hover:shadow-red-300/40 transition-all hover:scale-[1.03] cursor-pointer">

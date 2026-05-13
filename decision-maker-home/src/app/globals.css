@@ -19,6 +19,208 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════
+   GLOBAL INTERACTIVE ELEMENTS - cursor-pointer
+   ═══════════════════════════════════════════ */
+button,
+[role="button"],
+a[href],
+.ant-btn,
+.ant-select,
+.ant-select-selector,
+.ant-switch,
+.ant-checkbox-wrapper,
+.ant-radio-wrapper,
+.ant-rate-star,
+.ant-upload,
+.ant-upload-drag,
+.ant-dropdown-trigger,
+.ant-tabs-tab,
+.ant-pagination-item,
+.ant-pagination-prev,
+.ant-pagination-next,
+.ant-modal-close,
+.ant-tag,
+.ant-card,
+.clickable {
+  cursor: pointer !important;
+}
+
+button:disabled,
+.ant-btn:disabled,
+.ant-btn-disabled,
+[disabled] {
+  cursor: not-allowed !important;
+}
+
+/* ═══════════════════════════════════════════
+   UNIFIED BUTTON STYLES
+   ═══════════════════════════════════════════ */
+
+/* Base button reset for custom buttons */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  line-height: 1;
+}
+
+.btn-base:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Primary action button */
+.btn-primary {
+  background: linear-gradient(135deg, #E53E3E, #C53030);
+  color: white;
+  box-shadow: 0 4px 14px rgba(229, 62, 62, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #C53030, #9B2C2C);
+  box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Ghost/outline button */
+.btn-ghost {
+  background: transparent;
+  color: #64748b;
+  border: 1.5px solid #e2e8f0;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: #E53E3E;
+  border-color: #fecaca;
+  background: rgba(229, 62, 62, 0.04);
+}
+
+/* Small action buttons (edit, delete, etc.) */
+.btn-action {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
+}
+
+.btn-action-edit {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.btn-action-edit:hover {
+  background: #dbeafe;
+}
+
+.btn-action-delete {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.btn-action-delete:hover {
+  background: #fee2e2;
+}
+
+.btn-action-success {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.btn-action-success:hover {
+  background: #dcfce7;
+}
+
+/* Filter pill buttons */
+.btn-filter {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-filter:hover {
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.btn-filter.active {
+  background: #1e293b;
+  color: white;
+  border-color: #1e293b;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-filter.active-orange {
+  background: #f97316;
+  color: white;
+  border-color: #f97316;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+.btn-filter.active-green {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Ant Design button overrides for consistency */
+.ant-btn {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+
+.ant-btn-lg {
+  border-radius: 14px !important;
+}
+
+.ant-btn-sm {
+  border-radius: 8px !important;
+}
+
+.ant-btn-round,
+.ant-btn-round.ant-btn-lg {
+  border-radius: 9999px !important;
+}
+
+/* Unified Ant Design primary button color */
+.ant-btn-primary:not(:disabled) {
+  background: #E53E3E !important;
+  border-color: #E53E3E !important;
+}
+
+.ant-btn-primary:not(:disabled):hover {
+  background: #C53030 !important;
+  border-color: #C53030 !important;
 }
 
 /* Scrollbar */
@@ -387,4 +589,97 @@ html {
 .reveal-section.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════
+   MISSING ANIMATION KEYFRAMES
+   ═══════════════════════════════════════════ */
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out both;
+}
+
+.animate-slide-left {
+  animation: slide-left 0.6s ease-out both;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.4s ease-out both;
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s ease-out both;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes count-up-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.animate-count-up {
+  animation: count-up-pulse 0.6s ease-out;
+}
+
+/* ═══════════════════════════════════════════
+   TOUR GUIDE STYLES
+   ═══════════════════════════════════════════ */
+.react-joyride__tooltip {
+  border-radius: 16px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.react-joyride__spotlight {
+  border-radius: 16px !important;
+}
+
+.tour-highlight {
+  position: relative;
+  z-index: 1;
+}
+
+.tour-highlight::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  border: 2px dashed #E53E3E;
+  opacity: 0;
+  animation: tour-pulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tour-pulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.02); }
 }

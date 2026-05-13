@@ -25,6 +25,7 @@ import { categoriesApi } from '@/api/categories';
 import { userStreakApi } from '@/api/user-streaks';
 import { UserOutlined, CrownOutlined } from '@ant-design/icons';
 import SplashScreen from '@/components/SplashScreen';
+import TourGuide from '@/components/TourGuide';
 import type { Streak, SpinHistory } from '@/types/spin-histories';
 import type { Category } from '@/types/category';
 import type { UserStreak } from '@/types/user-streak';
@@ -158,6 +159,7 @@ export default function StatsPage() {
   return (
     <>
     <SplashScreen ready={!loading} />
+    <TourGuide page="stats" />
     <div className="px-4 py-6 text-slate-900">
       <div className="max-w-4xl mx-auto">
         {/* Header with user info */}
@@ -208,7 +210,7 @@ export default function StatsPage() {
         </div>
 
         {/* Stats cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8" data-tour="stats-cards">
           <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-red-50 border border-orange-100 shadow-sm p-4 text-center hover-lift animate-scale-in delay-100">
             <FireFilled className="text-orange-500 text-2xl mb-1" />
             <div className="text-2xl font-black text-orange-500">{currentBest}</div>
@@ -244,16 +246,16 @@ export default function StatsPage() {
         </div>
 
         {/* Calendar */}
-        <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8 animate-slide-up delay-300">
+        <div className="rounded-2xl bg-white border border-slate-100 shadow-sm p-5 mb-8 animate-slide-up delay-300" data-tour="calendar">
           {/* Calendar header */}
           <div className="flex items-center justify-between mb-5">
-            <button type="button" onClick={prevMonth} className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors text-lg font-bold">
+            <button type="button" onClick={prevMonth} className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors text-lg font-bold cursor-pointer">
               &lsaquo;
             </button>
             <h2 className="text-base font-black text-slate-800 capitalize flex items-center gap-2">
               <CalendarOutlined className="text-red-500" /> {formatMonth(calYear, calMonth)}
             </h2>
-            <button type="button" onClick={nextMonth} className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors text-lg font-bold">
+            <button type="button" onClick={nextMonth} className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-red-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors text-lg font-bold cursor-pointer">
               &rsaquo;
             </button>
           </div>

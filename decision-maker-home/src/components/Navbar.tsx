@@ -127,7 +127,7 @@ export default function Navbar() {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
+              className="md:hidden p-2 rounded-lg hover:bg-red-50 transition-all duration-200 cursor-pointer"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen
