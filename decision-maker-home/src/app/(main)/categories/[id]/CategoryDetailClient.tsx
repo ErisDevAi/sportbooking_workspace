@@ -2,11 +2,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Spin, Modal, Form, Input, InputNumber, ColorPicker, App } from "antd";
-import { ArrowLeftOutlined, PlusOutlined, PlayCircleOutlined, EditOutlined, DeleteOutlined, SearchOutlined, AppstoreOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined, PlusOutlined, PlayCircleOutlined, EditOutlined, DeleteOutlined,
+  SearchOutlined, AppstoreOutlined, GlobalOutlined, LockOutlined, CrownOutlined,
+} from "@ant-design/icons";
 import SplashScreen from "@/components/SplashScreen";
 import { categoriesApi } from "@/api/categories";
 import { wheelContentsApi } from "@/api/wheel-contents";
 import { getCategoryIcon } from "@/utils/categoryIcons";
+import { useAuthStore } from "@/store/auth";
 import type { Category } from "@/types/category";
 import type { WheelContent } from "@/types/wheel-contents";
 
@@ -14,6 +18,7 @@ export default function CategoryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { message, modal } = App.useApp();
+  const user = useAuthStore((s) => s.user);
   const id = params.id as string;
   const [form] = Form.useForm();
   const [category, setCategory] = useState<Category | null>(null);
@@ -40,6 +45,15 @@ export default function CategoryDetailPage() {
   };
 
   useEffect(() => { fetchData(); }, [id]);
+
+  // Kiểm tra quyền sở hữu
+  const isOwner = (() => {
+    if (!category || !user) return false;
+    const ownerId = typeof category.createdBy === 'object' ? (category.createdBy as any)?._id : category.createdBy;
+    return ownerId === user._id;
+  })();
+  const isDefault = category?.isDefault === true;
+  const canEdit = isOwner && !isDefault;
 
   const showAddModal = () => { setEditingItem(null); form.resetFields(); setIsModalOpen(true); };
   const showEditModal = (item: WheelContent) => {
@@ -103,19 +117,38 @@ export default function CategoryDetailPage() {
                 {getCategoryIcon(category.name, category.slug)}
               </div>
               <div>
-                <h1 className="text-lg font-black text-slate-800">{category.name}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-black text-slate-800">{category.name}</h1>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                    isDefault
+                      ? 'bg-amber-50 text-amber-600'
+                      : isOwner
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'bg-emerald-50 text-emerald-600'
+                  }`}>
+                    {isDefault ? (
+                      <><CrownOutlined className="text-[8px]" /> Mặc định</>
+                    ) : isOwner ? (
+                      <><LockOutlined className="text-[8px]" /> Của tôi</>
+                    ) : (
+                      <><GlobalOutlined className="text-[8px]" /> Công khai</>
+                    )}
+                  </span>
+                </div>
                 <p className="text-xs text-slate-400 font-medium">{items.length} lựa chọn</p>
               </div>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button
-              icon={<PlusOutlined />}
-              onClick={showAddModal}
-              className="!rounded-full !font-semibold"
-            >
-              Thêm
-            </Button>
+            {canEdit && (
+              <Button
+                icon={<PlusOutlined />}
+                onClick={showAddModal}
+                className="!rounded-full !font-semibold"
+              >
+                Thêm
+              </Button>
+            )}
             <Button
               type="primary"
               icon={<PlayCircleOutlined />}
@@ -129,6 +162,16 @@ export default function CategoryDetailPage() {
         </div>
       </div>
 
+      {/* Thông báo nếu không phải danh mục của mình */}
+      {!isOwner && (
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-2.5 text-xs text-amber-700 flex items-center gap-2 mb-4">
+            <GlobalOutlined />
+            Đây là danh mục {isDefault ? 'mặc định' : 'công khai'} — bạn có thể sử dụng để quay nhưng không thể chỉnh sửa.
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {category.description && (
@@ -139,16 +182,17 @@ export default function CategoryDetailPage() {
           <div className="text-center py-16">
             <div className="text-6xl mb-4 text-slate-300"><AppstoreOutlined /></div>
             <h3 className="text-lg font-bold text-slate-700 mb-2">Chưa có lựa chọn nào</h3>
-            <p className="text-slate-500 text-sm mb-6">Thêm ít nhất 2 lựa chọn để bắt đầu quay</p>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={showAddModal}
-              size="large"
-              className="!rounded-full !font-bold !bg-red-500 !border-red-500 hover:!bg-red-600"
-            >
-              Thêm lựa chọn đầu tiên
-            </Button>
+            <p className="text-slate-500 text-sm mb-6">
+              {canEdit ? 'Thêm ít nhất 2 lựa chọn để bắt đầu quay' : 'Danh mục này chưa có lựa chọn'}
+            </p>
+            {canEdit && (
+              <Button
+                type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large"
+                className="!rounded-full !font-bold !bg-red-500 !border-red-500 hover:!bg-red-600"
+              >
+                Thêm lựa chọn đầu tiên
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-3 list-stagger">
@@ -168,18 +212,16 @@ export default function CategoryDetailPage() {
                   <span className="text-xs font-bold text-red-500 bg-red-50 rounded-full px-3 py-1">
                     x{item.weight}
                   </span>
-                  <button
-                    onClick={() => showEditModal(item)}
-                    className="btn-action btn-action-edit"
-                  >
-                    <EditOutlined className="text-[10px]" /> Sửa
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="btn-action btn-action-delete"
-                  >
-                    <DeleteOutlined className="text-[10px]" /> Xóa
-                  </button>
+                  {canEdit && (
+                    <>
+                      <button onClick={() => showEditModal(item)} className="btn-action btn-action-edit">
+                        <EditOutlined className="text-[10px]" /> Sửa
+                      </button>
+                      <button onClick={() => handleDelete(item._id)} className="btn-action btn-action-delete">
+                        <DeleteOutlined className="text-[10px]" /> Xóa
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -187,33 +229,35 @@ export default function CategoryDetailPage() {
         )}
       </div>
 
-      {/* Modal */}
-      <Modal
-        title={editingItem ? "Sửa lựa chọn" : "Thêm lựa chọn mới"}
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onOk={() => form.submit()}
-        confirmLoading={submitting}
-        okText={editingItem ? "Cập nhật" : "Thêm"}
-        cancelText="Hủy"
-        centered
-        width={440}
-      >
-        <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ weight: 1, color: "#E53E3E" }} className="mt-4">
-          <Form.Item name="label" label="Tên lựa chọn" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
-            <Input placeholder="Ví dụ: Ăn phở" size="large" className="!rounded-lg" />
-          </Form.Item>
-          <Form.Item name="description" label="Mô tả (tùy chọn)">
-            <Input.TextArea rows={2} placeholder="Mô tả ngắn..." className="!rounded-lg" />
-          </Form.Item>
-          <Form.Item name="color" label="Màu sắc trên vòng quay">
-            <ColorPicker showText />
-          </Form.Item>
-          <Form.Item name="weight" label="Trọng số (xác suất)" tooltip="Trọng số càng cao, xác suất được chọn càng lớn" rules={[{ required: true }]}>
-            <InputNumber min={1} max={10} style={{ width: "100%" }} size="large" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {/* Modal - chỉ hiện khi có quyền edit */}
+      {canEdit && (
+        <Modal
+          title={editingItem ? "Sửa lựa chọn" : "Thêm lựa chọn mới"}
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          onOk={() => form.submit()}
+          confirmLoading={submitting}
+          okText={editingItem ? "Cập nhật" : "Thêm"}
+          cancelText="Hủy"
+          centered
+          width={440}
+        >
+          <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ weight: 1, color: "#E53E3E" }} className="mt-4">
+            <Form.Item name="label" label="Tên lựa chọn" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
+              <Input placeholder="Ví dụ: Ăn phở" size="large" className="!rounded-lg" />
+            </Form.Item>
+            <Form.Item name="description" label="Mô tả (tùy chọn)">
+              <Input.TextArea rows={2} placeholder="Mô tả ngắn..." className="!rounded-lg" />
+            </Form.Item>
+            <Form.Item name="color" label="Màu sắc trên vòng quay">
+              <ColorPicker showText />
+            </Form.Item>
+            <Form.Item name="weight" label="Trọng số (xác suất)" tooltip="Trọng số càng cao, xác suất được chọn càng lớn" rules={[{ required: true }]}>
+              <InputNumber min={1} max={10} style={{ width: "100%" }} size="large" />
+            </Form.Item>
+          </Form>
+        </Modal>
+      )}
     </div>}
     </>
   );

@@ -39,9 +39,18 @@ export default function SplashScreen({ ready }: SplashScreenProps) {
   const [visible, setVisible] = useState(true);
   const [fading, setFading] = useState(false);
   const mountTime = useRef(Date.now());
-  const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
-  const [tip] = useState(() => TIPS[Math.floor(Math.random() * TIPS.length)]);
+  // Use fixed index for SSR, randomize after mount to avoid hydration mismatch
+  const [quoteIdx, setQuoteIdx] = useState(0);
+  const [tipIdx, setTipIdx] = useState(0);
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    setQuoteIdx(Math.floor(Math.random() * QUOTES.length));
+    setTipIdx(Math.floor(Math.random() * TIPS.length));
+  }, []);
+
+  const quote = QUOTES[quoteIdx];
+  const tip = TIPS[tipIdx];
 
   // Progress bar animation (0 → 90% in 2s, then jump to 100% when ready)
   useEffect(() => {

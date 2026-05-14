@@ -31,7 +31,7 @@ export default function RegisterPage() {
         token,
         user: {
           _id: user._id, name: user.name, email: user.email,
-          role: user.role || 'viewer', isActive: true, permissions: [],
+          role: user.role || 'editor', isActive: true, permissions: [],
           createdAt: (user as any).createdAt,
         },
       });

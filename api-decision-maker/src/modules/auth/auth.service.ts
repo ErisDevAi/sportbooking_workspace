@@ -34,7 +34,7 @@ export const authService: {
       throw new AppError("Email already registered", 409);
     }
     const password = await hashPassword(dto.password);
-    const user = await User.create({ ...dto, password, role: "viewer" });
+    const user = await User.create({ ...dto, password, role: "editor" });
 
     const permissions = await getRolePermissions(user.role);
     const token = signToken({ userId: String(user._id), email: user.email, role: user.role, permissions });

@@ -130,6 +130,16 @@ function SpinPage() {
   const selectedCategoryInfo = categories.find((c) => c._id === selectedCategory);
   const currentStreak = streaks.find((s) => s.categoryId?._id === selectedCategory);
 
+  // Kiểm tra user có sở hữu danh mục đang chọn không
+  const isOwnCategory = (() => {
+    if (!selectedCategoryInfo || !user) return false;
+    const ownerId = typeof selectedCategoryInfo.createdBy === 'object'
+      ? (selectedCategoryInfo.createdBy as any)?._id
+      : selectedCategoryInfo.createdBy;
+    return ownerId === user._id;
+  })();
+  const isDefaultCategory = selectedCategoryInfo?.isDefault === true;
+
   // ─── Refresh data helpers ─────────────────────────────
   const refreshStreaksAndHistory = async () => {
     try {
@@ -165,7 +175,7 @@ function SpinPage() {
     const hexColor = typeof values.color === 'string' ? values.color : values.color?.toHexString() || '#E53E3E';
     try {
       setCatSubmitting(true);
-      const res = await categoriesApi.create({ ...values, color: hexColor });
+      const res = await categoriesApi.create({ ...values, color: hexColor, isPublic: false });
       const newCat = res.data.data;
       setCategories((prev) => [...prev, newCat]);
       setSelectedCategory(newCat._id);
@@ -410,7 +420,27 @@ function SpinPage() {
                 <Button size="small" icon={<PlusOutlined />} onClick={() => { catForm.resetFields(); setShowCatModal(true); }} className="!text-xs !rounded-lg" data-tour="create-category">Tạo mới</Button>
               </div>
               <Select placeholder="Chọn danh mục quyết định..." className="w-full" onChange={handleSelectCategory} size="large" value={selectedCategory || undefined}>
-                {categories.map((cat) => (<Select.Option key={cat._id} value={cat._id}>{getCategoryIcon(cat.name, cat.slug)} {cat.name}</Select.Option>))}
+                {(() => {
+                  const publicCats = categories.filter((c) => c.isDefault || (c.isPublic && (typeof c.createdBy === 'object' ? (c.createdBy as any)?._id : c.createdBy) !== user?._id));
+                  const myCats = categories.filter((c) => {
+                    const oid = typeof c.createdBy === 'object' ? (c.createdBy as any)?._id : c.createdBy;
+                    return oid === user?._id;
+                  });
+                  return (
+                    <>
+                      {publicCats.length > 0 && (
+                        <Select.OptGroup label="Công khai">
+                          {publicCats.map((cat) => (<Select.Option key={cat._id} value={cat._id}>{getCategoryIcon(cat.name, cat.slug)} {cat.name}</Select.Option>))}
+                        </Select.OptGroup>
+                      )}
+                      {myCats.length > 0 && (
+                        <Select.OptGroup label="Của tôi">
+                          {myCats.map((cat) => (<Select.Option key={cat._id} value={cat._id}>{getCategoryIcon(cat.name, cat.slug)} {cat.name}</Select.Option>))}
+                        </Select.OptGroup>
+                      )}
+                    </>
+                  );
+                })()}
               </Select>
             </div>
 
@@ -420,7 +450,7 @@ function SpinPage() {
                 <h2 className="text-base font-bold text-slate-700">Danh sách lựa chọn</h2>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-red-500 bg-red-50 rounded-full px-3 py-1">{items.length} mục</span>
-                  {selectedCategory && (<Button size="small" icon={<PlusOutlined />} onClick={handleOpenAddItem} className="!text-xs">Thêm</Button>)}
+                  {selectedCategory && isOwnCategory && (<Button size="small" icon={<PlusOutlined />} onClick={handleOpenAddItem} className="!text-xs">Thêm</Button>)}
                 </div>
               </div>
               {loadingItems ? (<div className="flex justify-center py-8"><Spin /></div>)
@@ -437,8 +467,12 @@ function SpinPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-slate-400">x{item.weight}</span>
-                        <Button type="text" size="small" icon={<EditOutlined />} onClick={() => handleOpenEditItem(item)} className="!text-slate-300 hover:!text-blue-500 !p-0 !w-6 !h-6 !min-w-0" />
-                        <Button type="text" size="small" icon={<DeleteOutlined />} onClick={() => handleDeleteItem(item._id)} className="!text-slate-300 hover:!text-red-500 !p-0 !w-6 !h-6 !min-w-0" />
+                        {isOwnCategory && (
+                          <>
+                            <Button type="text" size="small" icon={<EditOutlined />} onClick={() => handleOpenEditItem(item)} className="!text-slate-300 hover:!text-blue-500 !p-0 !w-6 !h-6 !min-w-0" />
+                            <Button type="text" size="small" icon={<DeleteOutlined />} onClick={() => handleDeleteItem(item._id)} className="!text-slate-300 hover:!text-red-500 !p-0 !w-6 !h-6 !min-w-0" />
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -480,9 +514,27 @@ function SpinPage() {
 
           {/* RIGHT PANEL - Wheel */}
           <div className="flex flex-col items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm p-6" data-tour="wheel">
-            <p className="text-sm text-slate-400 mb-4 font-medium">
-              {selectedCategoryInfo ? <><span className="inline-flex mr-1">{getCategoryIcon(selectedCategoryInfo.name, selectedCategoryInfo.slug)}</span> {selectedCategoryInfo.name}</> : 'Bước 2: Nhấn QUAY'}
-            </p>
+            <div className="flex items-center gap-2 mb-4">
+              {selectedCategoryInfo ? (
+                <>
+                  <p className="text-sm text-slate-400 font-medium">
+                    <span className="inline-flex mr-1">{getCategoryIcon(selectedCategoryInfo.name, selectedCategoryInfo.slug)}</span> {selectedCategoryInfo.name}
+                  </p>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    isOwnCategory
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'bg-amber-50 text-amber-600'
+                  }`}>
+                    {isOwnCategory ? 'Của tôi' : 'Công khai'}
+                  </span>
+                  {!isOwnCategory && (
+                    <span className="text-[10px] text-slate-400">(chỉ xem)</span>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-slate-400 font-medium">Bước 2: Nhấn QUAY</p>
+              )}
+            </div>
             <div className="relative mb-8 h-[280px] w-[280px] sm:h-[340px] sm:w-[340px]">
               {/* Outer ring glow */}
               <div className="absolute inset-[-12px] rounded-full bg-gradient-to-br from-red-200/30 to-orange-200/20 blur-xl" />
@@ -892,10 +944,13 @@ function SpinPage() {
 
       {/* ──────────── CREATE CATEGORY MODAL ──────────── */}
       <Modal title="Tạo danh mục mới" open={showCatModal} onCancel={() => setShowCatModal(false)} onOk={() => catForm.submit()} confirmLoading={catSubmitting} okText="Tạo mới" cancelText="Hủy" centered width={420}>
-        <Form form={catForm} layout="vertical" onFinish={handleCreateCategory} initialValues={{ isPublic: true, color: '#E53E3E' }} className="mt-4">
+        <Form form={catForm} layout="vertical" onFinish={handleCreateCategory} initialValues={{ color: '#E53E3E' }} className="mt-4">
           <Form.Item name="name" label="Tên danh mục" rules={[{ required: true, message: 'Vui lòng nhập tên' }]}><Input placeholder="Ví dụ: Ăn gì hôm nay" size="large" /></Form.Item>
           <Form.Item name="color" label="Màu sắc"><ColorPicker showText /></Form.Item>
           <Form.Item name="description" label="Mô tả"><Input.TextArea rows={2} placeholder="Mô tả ngắn gọn..." /></Form.Item>
+          <div className="rounded-xl bg-slate-50 border border-slate-100 px-4 py-2.5 text-xs text-slate-500 flex items-center gap-2">
+            <span>Danh mục sẽ ở chế độ <span className="font-bold text-slate-700">riêng tư</span> — chỉ bạn mới thấy.</span>
+          </div>
         </Form>
       </Modal>
 

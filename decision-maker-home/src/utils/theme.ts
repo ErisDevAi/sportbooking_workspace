@@ -1,5 +1,7 @@
 import type { ThemeConfig } from 'antd';
 
+export const antdWarning = { strict: false };
+
 export const antdTheme: ThemeConfig = {
   token: {
     colorPrimary: '#E53E3E',

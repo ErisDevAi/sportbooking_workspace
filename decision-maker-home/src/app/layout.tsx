@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ConfigProvider, App } from 'antd';
-import { antdTheme } from '@/utils/theme';
+import { antdTheme, antdWarning } from '@/utils/theme';
 import './globals.css';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://decisionmaker.humg.edu.vn';
@@ -125,7 +125,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         {/* JSON-LD Structured Data for SEO & AIO */}
@@ -210,9 +210,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <AntdRegistry>
-          <ConfigProvider theme={antdTheme}>
+          <ConfigProvider theme={antdTheme} warning={antdWarning}>
             <App>{children}</App>
           </ConfigProvider>
         </AntdRegistry>
