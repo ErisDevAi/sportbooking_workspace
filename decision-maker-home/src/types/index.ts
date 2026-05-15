@@ -2,6 +2,7 @@ export type { User } from './user';
 export type { Category } from './category';
 export type { WheelContent } from './wheel-contents';
 export type { SpinHistory, Streak, SpinStats } from './spin-histories';
+export type { UserStreak, Badge } from './user-streak';
 
 export interface ApiResponse<T> {
   success: boolean;

@@ -7,6 +7,10 @@ import {
   AppstoreOutlined,
   PieChartOutlined,
   TeamOutlined,
+  FireOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  DatabaseOutlined,
 } from '@ant-design/icons';
 import { dashboardApi } from '@/api/dashboard';
 
@@ -18,8 +22,20 @@ interface DashboardData {
     permissions: number;
     categories: number;
     spins: number;
+    wheelContents?: number;
+    backups?: number;
+    streaks?: number;
+    completedDecisions?: number;
+    pendingDecisions?: number;
   };
   usersByRole: { role: string; count: number }[];
+  topStreaks?: Array<{
+    user: { _id: string; name: string; email: string };
+    currentStreak: number;
+    longestStreak: number;
+    level: number;
+    totalCheckins: number;
+  }>;
   system: {
     status: string;
     version: string;
@@ -60,8 +76,8 @@ export default function DashboardPage() {
       title: 'Tổng người dùng',
       value: data?.totals.users || 0,
       icon: <UserOutlined />,
-      color: '#7C3AED',
-      bgColor: '#F3E8FF',
+      color: '#E53E3E',
+      bgColor: '#FFF5F5',
     },
     {
       title: 'Đang hoạt động',
@@ -84,18 +100,46 @@ export default function DashboardPage() {
       color: '#DC2626',
       bgColor: '#FEF2F2',
     },
+    {
+      title: 'Hoàn thành',
+      value: data?.totals.completedDecisions || 0,
+      icon: <CheckCircleOutlined />,
+      color: '#16A34A',
+      bgColor: '#F0FDF4',
+    },
+    {
+      title: 'Đang chờ',
+      value: data?.totals.pendingDecisions || 0,
+      icon: <ClockCircleOutlined />,
+      color: '#F59E0B',
+      bgColor: '#FFFBEB',
+    },
+    {
+      title: 'Streaks',
+      value: data?.totals.streaks || 0,
+      icon: <FireOutlined />,
+      color: '#EA580C',
+      bgColor: '#FFF7ED',
+    },
+    {
+      title: 'Sao lưu',
+      value: data?.totals.backups || 0,
+      icon: <DatabaseOutlined />,
+      color: '#7C3AED',
+      bgColor: '#F5F3FF',
+    },
   ];
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">Tổng quan hệ thống</h1>
+        <h1 className="text-xl font-bold text-slate-800">Tổng quan hệ thống</h1>
         <p className="text-slate-500 text-sm mt-1">Thống kê tổng hợp về hệ thống Decision Maker</p>
       </div>
 
       <Row gutter={[20, 20]}>
         {statCards.map((card, index) => (
-          <Col xs={24} sm={12} lg={6} key={index}>
+          <Col xs={12} sm={8} lg={6} key={index}>
             <div className="rounded-xl border border-slate-100 p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div>
@@ -114,8 +158,9 @@ export default function DashboardPage() {
         ))}
       </Row>
 
-      {/* Users by Role */}
+      {/* Bottom sections */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Users by Role */}
         <div className="rounded-xl border border-slate-100 p-6">
           <h3 className="font-bold text-slate-800 mb-4">Phân bổ vai trò</h3>
           <div className="space-y-3">
@@ -130,29 +175,60 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Top Streaks */}
         <div className="rounded-xl border border-slate-100 p-6">
-          <h3 className="font-bold text-slate-800 mb-4">Thông tin hệ thống</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Trạng thái</span>
-              <span className="font-semibold text-green-600">
-                {data?.system.status === 'healthy' ? 'Hoạt động' : 'Lỗi'}
-              </span>
+          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <FireOutlined className="text-orange-500" /> Top Streaks
+          </h3>
+          {data?.topStreaks && data.topStreaks.length > 0 ? (
+            <div className="space-y-3">
+              {data.topStreaks.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white ${
+                      i === 0 ? 'bg-yellow-500' : i === 1 ? 'bg-slate-400' : 'bg-amber-700'
+                    }`}>{i + 1}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{entry.user?.name || 'User'}</p>
+                      <p className="text-[11px] text-slate-400">Level {entry.level}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="font-bold text-orange-500">{entry.longestStreak} streak</span>
+                    <span className="text-slate-400">{entry.totalCheckins} check-in</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Phiên bản</span>
-              <span className="font-semibold text-slate-700">{data?.system.version}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Node.js</span>
-              <span className="font-semibold text-slate-700">{data?.system.nodeVersion}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-500">Uptime</span>
-              <span className="font-semibold text-slate-700">
-                {Math.floor((data?.system.uptime || 0) / 60)} phút
-              </span>
-            </div>
+          ) : (
+            <p className="text-sm text-slate-400">Chưa có dữ liệu streak</p>
+          )}
+        </div>
+      </div>
+
+      {/* System Info */}
+      <div className="mt-6 rounded-xl border border-slate-100 p-6">
+        <h3 className="font-bold text-slate-800 mb-4">Thông tin hệ thống</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-sm">
+            <span className="text-slate-500 block">Trạng thái</span>
+            <span className="font-semibold text-green-600">
+              {data?.system.status === 'healthy' ? 'Hoạt động' : 'Lỗi'}
+            </span>
+          </div>
+          <div className="text-sm">
+            <span className="text-slate-500 block">Phiên bản</span>
+            <span className="font-semibold text-slate-700">{data?.system.version}</span>
+          </div>
+          <div className="text-sm">
+            <span className="text-slate-500 block">Node.js</span>
+            <span className="font-semibold text-slate-700">{data?.system.nodeVersion}</span>
+          </div>
+          <div className="text-sm">
+            <span className="text-slate-500 block">Uptime</span>
+            <span className="font-semibold text-slate-700">
+              {Math.floor((data?.system.uptime || 0) / 60)} phút
+            </span>
           </div>
         </div>
       </div>

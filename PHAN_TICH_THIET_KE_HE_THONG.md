@@ -2984,3 +2984,82 @@ FUNCTION checkBadges(streak, userId):
 
     RETURN newBadges
 ```
+
+---
+
+## 7. TÍNH NĂNG BỔ SUNG
+
+### 7.1 Tour Guide (Hướng dẫn sử dụng)
+
+#### Mô tả
+
+Hệ thống Tour Guide cung cấp hướng dẫn sử dụng từng bước cho người dùng mới. Tour tự động hiển thị khi người dùng truy cập trang lần đầu tiên và có thể được kích hoạt lại bất kỳ lúc nào qua nút "?" ở góc phải dưới màn hình.
+
+#### Công nghệ
+
+- Sử dụng thư viện `react-joyride` v3
+- Lưu trạng thái đã xem tour vào `localStorage`
+- Hỗ trợ nhiều trang: Trang chủ, Vòng quay, Danh mục, Thống kê
+
+#### Các bước Tour (Trang Vòng quay - chính)
+
+| Bước | Target | Nội dung |
+|------|--------|----------|
+| 1 | Toàn trang | Chào mừng, giới thiệu tổng quan |
+| 2 | Category Select | Hướng dẫn chọn danh mục |
+| 3 | Create Category | Hướng dẫn tạo danh mục mới |
+| 4 | Item List | Hướng dẫn quản lý lựa chọn |
+| 5 | Wheel | Giới thiệu vòng quay |
+| 6 | Spin Button | Hướng dẫn nhấn quay |
+| 7 | History | Giới thiệu lịch sử và đánh giá |
+| 8 | Toàn trang | Hoàn thành, bắt đầu sử dụng |
+
+#### Yêu cầu kỹ thuật
+
+- FR-TG1: Hiển thị tour tự động cho người dùng mới (chưa từng xem)
+- FR-TG2: Cho phép bỏ qua tour bất kỳ lúc nào
+- FR-TG3: Cho phép kích hoạt lại tour qua nút "?"
+- FR-TG4: Lưu trạng thái đã xem tour theo từng trang
+- FR-TG5: Highlight phần tử đang được hướng dẫn
+
+### 7.2 Re-spin (Quay lại)
+
+#### Mô tả
+
+Sau khi nhận kết quả quay, người dùng có thể chọn quay lại nếu không hài lòng. Giới hạn tối đa 2 lần re-spin mỗi phiên.
+
+#### Luồng
+
+1. Người dùng nhận kết quả quay
+2. Chọn "Quay lại" thay vì "Chấp nhận"
+3. Hệ thống kiểm tra số lần re-spin còn lại
+4. Nếu còn lượt: thực hiện quay mới
+5. Nếu hết lượt: hiển thị thông báo "Đã hết lượt quay lại"
+
+#### Yêu cầu
+
+- FR-RS1: Giới hạn tối đa 2 lần re-spin mỗi phiên
+- FR-RS2: Hiển thị số lượt re-spin còn lại
+- FR-RS3: Reset số lượt khi người dùng chấp nhận kết quả
+
+### 7.3 Thống nhất UI/UX
+
+#### Quy chuẩn Button
+
+| Loại | Class CSS | Mô tả |
+|------|-----------|-------|
+| Primary | `.btn-primary` / `.ant-btn-primary` | Nút hành động chính (đỏ #E53E3E) |
+| Ghost | `.btn-ghost` | Nút phụ, viền xám |
+| Action Edit | `.btn-action .btn-action-edit` | Nút sửa nhỏ (xanh dương) |
+| Action Delete | `.btn-action .btn-action-delete` | Nút xóa nhỏ (đỏ) |
+| Action Success | `.btn-action .btn-action-success` | Nút xác nhận nhỏ (xanh lá) |
+| Filter | `.btn-filter` | Nút lọc dạng pill |
+| Filter Active | `.btn-filter.active` | Nút lọc đang active |
+
+#### Quy chuẩn chung
+
+- Tất cả phần tử tương tác đều có `cursor: pointer`
+- Ant Design buttons có `border-radius: 12px` thống nhất
+- Primary color: `#E53E3E` (đỏ) áp dụng toàn hệ thống
+- Hiệu ứng hover: `translateY(-1px)` + `box-shadow` tăng
+- Hiệu ứng active: `scale(0.97)` cho feedback nhấn

@@ -21,6 +21,7 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import { wheelContentsApi } from '@/api/wheel-contents';
 import { categoriesApi } from '@/api/categories';
@@ -105,7 +106,7 @@ export default function WheelContentsPage() {
     const hexColor =
       typeof values.color === 'string'
         ? values.color
-        : values.color?.toHexString() || '#7C3AED';
+        : values.color?.toHexString() || '#E53E3E';
 
     const formData = new FormData();
     formData.append('label', values.label);
@@ -165,7 +166,7 @@ export default function WheelContentsPage() {
       key: 'weight',
       width: 100,
       render: (weight: number) => (
-        <Tag color="purple" className="!font-bold">x{weight}</Tag>
+        <Tag color="red" className="!font-bold">x{weight}</Tag>
       ),
     },
     {
@@ -229,7 +230,7 @@ export default function WheelContentsPage() {
           >
             {categories.map((cat) => (
               <Select.Option key={cat._id} value={cat._id}>
-                {cat.icon} {cat.name}
+                <AppstoreOutlined /> {cat.name}
               </Select.Option>
             ))}
           </Select>
@@ -311,7 +312,7 @@ export default function WheelContentsPage() {
             <Select size="large">
               {categories.map((cat) => (
                 <Select.Option key={cat._id} value={cat._id}>
-                  {cat.icon} {cat.name}
+                  <AppstoreOutlined /> {cat.name}
                 </Select.Option>
               ))}
             </Select>

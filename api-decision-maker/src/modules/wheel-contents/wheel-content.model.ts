@@ -7,6 +7,18 @@
 
 import mongoose, { Document, Schema, Types } from "mongoose";
 
+export interface IWheelContentLocation {
+  lat?: number;
+  lng?: number;
+  address?: string;
+}
+
+export interface IWheelContentMetadata {
+  priceRange?: number; // 1-5
+  rating?: number;     // 1-5
+  url?: string;
+}
+
 export interface IWheelContent extends Document {
   label: string;
   description: string;
@@ -16,6 +28,12 @@ export interface IWheelContent extends Document {
   categoryId: Types.ObjectId;
   createdBy: Types.ObjectId;
   isActive: boolean;
+  timesSelected: number;   // how many times this choice was selected
+  timesCompleted: number;  // how many times this choice was completed (verified)
+  lastSelectedAt: Date | null; // when it was last selected
+  tags: string[];
+  location: IWheelContentLocation;
+  metadata: IWheelContentMetadata;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +48,20 @@ const WheelContentSchema = new Schema<IWheelContent>(
     categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     isActive: { type: Boolean, default: true },
+    timesSelected: { type: Number, default: 0, min: 0 },
+    timesCompleted: { type: Number, default: 0, min: 0 },
+    lastSelectedAt: { type: Date, default: null },
+    tags: { type: [String], default: [] },
+    location: {
+      lat: { type: Number, min: -90, max: 90 },
+      lng: { type: Number, min: -180, max: 180 },
+      address: { type: String, maxlength: 500 },
+    },
+    metadata: {
+      priceRange: { type: Number, min: 1, max: 5 },
+      rating: { type: Number, min: 1, max: 5 },
+      url: { type: String },
+    },
   },
   {
     timestamps: true,
