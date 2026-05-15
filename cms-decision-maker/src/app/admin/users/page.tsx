@@ -137,7 +137,7 @@ export default function UsersPage() {
       key: 'user',
       render: (_: any, record: User) => (
         <div className="flex items-center gap-3">
-          <Avatar className="bg-purple-100 text-purple-600" icon={<UserOutlined />}>
+          <Avatar className="bg-red-100 text-red-500" icon={<UserOutlined />}>
             {record.name.charAt(0).toUpperCase()}
           </Avatar>
           <div>

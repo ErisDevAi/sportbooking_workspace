@@ -1,9 +1,11 @@
 import type { ThemeConfig } from 'antd';
 
+export const antdWarning = { strict: false };
+
 export const antdTheme: ThemeConfig = {
   token: {
-    colorPrimary: '#7C3AED',
-    colorInfo: '#7C3AED',
+    colorPrimary: '#E53E3E',
+    colorInfo: '#E53E3E',
     colorSuccess: '#10B981',
     colorWarning: '#F59E0B',
     colorError: '#EF4444',
@@ -11,7 +13,7 @@ export const antdTheme: ThemeConfig = {
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: 14,
     colorBgContainer: '#ffffff',
-    colorBgLayout: '#F8FAFC',
+    colorBgLayout: '#FAFAFA',
   },
   components: {
     Button: {
@@ -28,18 +30,18 @@ export const antdTheme: ThemeConfig = {
       borderRadiusLG: 12,
     },
     Table: {
-      headerBg: '#F8FAFC',
+      headerBg: '#FAFAFA',
       headerColor: '#64748B',
       fontSize: 14,
     },
     Layout: {
       headerBg: '#ffffff',
       headerHeight: 64,
-      siderBg: '#1e1b4b',
+      siderBg: '#1a1a2e',
     },
     Menu: {
       darkItemBg: 'transparent',
-      darkItemSelectedBg: 'rgba(124, 58, 237, 0.2)',
+      darkItemSelectedBg: 'rgba(229, 62, 62, 0.2)',
       darkItemHoverBg: 'rgba(255, 255, 255, 0.05)',
     },
   },

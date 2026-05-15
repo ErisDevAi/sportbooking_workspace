@@ -9,6 +9,7 @@ import {
   MenuUnfoldOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
+import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useUIStore } from '@/store/ui';
@@ -16,8 +17,8 @@ import { useUIStore } from '@/store/ui';
 const { Header, Sider, Content } = Layout;
 
 const menuItems = [
-  { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
-  { key: '/users', icon: <UserOutlined />, label: 'Users' },
+  { key: '/dashboard', icon: <DashboardOutlined />, label: 'Tổng quan' },
+  { key: '/users', icon: <UserOutlined />, label: 'Người dùng' },
 ];
 
 export default function DashboardLayout({
@@ -33,7 +34,7 @@ export default function DashboardLayout({
   const handleMenuClick = ({ key }: { key: string }) => {
     if (key === 'logout') {
       logout();
-      router.push('/login');
+      router.replace('/login');
     } else {
       router.push(key);
     }
@@ -85,7 +86,9 @@ export default function DashboardLayout({
             {sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </button>
           <div className="ml-auto flex items-center gap-4">
-            <span className="text-gray-600">Welcome back</span>
+            <Link href="/" className="text-sm text-gray-500 hover:text-red-500 transition-colors">
+              Về trang chủ
+            </Link>
           </div>
         </Header>
 

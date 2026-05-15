@@ -16,7 +16,7 @@ export interface LoginDto    { email: string; password: string; }
 
 export interface AuthResult {
   token: string;
-  user: { id: string; name: string; email: string; role: string };
+  user: { id: string; name: string; email: string; role: string; createdAt: Date };
 }
 
 async function getRolePermissions(roleName: string): Promise<string[]> {
@@ -34,12 +34,12 @@ export const authService: {
       throw new AppError("Email already registered", 409);
     }
     const password = await hashPassword(dto.password);
-    const user = await User.create({ ...dto, password, role: "viewer" });
+    const user = await User.create({ ...dto, password, role: "editor" });
 
     const permissions = await getRolePermissions(user.role);
     const token = signToken({ userId: String(user._id), email: user.email, role: user.role, permissions });
 
-    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role } };
+    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } };
   },
 
   async login(dto: LoginDto): Promise<AuthResult> {
@@ -53,7 +53,7 @@ export const authService: {
     const permissions = await getRolePermissions(user.role);
     const token = signToken({ userId: String(user._id), email: user.email, role: user.role, permissions });
 
-    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role } };
+    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } };
   },
 
   async me(userId: string) {

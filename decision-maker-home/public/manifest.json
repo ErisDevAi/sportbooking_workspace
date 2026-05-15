@@ -1,0 +1,18 @@
+{
+  "name": "Decision Maker - Hỗ trợ ra quyết định hàng ngày",
+  "short_name": "Decision Maker",
+  "description": "Ứng dụng vòng quay quyết định thông minh. Ăn gì hôm nay? Làm gì bây giờ? Quay và hành động ngay!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#E53E3E",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["productivity", "utilities"]
+}

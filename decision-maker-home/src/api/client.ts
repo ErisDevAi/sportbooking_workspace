@@ -25,7 +25,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        const currentPath = window.location.pathname;
+        window.location.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
       }
     }
     return Promise.reject(error);
