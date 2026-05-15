@@ -23,11 +23,13 @@ export interface LoginDto {
 
 export interface AuthResult {
   token: string;
-<<<<<<< HEAD
-  user: { _id: string; name: string; email: string; role: string };
-=======
-  user: { id: string; name: string; email: string; role: string; createdAt: Date };
->>>>>>> 840d60e23d6aec37ac646c3c0366ebde393c0ac5
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: Date;
+  };
 }
 
 async function getRolePermissions(roleName: string): Promise<string[]> {
@@ -55,19 +57,16 @@ export const authService: {
       permissions,
     });
 
-<<<<<<< HEAD
     return {
       token,
       user: {
-        _id: String(user._id),
+        id: String(user._id),
         name: user.name,
         email: user.email,
         role: user.role,
+        createdAt: user.createdAt,
       },
     };
-=======
-    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } };
->>>>>>> 840d60e23d6aec37ac646c3c0366ebde393c0ac5
   },
 
   async login(dto: LoginDto): Promise<AuthResult> {
@@ -86,19 +85,16 @@ export const authService: {
       permissions,
     });
 
-<<<<<<< HEAD
     return {
       token,
       user: {
-        _id: String(user._id),
+        id: String(user._id),
         name: user.name,
         email: user.email,
         role: user.role,
+        createdAt: user.createdAt,
       },
     };
-=======
-    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } };
->>>>>>> 840d60e23d6aec37ac646c3c0366ebde393c0ac5
   },
 
   async me(userId: string) {
