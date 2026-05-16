@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, Suspense } from 'react';
-import { Form, Input, Button, App } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { useAuthStore } from '@/store/auth';
-import SplashScreen from '@/components/SplashScreen';
+import { useEffect, Suspense } from "react";
+import { Form, Input, Button, App } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useAuthStore } from "@/store/auth";
+import SplashScreen from "@/components/SplashScreen";
 
 interface LoginForm {
   email: string;
@@ -24,7 +24,7 @@ export default function LoginPageWrapper() {
 function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/wheels';
+  const redirectTo = searchParams.get("redirect") || "/wheels";
   const { message } = App.useApp();
   const login = useAuthStore((s) => s.login);
   const token = useAuthStore((s) => s.token);
@@ -39,10 +39,10 @@ function LoginPage() {
   const onFinish = async (values: LoginForm) => {
     try {
       await login(values.email, values.password);
-      message.success('Đăng nhập thành công');
+      message.success("Đăng nhập thành công");
       router.replace(redirectTo);
     } catch {
-      message.error('Sai email hoặc mật khẩu');
+      message.error("Sai email hoặc mật khẩu");
     }
   };
 
@@ -60,15 +60,51 @@ function LoginPage() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="9" stroke="white" strokeWidth="2" />
                 <circle cx="12" cy="12" r="3" fill="white" />
-                <line x1="12" y1="3" x2="12" y2="7" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                <line x1="12" y1="17" x2="12" y2="21" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                <line x1="3" y1="12" x2="7" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                <line x1="17" y1="12" x2="21" y2="12" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <line
+                  x1="12"
+                  y1="3"
+                  x2="12"
+                  y2="7"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="12"
+                  y1="17"
+                  x2="12"
+                  y2="21"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="3"
+                  y1="12"
+                  x2="7"
+                  y2="12"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="17"
+                  y1="12"
+                  x2="21"
+                  y2="12"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-xl font-black text-slate-800">Decision<span className="text-red-500">Maker</span></span>
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider">Smart Choices</span>
+              <span className="text-xl font-black text-slate-800">
+                Decision<span className="text-red-500">Maker</span>
+              </span>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider">
+                Smart Choices
+              </span>
             </div>
           </Link>
         </div>
@@ -76,40 +112,96 @@ function LoginPage() {
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 animate-scale-in delay-200">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-slate-800">Chào mừng trở lại!</h1>
-            <p className="text-slate-500 mt-1 text-sm">Đăng nhập để tiếp tục sử dụng</p>
+            <h1 className="text-2xl font-bold text-slate-800">
+              Chào mừng trở lại!
+            </h1>
+            <p className="text-slate-500 mt-1 text-sm">
+              Đăng nhập để tiếp tục sử dụng
+            </p>
+          </div>
+          <div className="mt-6 space-y-3">
+            {/* Button Google */}
+            <button
+              className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg py-2.5 hover:bg-gray-50 transition"
+              onClick={() => alert("Google login coming soon 🚀")}
+            >
+              <img
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="google"
+                className="w-5 h-5"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                Tiếp tục với Google
+              </span>
+            </button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-px bg-gray-200"></div>
+              <span className="text-xs text-gray-400">
+                hoặc đăng nhập bằng email
+              </span>
+              <div className="flex-1 h-px bg-gray-200"></div>
+            </div>
+
+            {/* Demo warning */}
+            <div className="text-red-500 text-xs text-center border border-red-200 rounded-md py-2 bg-red-50">
+              Google login coming soon. This is a demo.
+            </div>
           </div>
 
-          <Form form={form} layout="vertical" onFinish={onFinish} autoComplete="off" size="large">
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            autoComplete="off"
+            size="large"
+          >
             <Form.Item
               name="email"
               label="Email"
               rules={[
-                { required: true, message: 'Vui lòng nhập email' },
-                { type: 'email', message: 'Email không hợp lệ' },
+                { required: true, message: "Vui lòng nhập email" },
+                { type: "email", message: "Email không hợp lệ" },
               ]}
             >
-              <Input prefix={<UserOutlined className="text-slate-300" />} placeholder="your@email.com" className="!rounded-lg" />
+              <Input
+                prefix={<UserOutlined className="text-slate-300" />}
+                placeholder="your@email.com"
+                className="!rounded-lg"
+              />
             </Form.Item>
 
             <Form.Item
               name="password"
               label="Mật khẩu"
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
             >
-              <Input.Password prefix={<LockOutlined className="text-slate-300" />} placeholder="Nhập mật khẩu" className="!rounded-lg" />
+              <Input.Password
+                prefix={<LockOutlined className="text-slate-300" />}
+                placeholder="Nhập mật khẩu"
+                className="!rounded-lg"
+              />
             </Form.Item>
 
             <Form.Item className="mb-0">
-              <Button type="primary" htmlType="submit" block className="!h-12 !rounded-lg !font-bold !bg-red-500 !border-red-500 hover:!bg-red-600">
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                className="!h-12 !rounded-lg !font-bold !bg-red-500 !border-red-500 hover:!bg-red-600"
+              >
                 Đăng nhập
               </Button>
             </Form.Item>
           </Form>
 
           <div className="text-center mt-6 text-sm text-slate-500">
-            Chưa có tài khoản?{' '}
-            <Link href="/register" className="text-red-500 font-semibold hover:text-red-600">
+            Chưa có tài khoản?{" "}
+            <Link
+              href="/register"
+              className="text-red-500 font-semibold hover:text-red-600"
+            >
               Đăng ký miễn phí
             </Link>
           </div>

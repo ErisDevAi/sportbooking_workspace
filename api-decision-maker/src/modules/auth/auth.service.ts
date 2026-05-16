@@ -11,12 +11,25 @@ import { hashPassword, comparePassword } from "../../utils/hash";
 import { signToken } from "../../utils/jwt";
 import { AppError } from "../../middlewares/error.middleware";
 
-export interface RegisterDto { name: string; email: string; password: string; }
-export interface LoginDto    { email: string; password: string; }
+export interface RegisterDto {
+  name: string;
+  email: string;
+  password: string;
+}
+export interface LoginDto {
+  email: string;
+  password: string;
+}
 
 export interface AuthResult {
   token: string;
-  user: { id: string; name: string; email: string; role: string; createdAt: Date };
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: Date;
+  };
 }
 
 async function getRolePermissions(roleName: string): Promise<string[]> {
@@ -37,9 +50,23 @@ export const authService: {
     const user = await User.create({ ...dto, password, role: "editor" });
 
     const permissions = await getRolePermissions(user.role);
-    const token = signToken({ userId: String(user._id), email: user.email, role: user.role, permissions });
+    const token = signToken({
+      userId: String(user._id),
+      email: user.email,
+      role: user.role,
+      permissions,
+    });
 
-    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } };
+    return {
+      token,
+      user: {
+        id: String(user._id),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    };
   },
 
   async login(dto: LoginDto): Promise<AuthResult> {
@@ -51,9 +78,23 @@ export const authService: {
     if (!valid) throw new AppError("Invalid email or password", 401);
 
     const permissions = await getRolePermissions(user.role);
-    const token = signToken({ userId: String(user._id), email: user.email, role: user.role, permissions });
+    const token = signToken({
+      userId: String(user._id),
+      email: user.email,
+      role: user.role,
+      permissions,
+    });
 
-    return { token, user: { id: String(user._id), name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } };
+    return {
+      token,
+      user: {
+        id: String(user._id),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    };
   },
 
   async me(userId: string) {
