@@ -7,9 +7,12 @@ interface LoginRequest {
 
 interface AuthUser {
   _id: string;
+  id: string;
   name: string;
   email: string;
   role: string;
+  isActive: boolean;
+  permissions: string[];
 }
 
 interface ApiResponse<T> {

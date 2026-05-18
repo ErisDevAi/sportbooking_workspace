@@ -24,10 +24,13 @@ export interface LoginDto {
 export interface AuthResult {
   token: string;
   user: {
+    _id: string;
     id: string;
     name: string;
     email: string;
     role: string;
+    isActive: boolean;
+    permissions: string[];
     createdAt: Date;
   };
 }
@@ -60,10 +63,13 @@ export const authService: {
     return {
       token,
       user: {
+        _id: String(user._id),
         id: String(user._id),
         name: user.name,
         email: user.email,
         role: user.role,
+        isActive: user.isActive,
+        permissions,
         createdAt: user.createdAt,
       },
     };
@@ -88,10 +94,13 @@ export const authService: {
     return {
       token,
       user: {
+        _id: String(user._id),
         id: String(user._id),
         name: user.name,
         email: user.email,
         role: user.role,
+        isActive: user.isActive,
+        permissions,
         createdAt: user.createdAt,
       },
     };

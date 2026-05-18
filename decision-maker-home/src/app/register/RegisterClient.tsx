@@ -27,12 +27,17 @@ export default function RegisterPage() {
         password: values.password,
       });
       const { token, user } = res.data.data;
+      const u = user as any;
       useAuthStore.setState({
         token,
         user: {
-          _id: user._id, name: user.name, email: user.email,
-          role: user.role || 'editor', isActive: true, permissions: [],
-          createdAt: (user as any).createdAt,
+          _id: u._id || u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role || 'editor',
+          isActive: u.isActive ?? true,
+          permissions: u.permissions ?? [],
+          createdAt: u.createdAt,
         },
       });
       message.success('Đăng ký thành công!');
